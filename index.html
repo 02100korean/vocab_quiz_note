@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>다국어 한국어 어휘 학습 & 실전 퀴즈 플랫폼 v2.5</title>
+  <title>다국어 한국어 어휘 학습 & 실전 퀴즈 플랫폼 v2.7</title>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
   <!-- Google Fonts & Libraries -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -627,12 +628,12 @@
       width: 100%;
       border-collapse: collapse;
       text-align: left;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
     }
     .admin-table th {
       background: #f1f5f9;
       color: var(--primary);
-      padding: 0.7rem 0.8rem;
+      padding: 0.48rem 0.5rem;
       font-weight: 700;
       position: sticky;
       top: 0;
@@ -641,10 +642,28 @@
       z-index: 5;
     }
     .admin-table td {
-      padding: 0.65rem 0.8rem;
+      padding: 0.45rem 0.5rem;
       border-bottom: 1px solid var(--border);
       color: var(--text-main);
       white-space: nowrap;
+    }
+    .recent-profile-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: #eff6ff;
+      border: 1.5px solid #93c5fd;
+      color: #1e3a8a;
+      padding: 0.4rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .recent-profile-chip:hover {
+      background: #dbeafe;
+      transform: translateY(-1px);
     }
     .admin-table tr:hover { background: #f8fafc; }
 
@@ -687,7 +706,7 @@
       max-height: 94vh;
       overflow-y: auto;
     }
-    .modal-box.wide { max-width: 1060px; text-align: left; }
+    .modal-box.wide { max-width: 96vw; width: 1480px; text-align: left; }
 
     /* PPT Studio Styles */
     .ppt-theme-grid {
@@ -1283,27 +1302,46 @@
     </div>
   </div>
 
-  <!-- 1. Student Class & Name Entry Modal (No ID/Password required) -->
+  <!-- 1. Student Institution, Semester, Class & Name Entry Modal -->
   <div id="nameModal" class="modal-overlay">
-    <div class="modal-box">
-      <div style="font-size: 2.8rem; margin-bottom: 0.4rem;">👋</div>
-      <h2 style="font-size: 1.35rem; font-weight: 800; margin-bottom: 0.4rem; color: var(--primary);">환영합니다!</h2>
-      <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1.25rem; line-height: 1.5;">
-        한 학기 학습 기록 및 연속 학습(스트릭) 저장을 위해<br><strong>소속 급수(분반)</strong>와 <strong>이름</strong>을 입력해 주세요.<br>(최초 1회만 입력하면 한 학기 내내 자동 유지됩니다)
+    <div class="modal-box" style="max-width:500px;">
+      <div style="font-size: 2.5rem; margin-bottom: 0.35rem;">👋</div>
+      <h2 style="font-size: 1.35rem; font-weight: 800; margin-bottom: 0.35rem; color: var(--primary);">환영합니다!</h2>
+      <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem; line-height: 1.5;">
+        학습 기록 저장을 위해 <strong>기관명 · 학기 · 반 이름 · 본인 이름</strong>을 선택·입력해 주세요.<br>(한 번 접속한 이름은 아래 버튼으로 바로 재접속할 수 있습니다)
       </p>
-      <div style="text-align:left; margin-bottom:0.85rem;">
-        <label style="font-size:0.8rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.3rem;">소속 급수 (분반 선택)</label>
-        <select id="userClassSelect" style="width:100%; padding:0.75rem; font-size:1rem;">
-          <option value="용인대 1급">용인대 1급</option>
-          <option value="용인대 2급">용인대 2급</option>
-          <option value="용인대 3급">용인대 3급</option>
+
+      <div id="recentProfilesBox" style="display:none; background:#f8fafc; border:1px solid var(--border); border-radius:12px; padding:0.75rem; margin-bottom:1rem; text-align:left;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.45rem;">
+          <span style="font-size:0.78rem; font-weight:800; color:var(--primary);">⚡ 이 기기에서 접속했던 이름 (클릭 시 바로 접속)</span>
+          <button type="button" class="btn btn-outline btn-sm" style="padding:0.2rem 0.55rem; font-size:0.74rem;" onclick="prepareNewStudentRegistration()">+ 새 이름 등록</button>
+        </div>
+        <div id="recentProfilesList" style="display:flex; flex-wrap:wrap; gap:0.4rem;"></div>
+      </div>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.6rem; text-align:left; margin-bottom:0.75rem;">
+        <div>
+          <label style="font-size:0.78rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.25rem;">기관명</label>
+          <select id="userInstSelect" style="width:100%; padding:0.65rem; font-size:0.92rem;" onchange="onStudentInstSelectChange()"></select>
+        </div>
+        <div>
+          <label style="font-size:0.78rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.25rem;">학기</label>
+          <select id="userSemesterSelect" style="width:100%; padding:0.65rem; font-size:0.92rem;"></select>
+        </div>
+      </div>
+
+      <div style="text-align:left; margin-bottom:0.75rem;">
+        <label style="font-size:0.78rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.25rem;">반 이름 (소속 급수)</label>
+        <select id="userClassSelect" style="width:100%; padding:0.68rem; font-size:0.95rem;">
           <option value="용인대 4급" selected>용인대 4급</option>
         </select>
       </div>
-      <div style="text-align:left; margin-bottom:1.15rem;">
-        <label style="font-size:0.8rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.3rem;">학생 이름 (또는 닉네임)</label>
-        <input type="text" id="userNameInput" class="typing-input" placeholder="예: 홍길동" style="margin-bottom:0; font-size:1.05rem;" />
+
+      <div style="text-align:left; margin-bottom:1.1rem;">
+        <label style="font-size:0.78rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.25rem;">학생 이름</label>
+        <input type="text" id="userNameInput" class="typing-input" placeholder="예: 홍길동" style="margin-bottom:0; font-size:1.02rem; padding:0.75rem;" />
       </div>
+
       <button class="btn btn-primary" style="width: 100%; padding: 0.85rem;" onclick="saveUserProfileModal()">학습 시작하기</button>
     </div>
   </div>
@@ -1352,89 +1390,222 @@
       <!-- Admin Navigation Sub-tabs -->
       <div class="no-print" style="display:flex; gap:0.45rem; margin-bottom:1rem; border-bottom:1.5px solid var(--border); padding-bottom:0.55rem; flex-wrap:wrap;">
         <button id="tabBtnRecords" class="btn btn-primary btn-sm" onclick="switchAdminSubTab('records')">📋 학생 성적 & 오답 분석</button>
+        <button id="tabBtnStudents" class="btn btn-outline btn-sm" onclick="switchAdminSubTab('students')">👨‍🎓 반별 학생 명단 관리</button>
         <button id="tabBtnPptStudio" class="btn btn-outline btn-sm" onclick="switchAdminSubTab('pptStudio')">📽️ 수업용 PPT & 슬라이드쇼</button>
         <button id="tabBtnPrintSheet" class="btn btn-outline btn-sm" onclick="switchAdminSubTab('printSheet')">🖨️ 인쇄용 단어 시험지</button>
         <button id="tabBtnWorkbook" class="btn btn-outline btn-sm" style="display:none;" onclick="switchAdminSubTab('workbook')">📒 단어 자료집 & 쓰기 연습지 (최종관리자)</button>
         <button id="tabBtnBuilder" class="btn btn-outline btn-sm" style="display:none;" onclick="switchAdminSubTab('builder')">🤖 AI 번역 & JSON 제작기</button>
-        <button id="tabBtnTeachers" class="btn btn-outline btn-sm" style="display:none;" onclick="switchAdminSubTab('teachers')">👥 선생님 계정 & 급수 배정</button>
+        <button id="tabBtnTeachers" class="btn btn-outline btn-sm" style="display:none;" onclick="switchAdminSubTab('teachers')">👥 선생님 계정 & 기관·학기 관리</button>
       </div>
 
-      <!-- SUB-TAB 1: Student Records & Class Analytics -->
+      <!-- SUB-TAB 1: Student Records, Wrong Rate Analysis & Matrix Report -->
       <div id="adminViewRecords" class="no-print">
-        <div class="stat-summary-grid">
-          <div class="stat-card">
+        <div style="display:flex; gap:0.45rem; flex-wrap:wrap; margin-bottom:0.8rem;">
+          <button type="button" id="recModeBtnLog" class="btn btn-primary btn-sm" onclick="switchRecordAnalyticsMode('log')">📑 세션별 학습 기록</button>
+          <button type="button" id="recModeBtnWrong" class="btn btn-outline btn-sm" onclick="switchRecordAnalyticsMode('wrong')">🔥 단원·학생별 오답률 순위</button>
+          <button type="button" id="recModeBtnMatrix" class="btn btn-outline btn-sm" onclick="switchRecordAnalyticsMode('matrix')">📊 학생별·단원별 전체 학습 현황표</button>
+        </div>
+
+        <div class="stat-summary-grid" style="margin-bottom:0.75rem;">
+          <div class="stat-card" style="padding:0.65rem 0.9rem;">
             <h4>조회 기간 내 총 학습 세션</h4>
             <div class="stat-val" id="statTotalSessions">0건</div>
           </div>
-          <div class="stat-card">
+          <div class="stat-card" style="padding:0.65rem 0.9rem;">
             <h4>평균 정답률</h4>
             <div class="stat-val" id="statAvgAccuracy">0%</div>
           </div>
-          <div class="stat-card">
+          <div class="stat-card" style="padding:0.65rem 0.9rem;">
             <h4>참여 학생 수 (고유 식별)</h4>
             <div class="stat-val" id="statUniqueStudents">0명</div>
           </div>
         </div>
 
-        <div style="background:#f8fafc; border:1px solid var(--border); border-radius:12px; padding:0.85rem; margin-bottom:0.85rem; display:flex; flex-direction:column; gap:0.6rem;">
+        <div style="background:#f8fafc; border:1px solid var(--border); border-radius:12px; padding:0.75rem; margin-bottom:0.75rem; display:flex; flex-direction:column; gap:0.5rem;">
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
-            <span style="font-size:0.88rem; font-weight:800; color:var(--primary);">🔍 급수·기간·학생별 실시간 조회</span>
-            <div style="display:flex; gap:0.45rem; flex-wrap:wrap;">
+            <span style="font-size:0.86rem; font-weight:800; color:var(--primary);">🔍 학기·급수·단원·학생별 실시간 조회</span>
+            <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
               <button class="btn btn-outline btn-sm" onclick="resetAdminFilters()">필터 초기화</button>
               <button class="btn btn-outline btn-sm" onclick="loadAdminRecords()">🔄 새로고침</button>
-              <button id="btnExportCSV" class="btn btn-primary btn-sm" onclick="exportAdminDataCSV()">📥 엑셀(CSV) 다운로드</button>
+              <button id="btnExportCSV" class="btn btn-primary btn-sm" onclick="exportCurrentAnalyticsExcel()">📥 엑셀 다운로드</button>
             </div>
           </div>
-          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap:0.5rem;">
-            <select id="adminFilterPeriod" style="padding:0.45rem 0.65rem; font-size:0.83rem;" onchange="loadAdminRecords()">
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(135px, 1fr)); gap:0.45rem;">
+            <select id="adminFilterPeriod" style="padding:0.42rem 0.55rem; font-size:0.81rem;" onchange="loadAdminRecords()">
               <option value="30">최근 30일 기록</option>
               <option value="7">최근 7일 기록</option>
               <option value="180" selected>이번 학기 전체 (180일)</option>
+              <option value="3650">전체 기간</option>
             </select>
-            <select id="adminFilterClass" style="padding:0.45rem 0.65rem; font-size:0.83rem;" onchange="filterAdminTable()">
-              <option value="ALL">전체 급수 (용인대 1~4급)</option>
-              <option value="용인대 1급">용인대 1급</option>
-              <option value="용인대 2급">용인대 2급</option>
-              <option value="용인대 3급">용인대 3급</option>
-              <option value="용인대 4급">용인대 4급</option>
+            <select id="adminFilterSemester" style="padding:0.42rem 0.55rem; font-size:0.81rem;" onchange="onAdminAnalyticsFilterChange()">
+              <option value="ALL">전체 학기</option>
             </select>
-            <input type="text" id="adminSearchInput" placeholder="학생 이름 검색..." class="typing-input" style="padding:0.45rem 0.7rem; font-size:0.83rem; margin-bottom:0; text-align:left;" oninput="filterAdminTable()" />
-            <select id="adminFilterMode" style="padding:0.45rem 0.65rem; font-size:0.83rem;" onchange="filterAdminTable()">
+            <select id="adminFilterClass" style="padding:0.42rem 0.55rem; font-size:0.81rem;" onchange="onAdminAnalyticsFilterChange()">
+              <option value="ALL">전체 급수/수업</option>
+            </select>
+            <select id="adminFilterUnit" style="padding:0.42rem 0.55rem; font-size:0.81rem;" onchange="onAdminAnalyticsFilterChange()">
+              <option value="ALL">전체 단원</option>
+            </select>
+            <input type="text" id="adminSearchInput" placeholder="학생 이름 검색..." class="typing-input" style="padding:0.42rem 0.6rem; font-size:0.81rem; margin-bottom:0; text-align:left;" oninput="onAdminAnalyticsFilterChange()" />
+            <select id="adminFilterMode" style="padding:0.42rem 0.55rem; font-size:0.81rem;" onchange="onAdminAnalyticsFilterChange()">
               <option value="ALL">전체 모드</option>
               <option value="choice">🎯 4지선다 퀴즈</option>
               <option value="spelling">✍️ 단어 직접 쓰기</option>
               <option value="match">🧩 짝 맞추기</option>
             </select>
-            <select id="adminFilterScore" style="padding:0.45rem 0.65rem; font-size:0.83rem;" onchange="filterAdminTable()">
+            <select id="adminFilterScore" style="padding:0.42rem 0.55rem; font-size:0.81rem;" onchange="onAdminAnalyticsFilterChange()">
               <option value="ALL">정답률 전체</option>
               <option value="100">🏆 100% 만점만</option>
               <option value="80">✅ 80% 이상</option>
               <option value="under80">⚠️ 80% 미만 (보충 필요)</option>
             </select>
           </div>
-          <div style="font-size:0.78rem; color:var(--text-muted);">
-            조회 결과: <strong id="adminFilterCount" style="color:var(--primary);">0</strong>건
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; font-size:0.78rem; color:var(--text-muted);">
+            <span>조회 결과: <strong id="adminFilterCount" style="color:var(--primary);">0</strong>건</span>
+            <div id="recordBulkActionBar" style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
+              <span style="font-weight:700; color:var(--primary);">선택 <strong id="selectedRecordCountBadge">0</strong>건:</span>
+              <select id="bulkAssignClassSelect" style="width:155px; padding:0.28rem 0.45rem; font-size:0.78rem;"></select>
+              <button type="button" class="btn btn-outline btn-sm" style="padding:0.25rem 0.55rem; font-size:0.76rem;" onclick="bulkAssignRecordsClass()">소속 일괄 지정</button>
+              <button type="button" id="btnBulkDeleteRecords" class="btn btn-danger btn-sm" style="padding:0.25rem 0.55rem; font-size:0.76rem;" onclick="bulkDeleteSelectedRecords()">🗑️ 선택 일괄 삭제</button>
+            </div>
           </div>
         </div>
 
-        <div class="admin-table-container">
+        <div id="recSubViewLog" class="admin-table-container" style="max-height:420px;">
           <table class="admin-table">
             <thead>
               <tr>
+                <th style="width:28px; text-align:center;"><input type="checkbox" id="selectAllRecordsCb" onchange="toggleSelectAllRecords(this.checked)" /></th>
                 <th>완료 일시</th>
+                <th>학기</th>
                 <th>소속 급수</th>
                 <th>학생 이름</th>
-                <th>교재 / 단원</th>
-                <th>학습 모드</th>
+                <th>단원</th>
+                <th>모드</th>
                 <th>언어</th>
-                <th>정답 / 전체</th>
+                <th>정답/전체</th>
                 <th>정답률</th>
                 <th>스트릭</th>
                 <th id="adminDeleteColHeader" style="display:none;">삭제</th>
               </tr>
             </thead>
             <tbody id="adminTableBody">
-              <tr><td colspan="10" style="text-align:center; padding:2rem; color:var(--text-muted);">기록을 불러오는 중입니다...</td></tr>
+              <tr><td colspan="12" style="text-align:center; padding:2rem; color:var(--text-muted);">기록을 불러오는 중입니다...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div id="recSubViewWrong" style="display:none;">
+          <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:0.5rem;">
+            ※ 선택한 반·학기·단원·학생 범위 내에서 <strong>오답률(%)이 가장 높은 단어 순</strong>으로 자동 정렬됩니다. 상단의 <strong>[📥 엑셀 다운로드]</strong>를 누르면 현재 오답 순위표를 엑셀로 저장합니다.
+          </div>
+          <div class="admin-table-container" style="max-height:420px;">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th style="width:48px;">순위</th>
+                  <th>단원</th>
+                  <th>소단원</th>
+                  <th>한국어 단어</th>
+                  <th>영어 뜻</th>
+                  <th>출제 횟수</th>
+                  <th>오답 횟수</th>
+                  <th>오답률</th>
+                  <th>주요 오답 학생</th>
+                </tr>
+              </thead>
+              <tbody id="wrongAnalyticsTableBody">
+                <tr><td colspan="9" style="text-align:center; padding:2rem; color:var(--text-muted);">분석할 데이터를 불러오는 중입니다...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="recSubViewMatrix" style="display:none;">
+          <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:10px; padding:0.7rem 0.85rem; margin-bottom:0.65rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.45rem;">
+              <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
+                <span style="font-size:0.82rem; font-weight:800; color:var(--primary);">📐 단원 열 기준:</span>
+                <select id="matrixUnitGranularity" style="width:155px; padding:0.3rem 0.5rem; font-size:0.8rem;" onchange="renderStudentUnitMatrix()">
+                  <option value="unit">대단원 기준 (1과 ~ 9과)</option>
+                  <option value="section">소단원 기준 (1-1, 1-2...)</option>
+                </select>
+                <select id="matrixAggMode" style="width:145px; padding:0.3rem 0.5rem; font-size:0.8rem;" onchange="renderStudentUnitMatrix()">
+                  <option value="max">최고 정답률 기준</option>
+                  <option value="avg">평균 정답률 기준</option>
+                </select>
+              </div>
+              <div style="display:flex; align-items:center; gap:0.45rem; flex-wrap:wrap; font-size:0.78rem;">
+                <span style="font-weight:800; color:var(--primary);">🎨 정답률 색상 기준:</span>
+                <label style="display:inline-flex; align-items:center; gap:0.25rem; background:#dcfce7; color:#166534; padding:2px 7px; border-radius:6px; font-weight:800;">
+                  연두 ≥ <input type="number" id="threshGreenInput" min="1" max="100" value="90" style="width:44px; padding:1px 3px; font-size:0.78rem; text-align:center;" onchange="onMatrixThresholdChange()" />%
+                </label>
+                <label style="display:inline-flex; align-items:center; gap:0.25rem; background:#fef9c3; color:#854d0e; padding:2px 7px; border-radius:6px; font-weight:800;">
+                  노랑 ≥ <input type="number" id="threshYellowInput" min="1" max="99" value="70" style="width:44px; padding:1px 3px; font-size:0.78rem; text-align:center;" onchange="onMatrixThresholdChange()" />%
+                </label>
+                <label style="display:inline-flex; align-items:center; gap:0.25rem; background:#ffedd5; color:#9a3412; padding:2px 7px; border-radius:6px; font-weight:800;">
+                  주황 ≥ <input type="number" id="threshOrangeInput" min="1" max="98" value="50" style="width:44px; padding:1px 3px; font-size:0.78rem; text-align:center;" onchange="onMatrixThresholdChange()" />%
+                </label>
+                <span style="background:#f1f5f9; color:#475569; padding:2px 7px; border-radius:6px; font-weight:700;">미만/미응시: 회색</span>
+                <button type="button" id="btnSaveMatrixThresholds" class="btn btn-primary btn-sm" style="display:none; padding:0.22rem 0.55rem; font-size:0.75rem;" onclick="saveMatrixThresholdsToCloud()">기준 저장</button>
+              </div>
+            </div>
+            <div style="font-size:0.76rem; color:var(--text-muted);">
+              ※ 왼쪽에서 오른쪽으로 1단원부터 순서대로 배열되며, <strong>[📥 엑셀 다운로드]</strong> 클릭 시 아래 색상 서식이 그대로 반영된 <code>.xlsx</code> 파일로 저장됩니다.
+            </div>
+          </div>
+
+          <div class="admin-table-container" style="max-height:420px;">
+            <table class="admin-table" id="studentMatrixTable">
+              <thead id="studentMatrixHead"></thead>
+              <tbody id="studentMatrixBody">
+                <tr><td style="text-align:center; padding:2rem; color:var(--text-muted);">현황표를 불러오는 중입니다...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUB-TAB 1.5: Class Student Roster Management (Teacher & Main Admin) -->
+      <div id="adminViewStudents" class="no-print" style="display:none;">
+        <div style="background:#f8fafc; border:1px solid var(--border); border-radius:12px; padding:0.85rem; margin-bottom:0.8rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.6rem;">
+            <div>
+              <h3 style="font-size:0.98rem; font-weight:800; color:var(--primary);">👨‍🎓 반별 학생 명단 관리 (이름·반 수정 및 일괄 삭제)</h3>
+              <p style="font-size:0.78rem; color:var(--text-muted);">담당 반(최종 관리자는 전체 반)에 접속한 학생 명단을 조회하고 이름·소속 반을 수정하거나 일괄 삭제할 수 있습니다.</p>
+            </div>
+            <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
+              <button type="button" class="btn btn-outline btn-sm" onclick="loadStudentRoster()">🔄 명단 새로고침</button>
+              <button type="button" class="btn btn-outline btn-sm" style="color:var(--danger); border-color:#fca5a5;" onclick="bulkDeleteStudents(false)">선택 명부만 삭제</button>
+              <button type="button" class="btn btn-danger btn-sm" onclick="bulkDeleteStudents(true)">🗑️ 선택 학생 + 성적 기록 모두 삭제</button>
+            </div>
+          </div>
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap:0.5rem;">
+            <select id="rosterFilterSemester" style="padding:0.42rem 0.6rem; font-size:0.82rem;" onchange="filterStudentRosterTable()">
+              <option value="ALL">전체 학기</option>
+            </select>
+            <select id="rosterFilterClass" style="padding:0.42rem 0.6rem; font-size:0.82rem;" onchange="filterStudentRosterTable()">
+              <option value="ALL">전체 반</option>
+            </select>
+            <input type="text" id="rosterSearchInput" placeholder="학생 이름 검색..." class="typing-input" style="padding:0.42rem 0.65rem; font-size:0.82rem; margin-bottom:0; text-align:left;" oninput="filterStudentRosterTable()" />
+          </div>
+        </div>
+
+        <div class="admin-table-container" style="max-height:420px;">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th style="width:28px; text-align:center;"><input type="checkbox" id="selectAllStudentsCb" onchange="toggleSelectAllStudents(this.checked)" /></th>
+                <th>기관명</th>
+                <th>학기</th>
+                <th>소속 반</th>
+                <th>학생 이름</th>
+                <th>최근 접속일</th>
+                <th>저장 / 삭제</th>
+              </tr>
+            </thead>
+            <tbody id="studentRosterTableBody">
+              <tr><td colspan="7" style="text-align:center; padding:2rem; color:var(--text-muted);">학생 명단을 불러오는 중...</td></tr>
             </tbody>
           </table>
         </div>
@@ -1646,6 +1817,13 @@
                 <option value="30">30문항</option>
                 <option value="40">40문항</option>
                 <option value="50">50문항</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:0.76rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.25rem;">출제 단어 정렬 기준</label>
+              <select id="sheetOrderSelect" style="padding:0.5rem; font-size:0.85rem;">
+                <option value="random">무작위 섞기 (기본)</option>
+                <option value="wrong_rate">🔥 해당 반·선택 단원 오답률 높은 순</option>
               </select>
             </div>
           </div>
@@ -1866,9 +2044,18 @@
 
       <!-- SUB-TAB 6: Teacher Account & Custom Institution / Class Management (Main Admin Only) -->
       <div id="adminViewTeachers" class="no-print" style="display:none;">
-        <!-- Institution & Class Registry Box -->
+        <!-- Semester & Institution / Class Registry Box -->
         <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:12px; padding:1rem; margin-bottom:1rem;">
-          <h3 style="font-size:0.98rem; font-weight:800; color:var(--primary); margin-bottom:0.4rem;">🏫 기관명 및 하위 급수·수업 커스텀 등록 (자동 저장)</h3>
+          <h3 style="font-size:0.98rem; font-weight:800; color:var(--primary); margin-bottom:0.4rem;">🏫 학기 · 기관명 · 하위 급수·수업 관리 (클라우드 자동 동기화)</h3>
+          <div style="background:white; padding:0.7rem; border-radius:10px; border:1px solid #dbeafe; margin-bottom:0.75rem;">
+            <label style="font-size:0.76rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.3rem;">0. 학기 관리 (예: 26-1, 26-2, 26-3, 26-4)</label>
+            <div style="display:flex; gap:0.4rem; flex-wrap:wrap; align-items:center;">
+              <input type="text" id="newSemesterInput" placeholder="새 학기 입력 (예: 27-1)" class="typing-input" style="width:170px; padding:0.42rem 0.65rem; font-size:0.84rem; margin-bottom:0; text-align:left;" />
+              <button type="button" class="btn btn-primary btn-sm" onclick="addCustomSemester()">+ 학기 추가</button>
+              <select id="manageSemesterSelect" style="width:140px; padding:0.42rem; font-size:0.83rem;"></select>
+              <button type="button" class="btn btn-danger btn-sm" onclick="deleteSelectedSemester()">학기 삭제</button>
+            </div>
+          </div>
           <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:0.75rem;">
             <div style="background:white; padding:0.7rem; border-radius:10px; border:1px solid #dbeafe;">
               <label style="font-size:0.76rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.3rem;">1. 새 기관명 추가 (클라우드 자동 저장)</label>
@@ -2255,7 +2442,10 @@
     <div id="view-result" class="view-card">
       <div style="text-align:center;">
         <h2 style="font-size:1.6rem; font-weight:800; color:var(--primary);" id="resTitle">학습 완료!</h2>
-        <p style="color:var(--text-muted); margin-top:0.35rem;" id="resSubtitle">수고하셨습니다. 이번 세션 결과입니다.</p>
+        <div style="margin-top:0.45rem;">
+          <span id="resUnitBadge" style="display:inline-block; background:#eff6ff; color:#1e3a8a; border:1.5px solid #93c5fd; padding:0.3rem 0.95rem; border-radius:999px; font-weight:800; font-size:0.95rem;">학습 단원: -</span>
+        </div>
+        <p style="color:var(--text-muted); margin-top:0.4rem;" id="resSubtitle">수고하셨습니다. 이번 세션 결과입니다.</p>
 
         <div id="certContainer" style="display:none;">
           <div class="cert-card">
@@ -2342,6 +2532,7 @@
     ========================================================================== */
     const STORAGE_KEYS = {
       USER_PROFILE: 'YONGIN_KOREAN_PROFILE_V2',
+      RECENT_PROFILES: 'YONGIN_KOREAN_RECENT_PROFILES_V2',
       STREAK: 'YONGIN_KOREAN_STREAK_V2',
       WRONG_BANK: 'YONGIN_KOREAN_WRONGBANK_V2',
       SAVED_PROGRESS: 'YONGIN_KOREAN_PROGRESS_V2',
@@ -2356,9 +2547,14 @@
     let filteredVocab = [];
     let sessionVocab = [];
 
+    let userInstitution = '용인대학교 한국어학당';
+    let userSemester = '26-1';
     let userClass = '용인대 4급';
     let userName = '학습자';
     let streakCount = 1;
+
+    let sessionWrongWords = [];
+    let sessionTestedWords = [];
 
     let selectedSections = new Set();
     let questionLimit = 'ALL';
@@ -2576,13 +2772,83 @@
     /* ==========================================================================
        5. STUDENT PROFILE, SEMESTER TRACKING & STREAK
     ========================================================================== */
+    function getRecentProfiles() {
+      try {
+        const arr = JSON.parse(localStorage.getItem(STORAGE_KEYS.RECENT_PROFILES) || '[]');
+        return Array.isArray(arr) ? arr : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function addRecentProfile(profileObj) {
+      const list = getRecentProfiles().filter(p =>
+        !(p.institution === profileObj.institution && p.semester === profileObj.semester && p.userClass === profileObj.userClass && p.name === profileObj.name)
+      );
+      list.unshift(profileObj);
+      localStorage.setItem(STORAGE_KEYS.RECENT_PROFILES, JSON.stringify(list.slice(0, 12)));
+    }
+
+    function renderRecentProfilesUI() {
+      const box = document.getElementById('recentProfilesBox');
+      const listEl = document.getElementById('recentProfilesList');
+      if (!box || !listEl) return;
+      const list = getRecentProfiles();
+      if (list.length === 0) {
+        box.style.display = 'none';
+        return;
+      }
+      box.style.display = 'block';
+      listEl.innerHTML = list.map((p, idx) => `
+        <button type="button" class="recent-profile-chip" onclick="quickSwitchRecentProfile(${idx})">
+          <span>👤</span>
+          <span>${p.semester || '26-1'} · ${p.userClass} · ${p.name}</span>
+        </button>
+      `).join('');
+    }
+
+    function quickSwitchRecentProfile(idx) {
+      const list = getRecentProfiles();
+      const p = list[idx];
+      if (!p) return;
+      userInstitution = p.institution || '용인대학교 한국어학당';
+      userSemester = p.semester || '26-1';
+      userClass = p.userClass || '용인대 4급';
+      userName = p.name;
+      localStorage.setItem(STORAGE_KEYS.USER_PROFILE, JSON.stringify({
+        institution: userInstitution,
+        semester: userSemester,
+        userClass,
+        name: userName
+      }));
+      addRecentProfile({ institution: userInstitution, semester: userSemester, userClass, name: userName });
+      updateHeaderUserUI();
+      upsertStudentRosterToCloud();
+      document.getElementById('nameModal').classList.remove('show');
+      if (booksConfig) {
+        populateBookDropdownForClass();
+        selectBookById(document.getElementById('bookSelect').value);
+      }
+    }
+
+    function prepareNewStudentRegistration() {
+      document.getElementById('userNameInput').value = '';
+      document.getElementById('userNameInput').focus();
+    }
+
     function loadUserProfile() {
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEYS.USER_PROFILE) || 'null');
+      renderInstitutionAndClassDropdowns();
+      renderRecentProfilesUI();
       if (!saved || !saved.name) {
         document.getElementById('nameModal').classList.add('show');
       } else {
+        userInstitution = saved.institution || '용인대학교 한국어학당';
+        userSemester = saved.semester || '26-1';
         userClass = saved.userClass || '용인대 4급';
         userName = saved.name;
+        addRecentProfile({ institution: userInstitution, semester: userSemester, userClass, name: userName });
+        upsertStudentRosterToCloud();
       }
       updateHeaderUserUI();
 
@@ -2605,21 +2871,28 @@
     }
 
     function updateHeaderUserUI() {
-      document.getElementById('headerUserClass').textContent = userClass;
+      document.getElementById('headerUserClass').textContent = `${userSemester} · ${userClass}`;
       document.getElementById('headerUserName').textContent = userName;
     }
 
     function saveUserProfileModal() {
+      const selectedInst = document.getElementById('userInstSelect')?.value || '용인대학교 한국어학당';
+      const selectedSem = document.getElementById('userSemesterSelect')?.value || '26-1';
       const selectedCls = document.getElementById('userClassSelect').value;
       const inputName = document.getElementById('userNameInput').value.trim();
       if (!inputName) {
         alert('이름을 입력해 주세요.');
         return;
       }
+      userInstitution = selectedInst;
+      userSemester = selectedSem;
       userClass = selectedCls;
       userName = inputName;
-      localStorage.setItem(STORAGE_KEYS.USER_PROFILE, JSON.stringify({ userClass, name: userName }));
+      const profileObj = { institution: userInstitution, semester: userSemester, userClass, name: userName };
+      localStorage.setItem(STORAGE_KEYS.USER_PROFILE, JSON.stringify(profileObj));
+      addRecentProfile(profileObj);
       updateHeaderUserUI();
+      upsertStudentRosterToCloud();
       document.getElementById('nameModal').classList.remove('show');
       if (booksConfig) {
         populateBookDropdownForClass();
@@ -2628,9 +2901,41 @@
     }
 
     function openNameModal() {
-      document.getElementById('userClassSelect').value = userClass;
-      document.getElementById('userNameInput').value = userName;
+      renderInstitutionAndClassDropdowns();
+      renderRecentProfilesUI();
+      const instSel = document.getElementById('userInstSelect');
+      if (instSel && Array.from(instSel.options).some(o => o.value === userInstitution)) {
+        instSel.value = userInstitution;
+        onStudentInstSelectChange();
+      }
+      const semSel = document.getElementById('userSemesterSelect');
+      if (semSel && Array.from(semSel.options).some(o => o.value === userSemester)) {
+        semSel.value = userSemester;
+      }
+      const clsSel = document.getElementById('userClassSelect');
+      if (clsSel && Array.from(clsSel.options).some(o => o.value === userClass)) {
+        clsSel.value = userClass;
+      }
+      document.getElementById('userNameInput').value = userName === '학습자' ? '' : userName;
       document.getElementById('nameModal').classList.add('show');
+    }
+
+    function buildStudentDocId(inst, sem, cls, name) {
+      return `${inst}__${sem}__${cls}__${name}`.replace(/[\/\.#\$\[\]]/g, '_');
+    }
+
+    function upsertStudentRosterToCloud() {
+      if (!db || !userName || userName === '학습자') return;
+      const docId = buildStudentDocId(userInstitution, userSemester, userClass, userName);
+      db.collection("students").doc(docId).set({
+        institution: userInstitution,
+        semester: userSemester,
+        studentClass: userClass,
+        studentName: userName,
+        studentKey: `${userInstitution}_${userSemester}_${userClass}_${userName}`,
+        lastActiveDate: new Date().toLocaleString('ko-KR'),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true }).catch(err => console.warn("Student roster upsert skipped:", err.message));
     }
 
     /* ==========================================================================
@@ -2744,12 +3049,47 @@
       }
     }
 
+    function extractUnitNumberLabel(unitStr) {
+      if (!unitStr) return '';
+      const m = String(unitStr).match(/^(\d+)/);
+      return m ? `${m[1]}과 전체` : String(unitStr).split(' ')[0];
+    }
+
+    function extractSectionCodeLabel(secStr) {
+      if (!secStr) return '';
+      const m = String(secStr).match(/^(\d+-\d+)/);
+      return m ? m[1] : String(secStr).split(' ')[0];
+    }
+
     function getScopeSummaryName() {
       const totalSections = document.querySelectorAll('.section-child-cb').length;
-      if (selectedSections.size === totalSections) return '전체 단원 통합';
-      const checkedUnits = Array.from(document.querySelectorAll('.unit-parent-cb:checked')).map(cb => cb.dataset.unit.split(' ')[0] + '단원');
-      if (checkedUnits.length > 0) return checkedUnits.join('+');
-      return Array.from(selectedSections).slice(0, 2).join(', ') + (selectedSections.size > 2 ? ` 외 ${selectedSections.size - 2}개` : '');
+      if (totalSections > 0 && selectedSections.size === totalSections) return '전체 단원';
+
+      const parentCbs = Array.from(document.querySelectorAll('.unit-parent-cb'));
+      const fullUnits = parentCbs.filter(cb => cb.checked).map(cb => cb.dataset.unit);
+      const fullUnitSet = new Set(fullUnits);
+
+      const parts = [];
+      fullUnits.forEach(u => parts.push(extractUnitNumberLabel(u)));
+
+      document.querySelectorAll('.section-child-cb:checked').forEach(cb => {
+        if (!fullUnitSet.has(cb.dataset.unit)) {
+          parts.push(extractSectionCodeLabel(cb.dataset.section));
+        }
+      });
+
+      if (parts.length === 0) return '-';
+      return parts.join(' / ');
+    }
+
+    function formatCompactUnitColumn(unitStr) {
+      if (!unitStr) return '-';
+      const s = String(unitStr).trim();
+      if (s === '전체 단원 통합' || s === '전체 단원') return '전체';
+      if (s.includes(' / ') || s.includes('과 전체')) return s;
+      const secMatch = s.match(/^(\d+-\d+)/);
+      if (secMatch && !s.includes(',')) return secMatch[1];
+      return s.replace(/단원/g, '과');
     }
 
     function applyFiltersAndStart() {
@@ -2935,6 +3275,7 @@
     function initMatchGame() {
       selectedTile = null;
       matchedCount = 0;
+      sessionWrongWords = [];
       document.getElementById('matchPauseOverlay')?.classList.remove('show');
 
       const sampleSize = Math.min(15, sessionVocab.length);
@@ -2991,9 +3332,11 @@
               sendRecordToFirestore({
                 mode: 'match',
                 correct: matchedCount,
-                wrong: 0,
+                wrong: sessionWrongWords.length,
                 total: matchPairs.length,
-                accuracy: 100
+                accuracy: Math.max(0, Math.round(((matchPairs.length - sessionWrongWords.length) / matchPairs.length) * 100)),
+                testedWords: matchPairs.map(w => ({ id: w.id || w.kr, kr: w.kr, en: w.en || '', unit: w.unit || '', section: w.section || '' })),
+                wrongWords: [...sessionWrongWords]
               });
               setTimeout(() => alert('짝 맞추기를 모두 완료했습니다! 축하합니다!'), 300);
             }
@@ -3003,7 +3346,11 @@
           tileEl.classList.add('wrong-flash');
           selectedTile.el.classList.add('wrong-flash');
           const firstEl = selectedTile.el;
-          recordWrongItem(matchPairs[tileData.matchId]);
+          const wrongMatchObj = matchPairs[tileData.matchId];
+          recordWrongItem(wrongMatchObj);
+          if (wrongMatchObj && !sessionWrongWords.some(w => w.kr === wrongMatchObj.kr)) {
+            sessionWrongWords.push({ id: wrongMatchObj.id || wrongMatchObj.kr, kr: wrongMatchObj.kr, en: wrongMatchObj.en || '', unit: wrongMatchObj.unit || '', section: wrongMatchObj.section || '' });
+          }
 
           setTimeout(() => {
             firstEl.classList.remove('selected', 'wrong-flash');
@@ -3044,6 +3391,14 @@
       quizIdx = 0;
       quizCorrect = 0;
       quizWrong = 0;
+      sessionWrongWords = [];
+      sessionTestedWords = quizQuestions.map(q => ({
+        id: q.item.id || q.item.kr,
+        kr: q.item.kr,
+        en: q.item.en || '',
+        unit: q.item.unit || '',
+        section: q.item.section || ''
+      }));
       document.getElementById('choicePauseOverlay').classList.remove('show');
       showChoiceQuestion();
     }
@@ -3092,6 +3447,13 @@
         btn.classList.add('incorrect');
         quizWrong++;
         recordWrongItem(q.item);
+        sessionWrongWords.push({
+          id: q.item.id || q.item.kr,
+          kr: q.item.kr,
+          en: q.item.en || '',
+          unit: q.item.unit || '',
+          section: q.item.section || ''
+        });
         allBtns.forEach(b => {
           if (b.querySelector('span:last-child').textContent === q.correctAns) b.classList.add('correct');
         });
@@ -3108,6 +3470,14 @@
       spellIdx = 0;
       spellCorrect = 0;
       spellWrong = 0;
+      sessionWrongWords = [];
+      sessionTestedWords = spellQuestions.map(item => ({
+        id: item.id || item.kr,
+        kr: item.kr,
+        en: item.en || '',
+        unit: item.unit || '',
+        section: item.section || ''
+      }));
       document.getElementById('spellPauseOverlay').classList.remove('show');
       showSpellingQuestion();
     }
@@ -3193,6 +3563,13 @@
         feedback.style.color = 'var(--danger)';
         spellWrong++;
         recordWrongItem(item);
+        sessionWrongWords.push({
+          id: item.id || item.kr,
+          kr: item.kr,
+          en: item.en || '',
+          unit: item.unit || '',
+          section: item.section || ''
+        });
       }
 
       setTimeout(() => {
@@ -3208,6 +3585,13 @@
       feedback.style.color = 'var(--danger)';
       spellWrong++;
       recordWrongItem(item);
+      sessionWrongWords.push({
+        id: item.id || item.kr,
+        kr: item.kr,
+        en: item.en || '',
+        unit: item.unit || '',
+        section: item.section || ''
+      });
       speakKorean(item.kr);
 
       setTimeout(() => {
@@ -3370,8 +3754,12 @@
       document.querySelectorAll('.view-card').forEach(card => card.classList.remove('active'));
       document.getElementById('view-result').classList.add('active');
 
+      const scopeSummary = getScopeSummaryName();
       const acc = total > 0 ? Math.round((correct / total) * 100) : 0;
       document.getElementById('resTitle').textContent = title;
+      const unitBadgeEl = document.getElementById('resUnitBadge');
+      if (unitBadgeEl) unitBadgeEl.textContent = `학습 단원: ${scopeSummary}`;
+
       document.getElementById('resAccuracy').textContent = `${acc}%`;
       document.getElementById('resCorrectCount').textContent = correct;
       document.getElementById('resWrongCount').textContent = wrong;
@@ -3390,7 +3778,9 @@
         correct,
         wrong,
         total,
-        accuracy: acc
+        accuracy: acc,
+        testedWords: [...sessionTestedWords],
+        wrongWords: [...sessionWrongWords]
       });
 
       const certContainer = document.getElementById('certContainer');
@@ -3401,8 +3791,8 @@
         document.getElementById('resSubtitle').textContent = "대단합니다! 정답률 100% 만점 인증서가 발급되었습니다! 🏆";
         certContainer.style.display = 'block';
         standardChart.style.display = 'none';
-        document.getElementById('certUserName').textContent = `${userClass} · ${userName}`;
-        document.getElementById('certUnitName').textContent = `${currentBook?.title || '한국어'} (${getScopeSummaryName()})`;
+        document.getElementById('certUserName').textContent = `${userSemester} · ${userClass} · ${userName}`;
+        document.getElementById('certUnitName').textContent = `${scopeSummary}`;
         document.getElementById('certStreakBadge').textContent = `🔥 연속 학습 ${streakCount}일차 완주!`;
         document.getElementById('certDate').textContent = new Date().toLocaleDateString('ko-KR');
       } else {
@@ -3416,24 +3806,34 @@
     function sendRecordToFirestore(recordData) {
       if (!db) return;
       const scopeName = getScopeSummaryName();
+      const testedUnits = Array.from(new Set((recordData.testedWords || []).map(w => w.unit).filter(Boolean)));
+      const testedSections = Array.from(new Set((recordData.testedWords || []).map(w => w.section).filter(Boolean)));
+
       const payload = {
+        studentInstitution: userInstitution,
+        studentSemester: userSemester,
         studentClass: userClass,
         studentName: userName,
-        studentKey: `${userClass}_${userName}`,
+        studentKey: `${userInstitution}_${userSemester}_${userClass}_${userName}`,
         bookId: currentBook?.id || 'snu4a',
         bookTitle: currentBook?.title || '서울대 한국어 + 4A',
         mode: recordData.mode,
         unit: scopeName,
+        testedUnits: testedUnits,
+        testedSections: testedSections,
         language: currentLang,
         correctCount: recordData.correct,
         wrongCount: recordData.wrong,
         totalQuestions: recordData.total,
         accuracy: recordData.accuracy,
+        wrongWords: recordData.wrongWords || [],
+        testedWords: recordData.testedWords || [],
         streak: streakCount,
         completedAt: firebase.firestore.FieldValue.serverTimestamp(),
         clientDate: new Date().toLocaleString('ko-KR')
       };
 
+      upsertStudentRosterToCloud();
       db.collection("student_records").add(payload)
         .then(() => {
           document.getElementById('firebaseSyncNotice').style.display = 'inline-block';
@@ -3533,6 +3933,14 @@
       }
     }
 
+    let currentRecordAnalyticsMode = 'log';
+    let selectedRecordDocIds = new Set();
+    let cachedWrongRankingRows = [];
+    let studentRosterCache = [];
+    let studentRosterFiltered = [];
+    let selectedStudentDocIds = new Set();
+    let matrixThresholds = { green: 90, yellow: 70, orange: 50 };
+
     function setupAdminDashboardUI(isMainAdmin, email, assignedClass) {
       document.getElementById('currentAdminEmailDisplay').textContent = email;
       const roleBadge = document.getElementById('adminRoleBadge');
@@ -3543,20 +3951,29 @@
       const btnExport = document.getElementById('btnExportCSV');
       const delColHeader = document.getElementById('adminDeleteColHeader');
       const classFilterSelect = document.getElementById('adminFilterClass');
+      const btnSaveThresh = document.getElementById('btnSaveMatrixThresholds');
+      const btnBulkDelRec = document.getElementById('btnBulkDeleteRecords');
+
+      syncAllInstitutionAndClassDropdowns();
 
       if (isMainAdmin) {
         roleBadge.textContent = '👑 최종 관리자';
         roleBadge.style.background = '#fef3c7';
         roleBadge.style.color = '#b45309';
-        classBadge.textContent = '전체 급수 (용인대 1~4급)';
+        classBadge.textContent = '전체 기관 · 전체 급수';
         tabTeachersBtn.style.display = 'inline-flex';
         tabBuilderBtn.style.display = 'inline-flex';
         tabWorkbookBtn.style.display = 'inline-flex';
+        if (btnSaveThresh) btnSaveThresh.style.display = 'inline-flex';
+        ['threshGreenInput', 'threshYellowInput', 'threshOrangeInput'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.disabled = false;
+        });
         initWorkbookControls();
         initBuilderLanguageUI();
-        syncAllInstitutionAndClassDropdowns();
         btnExport.style.display = 'inline-flex';
         delColHeader.style.display = 'table-cell';
+        if (btnBulkDelRec) btnBulkDelRec.style.display = 'inline-flex';
         classFilterSelect.disabled = false;
         classFilterSelect.value = 'ALL';
 
@@ -3570,8 +3987,14 @@
         tabTeachersBtn.style.display = 'none';
         tabBuilderBtn.style.display = 'none';
         tabWorkbookBtn.style.display = 'none';
+        if (btnSaveThresh) btnSaveThresh.style.display = 'none';
+        ['threshGreenInput', 'threshYellowInput', 'threshOrangeInput'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.disabled = true;
+        });
         btnExport.style.display = currentTeacherPermissions.canExportCSV ? 'inline-flex' : 'none';
         delColHeader.style.display = currentTeacherPermissions.canDeleteRecord ? 'table-cell' : 'none';
+        if (btnBulkDelRec) btnBulkDelRec.style.display = currentTeacherPermissions.canDeleteRecord ? 'inline-flex' : 'none';
 
         if (assignedClass !== 'ALL') {
           classFilterSelect.value = assignedClass;
@@ -3586,6 +4009,7 @@
     function switchAdminSubTab(tab) {
       const tabs = {
         records: ['tabBtnRecords', 'adminViewRecords'],
+        students: ['tabBtnStudents', 'adminViewStudents'],
         pptStudio: ['tabBtnPptStudio', 'adminViewPptStudio'],
         printSheet: ['tabBtnPrintSheet', 'adminViewPrintSheet'],
         workbook: ['tabBtnWorkbook', 'adminViewWorkbook'],
@@ -3598,12 +4022,32 @@
         if (btn) btn.className = key === tab ? 'btn btn-primary btn-sm' : 'btn btn-outline btn-sm';
         if (view) view.style.display = key === tab ? 'block' : 'none';
       });
+      if (tab === 'students') loadStudentRoster();
       if (tab === 'teachers') loadTeacherList();
       if (tab === 'printSheet') initPrintSheetControls();
       if (tab === 'pptStudio') initPptStudioControls();
       if (tab === 'workbook') initWorkbookControls();
-        initBuilderLanguageUI();
-        syncAllInstitutionAndClassDropdowns();
+    }
+
+    function switchRecordAnalyticsMode(subMode) {
+      currentRecordAnalyticsMode = subMode;
+      const map = {
+        log: ['recModeBtnLog', 'recSubViewLog'],
+        wrong: ['recModeBtnWrong', 'recSubViewWrong'],
+        matrix: ['recModeBtnMatrix', 'recSubViewMatrix']
+      };
+      Object.entries(map).forEach(([k, [btnId, viewId]]) => {
+        const btn = document.getElementById(btnId);
+        const view = document.getElementById(viewId);
+        if (btn) btn.className = k === subMode ? 'btn btn-primary btn-sm' : 'btn btn-outline btn-sm';
+        if (view) view.style.display = k === subMode ? 'block' : 'none';
+      });
+      const bulkBar = document.getElementById('recordBulkActionBar');
+      if (bulkBar) bulkBar.style.display = subMode === 'log' ? 'flex' : 'none';
+
+      if (subMode === 'wrong') renderWrongRateRankingTable();
+      else if (subMode === 'matrix') renderStudentUnitMatrix();
+      else renderAdminTable(adminFilteredRecords);
     }
 
     function logoutAdmin() {
@@ -3614,18 +4058,31 @@
       });
     }
 
+    function populateAdminUnitFilterDropdown() {
+      const unitSel = document.getElementById('adminFilterUnit');
+      if (!unitSel) return;
+      const prev = unitSel.value;
+      const unitSet = new Set();
+      RAW_VOCAB.forEach(v => { if (v.unit) unitSet.add(v.unit); });
+      adminRecordsCache.forEach(r => {
+        if (Array.isArray(r.testedUnits)) r.testedUnits.forEach(u => unitSet.add(u));
+      });
+      unitSel.innerHTML = `<option value="ALL">전체 단원</option>` +
+        Array.from(unitSet).map(u => `<option value="${u}">${extractUnitNumberLabel(u)} (${u.split(' ').slice(1).join(' ')})</option>`).join('');
+      if (prev && Array.from(unitSel.options).some(o => o.value === prev)) unitSel.value = prev;
+    }
+
     function loadAdminRecords() {
       const tbody = document.getElementById('adminTableBody');
-      tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:2rem;">클라우드에서 학생 기록을 불러오는 중...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="12" style="text-align:center; padding:2rem;">클라우드에서 학생 기록을 불러오는 중...</td></tr>';
       if (!db) return;
 
       const days = parseInt(document.getElementById('adminFilterPeriod')?.value || '180', 10);
       const cutoffMs = Date.now() - days * 24 * 60 * 60 * 1000;
 
-      // Single-field orderBy avoids Firestore composite index failure and loads all recent records reliably
       db.collection("student_records")
         .orderBy("completedAt", "desc")
-        .limit(500)
+        .limit(800)
         .get()
         .then((querySnapshot) => {
           adminRecordsCache = [];
@@ -3642,22 +4099,44 @@
             }
             adminRecordsCache.push(data);
           });
+          populateAdminUnitFilterDropdown();
           filterAdminTable();
         })
         .catch((err) => {
           console.error("Firestore fetch error:", err);
-          tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; color:var(--danger); padding:2rem;">기록을 불러오지 못했습니다. (${err.message})</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="12" style="text-align:center; color:var(--danger); padding:2rem;">기록을 불러오지 못했습니다. (${err.message})</td></tr>`;
         });
     }
 
+    function onAdminAnalyticsFilterChange() {
+      filterAdminTable();
+      if (currentRecordAnalyticsMode === 'wrong') renderWrongRateRankingTable();
+      else if (currentRecordAnalyticsMode === 'matrix') renderStudentUnitMatrix();
+    }
+
     function filterAdminTable() {
+      const semFilter = document.getElementById('adminFilterSemester')?.value || 'ALL';
       const classFilter = document.getElementById('adminFilterClass')?.value || 'ALL';
+      const unitFilter = document.getElementById('adminFilterUnit')?.value || 'ALL';
       const nameQuery = (document.getElementById('adminSearchInput')?.value || '').trim().toLowerCase();
       const modeFilter = document.getElementById('adminFilterMode')?.value || 'ALL';
       const scoreFilter = document.getElementById('adminFilterScore')?.value || 'ALL';
 
       adminFilteredRecords = adminRecordsCache.filter(r => {
-        if (classFilter !== 'ALL' && (r.studentClass || '') !== classFilter) return false;
+        const rSem = r.studentSemester || '미지정';
+        const rCls = (r.studentClass || '').trim();
+        if (semFilter !== 'ALL' && rSem !== semFilter) return false;
+        if (classFilter === 'UNASSIGNED') {
+          if (rCls && rCls !== '미지정') return false;
+        } else if (classFilter !== 'ALL') {
+          if (rCls !== classFilter) return false;
+        }
+        if (unitFilter !== 'ALL') {
+          const inTestedUnits = Array.isArray(r.testedUnits) && r.testedUnits.includes(unitFilter);
+          const unitNumPrefix = unitFilter.match(/^(\d+)/)?.[1];
+          const inUnitLabel = unitNumPrefix && String(r.unit || '').startsWith(unitNumPrefix);
+          if (!inTestedUnits && !inUnitLabel) return false;
+        }
         if (nameQuery && !(r.studentName || '').toLowerCase().includes(nameQuery)) return false;
         if (modeFilter !== 'ALL' && r.mode !== modeFilter) return false;
         const acc = Number(r.accuracy || 0);
@@ -3667,13 +4146,18 @@
         return true;
       });
 
+      selectedRecordDocIds.clear();
+      updateSelectedRecordBadge();
+      const selAllCb = document.getElementById('selectAllRecordsCb');
+      if (selAllCb) selAllCb.checked = false;
+
       document.getElementById('adminFilterCount').textContent = adminFilteredRecords.length;
       document.getElementById('statTotalSessions').textContent = `${adminFilteredRecords.length}건`;
       const avgAcc = adminFilteredRecords.length > 0
         ? Math.round(adminFilteredRecords.reduce((s, r) => s + Number(r.accuracy || 0), 0) / adminFilteredRecords.length)
         : 0;
       document.getElementById('statAvgAccuracy').textContent = `${avgAcc}%`;
-      const uniqueStudents = new Set(adminFilteredRecords.map(r => r.studentKey || r.studentName)).size;
+      const uniqueStudents = new Set(adminFilteredRecords.map(r => `${r.studentSemester || ''}_${r.studentClass || ''}_${r.studentName}`)).size;
       document.getElementById('statUniqueStudents').textContent = `${uniqueStudents}명`;
 
       renderAdminTable(adminFilteredRecords);
@@ -3682,27 +4166,126 @@
     function renderAdminTable(records) {
       const tbody = document.getElementById('adminTableBody');
       if (records.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:2rem; color:var(--text-muted);">조건에 일치하는 학습 기록이 없습니다.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="12" style="text-align:center; padding:2rem; color:var(--text-muted);">조건에 일치하는 학습 기록이 없습니다.</td></tr>';
         return;
       }
 
-      const modeNames = { choice: '🎯 4지선다', spelling: '✍️ 단어 쓰기', match: '🧩 짝 맞추기' };
+      const modeNames = { choice: '🎯 4지선다', spelling: '✍️ 쓰기', match: '🧩 짝맞추기' };
       const canDelete = currentUserRole === 'MAIN_ADMIN' || currentTeacherPermissions.canDeleteRecord;
 
-      tbody.innerHTML = records.map(r => `
+      tbody.innerHTML = records.map(r => {
+        const clsLabel = (r.studentClass && r.studentClass !== '미지정') ? r.studentClass : '미지정';
+        const isUnassigned = clsLabel === '미지정';
+        const checkedAttr = selectedRecordDocIds.has(r._docId) ? 'checked' : '';
+        return `
         <tr>
+          <td style="text-align:center;"><input type="checkbox" class="rec-row-cb" value="${r._docId}" ${checkedAttr} onchange="onRecordRowCheckboxChange(this)" /></td>
           <td>${r.clientDate || '-'}</td>
-          <td><span style="background:#eff6ff; color:#1e3a8a; padding:2px 7px; border-radius:6px; font-weight:700; font-size:0.78rem;">${r.studentClass || '미지정'}</span></td>
+          <td><span style="color:#475569; font-weight:700;">${r.studentSemester || '-'}</span></td>
+          <td><span style="background:${isUnassigned ? '#fef2f2' : '#eff6ff'}; color:${isUnassigned ? '#b91c1c' : '#1e3a8a'}; padding:2px 6px; border-radius:6px; font-weight:700; font-size:0.76rem;">${clsLabel}</span></td>
           <td><strong>${r.studentName}</strong></td>
-          <td>${r.unit || '-'}</td>
+          <td><span style="font-weight:700; color:var(--primary);">${formatCompactUnitColumn(r.unit)}</span></td>
           <td>${modeNames[r.mode] || r.mode}</td>
           <td>${(r.language || 'en').toUpperCase()}</td>
-          <td>${r.correctCount} / ${r.totalQuestions}</td>
-          <td><span style="font-weight:700; color:${r.accuracy >= 80 ? '#059669' : '#dc2626'}">${r.accuracy}%</span></td>
-          <td>🔥 ${r.streak || 1}일</td>
-          ${canDelete ? `<td><button class="btn btn-danger btn-sm" style="padding:0.2rem 0.5rem; font-size:0.74rem;" onclick="deleteStudentRecord('${r._docId}')">삭제</button></td>` : ''}
+          <td>${r.correctCount}/${r.totalQuestions}</td>
+          <td><span style="font-weight:800; color:${r.accuracy >= 80 ? '#059669' : '#dc2626'}">${r.accuracy}%</span></td>
+          <td>🔥${r.streak || 1}일</td>
+          ${canDelete ? `<td><button class="btn btn-danger btn-sm" style="padding:0.18rem 0.45rem; font-size:0.72rem;" onclick="deleteStudentRecord('${r._docId}')">삭제</button></td>` : ''}
         </tr>
-      `).join('');
+      `;
+      }).join('');
+    }
+
+    function toggleSelectAllRecords(checked) {
+      selectedRecordDocIds.clear();
+      document.querySelectorAll('.rec-row-cb').forEach(cb => {
+        cb.checked = checked;
+        if (checked) selectedRecordDocIds.add(cb.value);
+      });
+      updateSelectedRecordBadge();
+    }
+
+    function onRecordRowCheckboxChange(cb) {
+      if (cb.checked) selectedRecordDocIds.add(cb.value);
+      else selectedRecordDocIds.delete(cb.value);
+      updateSelectedRecordBadge();
+    }
+
+    function updateSelectedRecordBadge() {
+      const el = document.getElementById('selectedRecordCountBadge');
+      if (el) el.textContent = selectedRecordDocIds.size;
+    }
+
+    async function bulkDeleteSelectedRecords() {
+      const canDelete = currentUserRole === 'MAIN_ADMIN' || currentTeacherPermissions.canDeleteRecord;
+      if (!canDelete) {
+        alert("삭제 권한이 없습니다.");
+        return;
+      }
+      if (selectedRecordDocIds.size === 0) {
+        alert("삭제할 기록을 먼저 체크박스로 선택해 주세요.");
+        return;
+      }
+      if (!confirm(`선택한 ${selectedRecordDocIds.size}건의 학습 기록을 영구 삭제하시겠습니까?`)) return;
+
+      const ids = Array.from(selectedRecordDocIds);
+      try {
+        for (let i = 0; i < ids.length; i += 400) {
+          const batch = db.batch();
+          ids.slice(i, i + 400).forEach(id => batch.delete(db.collection("student_records").doc(id)));
+          await batch.commit();
+        }
+        const delSet = new Set(ids);
+        adminRecordsCache = adminRecordsCache.filter(r => !delSet.has(r._docId));
+        selectedRecordDocIds.clear();
+        filterAdminTable();
+        alert(`${ids.length}건의 기록이 일괄 삭제되었습니다.`);
+      } catch (err) {
+        alert("일괄 삭제 중 오류: " + err.message);
+      }
+    }
+
+    async function bulkAssignRecordsClass() {
+      if (selectedRecordDocIds.size === 0) {
+        alert("소속 급수를 일괄 지정할 기록을 먼저 선택해 주세요.");
+        return;
+      }
+      const targetClass = document.getElementById('bulkAssignClassSelect')?.value;
+      if (!targetClass) return;
+
+      const orgMap = getOrganizationsMap();
+      let foundInst = '용인대학교 한국어학당';
+      Object.entries(orgMap).forEach(([inst, clsList]) => {
+        if (clsList.includes(targetClass)) foundInst = inst;
+      });
+
+      if (!confirm(`선택한 ${selectedRecordDocIds.size}건의 소속을 [${targetClass}]로 일괄 변경하시겠습니까?`)) return;
+
+      const ids = Array.from(selectedRecordDocIds);
+      try {
+        for (let i = 0; i < ids.length; i += 400) {
+          const batch = db.batch();
+          ids.slice(i, i + 400).forEach(id => {
+            batch.update(db.collection("student_records").doc(id), {
+              studentInstitution: foundInst,
+              studentClass: targetClass
+            });
+          });
+          await batch.commit();
+        }
+        const idSet = new Set(ids);
+        adminRecordsCache.forEach(r => {
+          if (idSet.has(r._docId)) {
+            r.studentInstitution = foundInst;
+            r.studentClass = targetClass;
+          }
+        });
+        selectedRecordDocIds.clear();
+        filterAdminTable();
+        alert(`${ids.length}건의 소속 급수가 [${targetClass}]로 변경되었습니다.`);
+      } catch (err) {
+        alert("일괄 지정 중 오류: " + err.message);
+      }
     }
 
     async function deleteStudentRecord(docId) {
@@ -3717,29 +4300,604 @@
     }
 
     function resetAdminFilters() {
+      const semSel = document.getElementById('adminFilterSemester');
+      if (semSel) semSel.value = 'ALL';
       if (currentUserRole === 'MAIN_ADMIN' || assignedTeacherClass === 'ALL') {
         document.getElementById('adminFilterClass').value = 'ALL';
       }
+      const unitSel = document.getElementById('adminFilterUnit');
+      if (unitSel) unitSel.value = 'ALL';
       document.getElementById('adminSearchInput').value = '';
       document.getElementById('adminFilterMode').value = 'ALL';
       document.getElementById('adminFilterScore').value = 'ALL';
-      filterAdminTable();
+      onAdminAnalyticsFilterChange();
     }
 
-    function exportAdminDataCSV() {
+    /* --- SUB-VIEW B: Wrong Rate Ranking by Unit & Student --- */
+    function renderWrongRateRankingTable() {
+      const tbody = document.getElementById('wrongAnalyticsTableBody');
+      if (!tbody) return;
+
+      const unitFilter = document.getElementById('adminFilterUnit')?.value || 'ALL';
+      const statsMap = new Map();
+
+      adminFilteredRecords.forEach(r => {
+        const sName = r.studentName || '미상';
+        const tested = Array.isArray(r.testedWords) ? r.testedWords : [];
+        const wrongs = Array.isArray(r.wrongWords) ? r.wrongWords : [];
+
+        tested.forEach(w => {
+          if (!w || !w.kr) return;
+          if (unitFilter !== 'ALL' && w.unit !== unitFilter) return;
+          const key = `${w.section || ''}__${w.kr}`;
+          if (!statsMap.has(key)) {
+            statsMap.set(key, {
+              unit: w.unit || '-',
+              section: w.section || '-',
+              kr: w.kr,
+              en: w.en || (RAW_VOCAB.find(v => v.kr === w.kr)?.en || ''),
+              testedCount: 0,
+              wrongCount: 0,
+              wrongStudents: new Map()
+            });
+          }
+          statsMap.get(key).testedCount += 1;
+        });
+
+        wrongs.forEach(w => {
+          if (!w || !w.kr) return;
+          if (unitFilter !== 'ALL' && w.unit !== unitFilter) return;
+          const key = `${w.section || ''}__${w.kr}`;
+          if (!statsMap.has(key)) {
+            statsMap.set(key, {
+              unit: w.unit || '-',
+              section: w.section || '-',
+              kr: w.kr,
+              en: w.en || (RAW_VOCAB.find(v => v.kr === w.kr)?.en || ''),
+              testedCount: 1,
+              wrongCount: 0,
+              wrongStudents: new Map()
+            });
+          }
+          const entry = statsMap.get(key);
+          entry.wrongCount += 1;
+          entry.testedCount = Math.max(entry.testedCount, entry.wrongCount);
+          entry.wrongStudents.set(sName, (entry.wrongStudents.get(sName) || 0) + 1);
+        });
+      });
+
+      cachedWrongRankingRows = Array.from(statsMap.values())
+        .filter(item => item.wrongCount > 0)
+        .map(item => ({
+          ...item,
+          wrongRate: item.testedCount > 0 ? Math.round((item.wrongCount / item.testedCount) * 100) : 100,
+          studentsSummary: Array.from(item.wrongStudents.entries())
+            .sort((a, b) => b[1] - a[1])
+            .map(([n, cnt]) => `${n}(${cnt}회)`)
+            .join(', ')
+        }))
+        .sort((a, b) => b.wrongRate - a.wrongRate || b.wrongCount - a.wrongCount);
+
+      if (cachedWrongRankingRows.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:2rem; color:var(--text-muted);">선택한 조건에서 집계된 오답 단어 데이터가 없습니다. (퀴즈를 완료하면 단어별 오답이 자동 누적됩니다)</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = cachedWrongRankingRows.map((row, idx) => `
+        <tr>
+          <td style="font-weight:800; color:var(--primary);">${idx + 1}</td>
+          <td>${extractUnitNumberLabel(row.unit)}</td>
+          <td>${extractSectionCodeLabel(row.section)}</td>
+          <td><strong>${row.kr}</strong></td>
+          <td>${row.en}</td>
+          <td>${row.testedCount}회</td>
+          <td style="color:#dc2626; font-weight:700;">${row.wrongCount}회</td>
+          <td><span style="background:#fef2f2; color:#b91c1c; padding:2px 7px; border-radius:6px; font-weight:800;">${row.wrongRate}%</span></td>
+          <td style="white-space:normal; max-width:260px;">${row.studentsSummary}</td>
+        </tr>
+      `).join('');
+    }
+
+    /* --- SUB-VIEW C: Student x Unit Full Learning Matrix + Color Thresholds --- */
+    function onMatrixThresholdChange() {
+      const g = parseInt(document.getElementById('threshGreenInput')?.value || '90', 10);
+      const y = parseInt(document.getElementById('threshYellowInput')?.value || '70', 10);
+      const o = parseInt(document.getElementById('threshOrangeInput')?.value || '50', 10);
+      matrixThresholds = { green: g, yellow: y, orange: o };
+      renderStudentUnitMatrix();
+    }
+
+    async function saveMatrixThresholdsToCloud() {
+      if (currentUserRole !== 'MAIN_ADMIN' || !db) return;
+      onMatrixThresholdChange();
+      try {
+        await db.collection("app_settings").doc("organizations").set({
+          matrixThresholds: matrixThresholds,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+        alert("정답률 색상 기준 비율이 클라우드에 저장되었습니다.");
+      } catch (err) {
+        alert("기준 저장 실패: " + err.message);
+      }
+    }
+
+    function getMatrixCellColorSpec(accOrNull) {
+      if (accOrNull === null || accOrNull === undefined || Number.isNaN(accOrNull)) {
+        return { bgHex: 'F1F5F9', fgHex: '64748B', cssBg: '#f1f5f9', cssFg: '#64748b', bold: false };
+      }
+      if (accOrNull >= matrixThresholds.green) {
+        return { bgHex: 'DCFCE7', fgHex: '166534', cssBg: '#dcfce7', cssFg: '#166534', bold: true };
+      }
+      if (accOrNull >= matrixThresholds.yellow) {
+        return { bgHex: 'FEF9C3', fgHex: '854D0E', cssBg: '#fef9c3', cssFg: '#854d0e', bold: true };
+      }
+      if (accOrNull >= matrixThresholds.orange) {
+        return { bgHex: 'FFEDD5', fgHex: '9A3412', cssBg: '#ffedd5', cssFg: '#9a3412', bold: true };
+      }
+      return { bgHex: 'E2E8F0', fgHex: '334155', cssBg: '#e2e8f0', cssFg: '#334155', bold: true };
+    }
+
+    function buildStudentUnitMatrixData() {
+      const granularity = document.getElementById('matrixUnitGranularity')?.value || 'unit';
+      const aggMode = document.getElementById('matrixAggMode')?.value || 'max';
+
+      const cols = [];
+      const seenCol = new Set();
+      RAW_VOCAB.forEach(v => {
+        const key = granularity === 'unit' ? v.unit : v.section;
+        const label = granularity === 'unit' ? extractUnitNumberLabel(v.unit) : extractSectionCodeLabel(v.section);
+        if (key && !seenCol.has(key)) {
+          seenCol.add(key);
+          cols.push({ key, label });
+        }
+      });
+
+      const studentMap = new Map();
+      adminFilteredRecords.forEach(r => {
+        const sKey = `${r.studentSemester || '-'}__${r.studentClass || '미지정'}__${r.studentName || '미상'}`;
+        if (!studentMap.has(sKey)) {
+          studentMap.set(sKey, {
+            semester: r.studentSemester || '-',
+            studentClass: r.studentClass || '미지정',
+            studentName: r.studentName || '미상',
+            scoresByCol: new Map()
+          });
+        }
+        const stu = studentMap.get(sKey);
+        const acc = Number(r.accuracy || 0);
+
+        let matchedKeys = [];
+        if (granularity === 'unit') {
+          if (Array.isArray(r.testedUnits) && r.testedUnits.length > 0) {
+            matchedKeys = r.testedUnits;
+          } else {
+            cols.forEach(c => {
+              const num = c.key.match(/^(\d+)/)?.[1];
+              if (num && (String(r.unit || '').includes(`${num}과`) || String(r.unit || '').startsWith(`${num}-`) || String(r.unit || '') === '전체 단원' || String(r.unit || '') === '전체 단원 통합')) {
+                matchedKeys.push(c.key);
+              }
+            });
+          }
+        } else {
+          if (Array.isArray(r.testedSections) && r.testedSections.length > 0) {
+            matchedKeys = r.testedSections;
+          } else {
+            cols.forEach(c => {
+              const secCode = c.label;
+              if (secCode && (String(r.unit || '').includes(secCode) || String(r.unit || '') === '전체 단원' || String(r.unit || '') === '전체 단원 통합')) {
+                matchedKeys.push(c.key);
+              }
+            });
+          }
+        }
+
+        matchedKeys.forEach(k => {
+          if (!stu.scoresByCol.has(k)) stu.scoresByCol.set(k, []);
+          stu.scoresByCol.get(k).push(acc);
+        });
+      });
+
+      const rows = Array.from(studentMap.values()).sort((a, b) =>
+        a.studentClass.localeCompare(b.studentClass, 'ko') || a.studentName.localeCompare(b.studentName, 'ko')
+      ).map(stu => {
+        const cellValues = cols.map(c => {
+          const arr = stu.scoresByCol.get(c.key);
+          if (!arr || arr.length === 0) return null;
+          if (aggMode === 'avg') return Math.round(arr.reduce((s, v) => s + v, 0) / arr.length);
+          return Math.max(...arr);
+        });
+        const validNums = cellValues.filter(v => v !== null);
+        const overallAvg = validNums.length > 0 ? Math.round(validNums.reduce((s, v) => s + v, 0) / validNums.length) : null;
+        return { ...stu, cellValues, overallAvg };
+      });
+
+      return { cols, rows };
+    }
+
+    function renderStudentUnitMatrix() {
+      const thead = document.getElementById('studentMatrixHead');
+      const tbody = document.getElementById('studentMatrixBody');
+      if (!thead || !tbody) return;
+
+      const { cols, rows } = buildStudentUnitMatrixData();
+      thead.innerHTML = `
+        <tr>
+          <th>학기</th>
+          <th>소속 반</th>
+          <th>학생 이름</th>
+          <th>전체 평균</th>
+          ${cols.map(c => `<th style="text-align:center;">${c.label}</th>`).join('')}
+        </tr>
+      `;
+
+      if (rows.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="${cols.length + 4}" style="text-align:center; padding:2rem; color:var(--text-muted);">표시할 학생 학습 기록이 없습니다.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = rows.map(row => {
+        const avgSpec = getMatrixCellColorSpec(row.overallAvg);
+        return `
+          <tr>
+            <td>${row.semester}</td>
+            <td>${row.studentClass}</td>
+            <td><strong>${row.studentName}</strong></td>
+            <td style="text-align:center; background:${avgSpec.cssBg}; color:${avgSpec.cssFg}; font-weight:800;">${row.overallAvg !== null ? row.overallAvg + '%' : '-'}</td>
+            ${row.cellValues.map(val => {
+              const spec = getMatrixCellColorSpec(val);
+              return `<td style="text-align:center; background:${spec.cssBg}; color:${spec.cssFg}; font-weight:${spec.bold ? '800' : '500'};">${val !== null ? val + '%' : '-'}</td>`;
+            }).join('')}
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function exportCurrentAnalyticsExcel() {
+      const today = new Date().toISOString().slice(0, 10);
+
+      if (currentRecordAnalyticsMode === 'matrix') {
+        const { cols, rows } = buildStudentUnitMatrixData();
+        if (rows.length === 0) {
+          alert("다운로드할 학생 현황 데이터가 없습니다.");
+          return;
+        }
+        if (typeof XLSX !== 'undefined') {
+          const wb = XLSX.utils.book_new();
+          const headerRow = ['학기', '소속 반', '학생 이름', '전체 평균', ...cols.map(c => c.label)];
+          const wsData = [headerRow];
+
+          rows.forEach(r => {
+            wsData.push([
+              r.semester,
+              r.studentClass,
+              r.studentName,
+              r.overallAvg !== null ? `${r.overallAvg}%` : '-',
+              ...r.cellValues.map(v => v !== null ? `${v}%` : '-')
+            ]);
+          });
+
+          const ws = XLSX.utils.aoa_to_sheet(wsData);
+          const thinBorder = {
+            top: { style: 'thin', color: { rgb: 'CBD5E1' } },
+            bottom: { style: 'thin', color: { rgb: 'CBD5E1' } },
+            left: { style: 'thin', color: { rgb: 'CBD5E1' } },
+            right: { style: 'thin', color: { rgb: 'CBD5E1' } }
+          };
+
+          for (let c = 0; c < headerRow.length; c++) {
+            const addr = XLSX.utils.encode_cell({ r: 0, c });
+            if (ws[addr]) {
+              ws[addr].s = {
+                fill: { fgColor: { rgb: '1E3A8A' } },
+                font: { bold: true, color: { rgb: 'FFFFFF' }, sz: 11 },
+                alignment: { horizontal: 'center', vertical: 'center' },
+                border: thinBorder
+              };
+            }
+          }
+
+          rows.forEach((r, rIdx) => {
+            const rowNum = rIdx + 1;
+            for (let c = 0; c < 3; c++) {
+              const addr = XLSX.utils.encode_cell({ r: rowNum, c });
+              if (ws[addr]) {
+                ws[addr].s = {
+                  font: { bold: c === 2, sz: 10, color: { rgb: '0F172A' } },
+                  alignment: { horizontal: c === 2 ? 'left' : 'center', vertical: 'center' },
+                  border: thinBorder
+                };
+              }
+            }
+            const allVals = [r.overallAvg, ...r.cellValues];
+            allVals.forEach((val, vIdx) => {
+              const addr = XLSX.utils.encode_cell({ r: rowNum, c: 3 + vIdx });
+              const spec = getMatrixCellColorSpec(val);
+              if (ws[addr]) {
+                ws[addr].s = {
+                  fill: { fgColor: { rgb: spec.bgHex } },
+                  font: { bold: spec.bold, color: { rgb: spec.fgHex }, sz: 10 },
+                  alignment: { horizontal: 'center', vertical: 'center' },
+                  border: thinBorder
+                };
+              }
+            });
+          });
+
+          ws['!cols'] = [{ wch: 10 }, { wch: 16 }, { wch: 14 }, { wch: 12 }, ...cols.map(() => ({ wch: 10 }))];
+          XLSX.utils.book_append_sheet(wb, ws, '단원별_학습현황');
+          XLSX.writeFile(wb, `학생별_단원학습현황표_${today}.xlsx`);
+          return;
+        }
+      }
+
+      if (currentRecordAnalyticsMode === 'wrong') {
+        if (cachedWrongRankingRows.length === 0) {
+          alert("다운로드할 오답 분석 데이터가 없습니다.");
+          return;
+        }
+        if (typeof XLSX !== 'undefined') {
+          const wb = XLSX.utils.book_new();
+          const aoa = [
+            ['순위', '단원', '소단원', '한국어 단어', '영어 뜻', '출제 횟수', '오답 횟수', '오답률(%)', '주요 오답 학생'],
+            ...cachedWrongRankingRows.map((r, i) => [
+              i + 1, extractUnitNumberLabel(r.unit), extractSectionCodeLabel(r.section),
+              r.kr, r.en, r.testedCount, r.wrongCount, `${r.wrongRate}%`, r.studentsSummary
+            ])
+          ];
+          const ws = XLSX.utils.aoa_to_sheet(aoa);
+          ws['!cols'] = [{ wch: 7 }, { wch: 11 }, { wch: 10 }, { wch: 18 }, { wch: 24 }, { wch: 11 }, { wch: 11 }, { wch: 11 }, { wch: 28 }];
+          XLSX.utils.book_append_sheet(wb, ws, '오답률_순위');
+          XLSX.writeFile(wb, `단원별_오답률순위_${today}.xlsx`);
+          return;
+        }
+      }
+
       if (adminFilteredRecords.length === 0) {
         alert("다운로드할 데이터가 없습니다.");
         return;
       }
-      let csv = "\uFEFF완료일시,소속급수,학생이름,교재,선택단원,학습모드,학습언어,정답수,전체문항,정답률,스트릭\n";
-      adminFilteredRecords.forEach(r => {
-        csv += `"${r.clientDate || ''}","${r.studentClass || ''}","${r.studentName}","${r.bookTitle || ''}","${r.unit}","${r.mode}","${r.language}",${r.correctCount},${r.totalQuestions},"${r.accuracy}%","${r.streak || 1}일"\n`;
+      if (typeof XLSX !== 'undefined') {
+        const wb = XLSX.utils.book_new();
+        const aoa = [
+          ['완료일시', '학기', '소속급수', '학생이름', '단원', '학습모드', '학습언어', '정답수', '전체문항', '정답률', '스트릭'],
+          ...adminFilteredRecords.map(r => [
+            r.clientDate || '', r.studentSemester || '', r.studentClass || '', r.studentName,
+            formatCompactUnitColumn(r.unit), r.mode, r.language, r.correctCount, r.totalQuestions, `${r.accuracy}%`, `${r.streak || 1}일`
+          ])
+        ];
+        const ws = XLSX.utils.aoa_to_sheet(aoa);
+        ws['!cols'] = [{ wch: 22 }, { wch: 9 }, { wch: 15 }, { wch: 13 }, { wch: 14 }, { wch: 11 }, { wch: 9 }, { wch: 9 }, { wch: 9 }, { wch: 10 }, { wch: 9 }];
+        XLSX.utils.book_append_sheet(wb, ws, '세션별_학습기록');
+        XLSX.writeFile(wb, `한국어퀴즈_학습기록_${today}.xlsx`);
+      }
+    }
+
+    /* ==========================================================================
+       11-B. CLASS STUDENT ROSTER MANAGEMENT (TEACHER & MAIN ADMIN)
+    ========================================================================== */
+    async function loadStudentRoster() {
+      const tbody = document.getElementById('studentRosterTableBody');
+      if (!tbody || !db) return;
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:2rem;">학생 명단을 불러오는 중...</td></tr>';
+
+      try {
+        const snap = await db.collection("students").get();
+        const mapByKey = new Map();
+        snap.forEach(doc => {
+          const d = doc.data();
+          d._docId = doc.id;
+          d._fromRoster = true;
+          if (currentUserRole === 'TEACHER' && assignedTeacherClass !== 'ALL') {
+            if ((d.studentClass || '') !== assignedTeacherClass) return;
+          }
+          mapByKey.set(`${d.semester || '26-1'}__${d.studentClass || '미지정'}__${d.studentName}`, d);
+        });
+
+        adminRecordsCache.forEach(r => {
+          const sem = r.studentSemester || '26-1';
+          const cls = r.studentClass || '미지정';
+          const name = r.studentName || '';
+          if (!name) return;
+          if (currentUserRole === 'TEACHER' && assignedTeacherClass !== 'ALL' && cls !== assignedTeacherClass) return;
+          const k = `${sem}__${cls}__${name}`;
+          if (!mapByKey.has(k)) {
+            mapByKey.set(k, {
+              _docId: buildStudentDocId(r.studentInstitution || '용인대학교 한국어학당', sem, cls, name),
+              _fromRoster: false,
+              institution: r.studentInstitution || '용인대학교 한국어학당',
+              semester: sem,
+              studentClass: cls,
+              studentName: name,
+              lastActiveDate: r.clientDate || '-'
+            });
+          }
+        });
+
+        studentRosterCache = Array.from(mapByKey.values()).sort((a, b) =>
+          (a.studentClass || '').localeCompare(b.studentClass || '', 'ko') || (a.studentName || '').localeCompare(b.studentName || '', 'ko')
+        );
+        filterStudentRosterTable();
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--danger); padding:2rem;">명단 조회 오류: ${err.message}</td></tr>`;
+      }
+    }
+
+    function filterStudentRosterTable() {
+      const semF = document.getElementById('rosterFilterSemester')?.value || 'ALL';
+      const clsF = document.getElementById('rosterFilterClass')?.value || 'ALL';
+      const q = (document.getElementById('rosterSearchInput')?.value || '').trim().toLowerCase();
+
+      studentRosterFiltered = studentRosterCache.filter(s => {
+        if (semF !== 'ALL' && (s.semester || '') !== semF) return false;
+        if (clsF !== 'ALL' && (s.studentClass || '') !== clsF) return false;
+        if (q && !(s.studentName || '').toLowerCase().includes(q)) return false;
+        return true;
       });
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = `한국어퀴즈_학습기록_${new Date().toISOString().slice(0,10)}.csv`;
-      a.click();
+
+      selectedStudentDocIds.clear();
+      const selAll = document.getElementById('selectAllStudentsCb');
+      if (selAll) selAll.checked = false;
+      renderStudentRosterTable();
+    }
+
+    function renderStudentRosterTable() {
+      const tbody = document.getElementById('studentRosterTableBody');
+      if (!tbody) return;
+      if (studentRosterFiltered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:2rem; color:var(--text-muted);">조건에 맞는 학생 명단이 없습니다.</td></tr>';
+        return;
+      }
+
+      const orgMap = getOrganizationsMap();
+      const allClasses = [];
+      Object.values(orgMap).forEach(arr => arr.forEach(c => { if (!allClasses.includes(c)) allClasses.push(c); }));
+      const sems = getSemestersList();
+
+      tbody.innerHTML = studentRosterFiltered.map((s, idx) => {
+        const clsOptions = Array.from(new Set([...allClasses, s.studentClass].filter(Boolean)));
+        const semOptions = Array.from(new Set([...sems, s.semester].filter(Boolean)));
+        return `
+          <tr>
+            <td style="text-align:center;"><input type="checkbox" class="stu-row-cb" value="${idx}" onchange="onStudentRowCheckboxChange(this)" /></td>
+            <td>${s.institution || '용인대학교 한국어학당'}</td>
+            <td>
+              <select id="editStuSem_${idx}" style="padding:0.25rem 0.4rem; font-size:0.8rem;">
+                ${semOptions.map(sm => `<option value="${sm}" ${s.semester === sm ? 'selected' : ''}>${sm}</option>`).join('')}
+              </select>
+            </td>
+            <td>
+              <select id="editStuCls_${idx}" style="padding:0.25rem 0.4rem; font-size:0.8rem;">
+                ${clsOptions.map(c => `<option value="${c}" ${s.studentClass === c ? 'selected' : ''}>${c}</option>`).join('')}
+              </select>
+            </td>
+            <td>
+              <input type="text" id="editStuName_${idx}" value="${s.studentName}" style="padding:0.25rem 0.5rem; font-size:0.82rem; border:1px solid var(--border); border-radius:6px; width:130px;" />
+            </td>
+            <td>${s.lastActiveDate || '-'}</td>
+            <td style="display:flex; gap:0.35rem;">
+              <button type="button" class="btn btn-primary btn-sm" style="padding:0.22rem 0.55rem; font-size:0.75rem;" onclick="saveEditedStudentRow(${idx})">수정 저장</button>
+              <button type="button" class="btn btn-danger btn-sm" style="padding:0.22rem 0.55rem; font-size:0.75rem;" onclick="deleteSingleStudentRoster(${idx})">삭제</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function toggleSelectAllStudents(checked) {
+      selectedStudentDocIds.clear();
+      document.querySelectorAll('.stu-row-cb').forEach(cb => {
+        cb.checked = checked;
+        if (checked) selectedStudentDocIds.add(parseInt(cb.value, 10));
+      });
+    }
+
+    function onStudentRowCheckboxChange(cb) {
+      const idx = parseInt(cb.value, 10);
+      if (cb.checked) selectedStudentDocIds.add(idx);
+      else selectedStudentDocIds.delete(idx);
+    }
+
+    async function saveEditedStudentRow(idx) {
+      const s = studentRosterFiltered[idx];
+      if (!s || !db) return;
+      const newSem = document.getElementById(`editStuSem_${idx}`).value;
+      const newCls = document.getElementById(`editStuCls_${idx}`).value;
+      const newName = document.getElementById(`editStuName_${idx}`).value.trim();
+      if (!newName) {
+        alert("학생 이름을 입력해 주세요.");
+        return;
+      }
+
+      const oldName = s.studentName;
+      const oldCls = s.studentClass;
+      const oldSem = s.semester;
+
+      try {
+        const newDocId = buildStudentDocId(s.institution || '용인대학교 한국어학당', newSem, newCls, newName);
+        await db.collection("students").doc(newDocId).set({
+          institution: s.institution || '용인대학교 한국어학당',
+          semester: newSem,
+          studentClass: newCls,
+          studentName: newName,
+          studentKey: `${s.institution || '용인대학교 한국어학당'}_${newSem}_${newCls}_${newName}`,
+          lastActiveDate: s.lastActiveDate || new Date().toLocaleString('ko-KR'),
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+
+        if (s._fromRoster && s._docId && s._docId !== newDocId) {
+          await db.collection("students").doc(s._docId).delete();
+        }
+
+        const matchingRecords = adminRecordsCache.filter(r =>
+          (r.studentName || '') === oldName && (r.studentClass || '미지정') === oldCls && (r.studentSemester || '26-1') === oldSem
+        );
+        if (matchingRecords.length > 0) {
+          const batch = db.batch();
+          matchingRecords.forEach(r => {
+            batch.update(db.collection("student_records").doc(r._docId), {
+              studentSemester: newSem,
+              studentClass: newCls,
+              studentName: newName
+            });
+            r.studentSemester = newSem;
+            r.studentClass = newCls;
+            r.studentName = newName;
+          });
+          await batch.commit();
+        }
+
+        alert(`학생 정보가 [${newSem} · ${newCls} · ${newName}]로 수정되었습니다.`);
+        loadStudentRoster();
+        filterAdminTable();
+      } catch (err) {
+        alert("학생 정보 수정 실패: " + err.message);
+      }
+    }
+
+    async function deleteSingleStudentRoster(idx) {
+      selectedStudentDocIds.clear();
+      selectedStudentDocIds.add(idx);
+      await bulkDeleteStudents(false);
+    }
+
+    async function bulkDeleteStudents(alsoDeleteRecords) {
+      if (selectedStudentDocIds.size === 0) {
+        alert("삭제할 학생을 체크박스로 먼저 선택해 주세요.");
+        return;
+      }
+      const targets = Array.from(selectedStudentDocIds).map(i => studentRosterFiltered[i]).filter(Boolean);
+      const msg = alsoDeleteRecords
+        ? `선택한 ${targets.length}명의 학생 명부와 해당 학생들의 모든 학습 성적 기록까지 영구 삭제하시겠습니까?`
+        : `선택한 ${targets.length}명의 학생을 명부에서 삭제하시겠습니까? (기존 학습 성적 기록은 유지됩니다)`;
+      if (!confirm(msg)) return;
+
+      try {
+        const batch = db.batch();
+        targets.forEach(s => {
+          if (s._docId) {
+            batch.delete(db.collection("students").doc(s._docId));
+          }
+          if (alsoDeleteRecords) {
+            adminRecordsCache.forEach(r => {
+              if ((r.studentName || '') === s.studentName && (r.studentClass || '미지정') === s.studentClass) {
+                batch.delete(db.collection("student_records").doc(r._docId));
+              }
+            });
+          }
+        });
+        await batch.commit();
+
+        if (alsoDeleteRecords) {
+          const targetPairs = new Set(targets.map(t => `${t.studentClass}__${t.studentName}`));
+          adminRecordsCache = adminRecordsCache.filter(r => !targetPairs.has(`${r.studentClass || '미지정'}__${r.studentName}`));
+          filterAdminTable();
+        }
+        selectedStudentDocIds.clear();
+        await loadStudentRoster();
+        alert(`${targets.length}명의 학생 삭제가 완료되었습니다.`);
+      } catch (err) {
+        alert("일괄 삭제 오류: " + err.message);
+      }
     }
 
     /* ==========================================================================
@@ -4809,7 +5967,29 @@
       const count = parseInt(document.getElementById('sheetCountSelect').value, 10);
 
       const pool = RAW_VOCAB.filter(v => selectedSecs.has(v.section));
-      const picked = [...pool].sort(() => 0.5 - Math.random()).slice(0, Math.min(count, pool.length));
+      const orderMode = document.getElementById('sheetOrderSelect')?.value || 'random';
+      let picked = [];
+
+      if (orderMode === 'wrong_rate') {
+        const wrongCountByKr = new Map();
+        adminRecordsCache.forEach(r => {
+          if (clsName && clsName !== 'ALL' && (r.studentClass || '') !== clsName) return;
+          (r.wrongWords || []).forEach(w => {
+            if (w && w.kr) {
+              wrongCountByKr.set(w.kr, (wrongCountByKr.get(w.kr) || 0) + 1);
+            }
+          });
+        });
+        const sortedByWrong = [...pool].sort((a, b) => {
+          const wa = wrongCountByKr.get(a.kr) || 0;
+          const wb = wrongCountByKr.get(b.kr) || 0;
+          if (wb !== wa) return wb - wa;
+          return 0.5 - Math.random();
+        });
+        picked = sortedByWrong.slice(0, Math.min(count, sortedByWrong.length));
+      } else {
+        picked = [...pool].sort(() => 0.5 - Math.random()).slice(0, Math.min(count, pool.length));
+      }
 
       const formatMultiText = (item) => langs.map(l => item[l] || item.en || '').filter(Boolean).join(' / ');
 
@@ -5547,14 +6727,17 @@ ${JSON.stringify(rawLines)}`;
        15. TEACHER REGISTRATION & CUSTOM INSTITUTION / CLASS MANAGEMENT
     ========================================================================== */
     const STORAGE_KEY_CUSTOM_ORGS = 'YONGIN_CUSTOM_ORGS_V2';
+    const STORAGE_KEY_SEMESTERS = 'YONGIN_CUSTOM_SEMESTERS_V2';
 
     const DEFAULT_ORGS_MAP = {
       '용인대학교 한국어학당': ['용인대 1급', '용인대 2급', '용인대 3급', '용인대 4급'],
       '온라인 세종학당': ['세종 초급1', '세종 초급2', '세종 중급1', '세종 중급2'],
       '02100 KOREAN': ['TOPIK I 집중반', 'TOPIK II 실전반']
     };
+    const DEFAULT_SEMESTERS = ['26-1', '26-2', '26-3', '26-4'];
 
     let cachedOrgsMap = null;
+    let cachedSemestersList = null;
 
     function getOrganizationsMap() {
       if (cachedOrgsMap && Object.keys(cachedOrgsMap).length > 0) return cachedOrgsMap;
@@ -5568,34 +6751,102 @@ ${JSON.stringify(rawLines)}`;
       return cachedOrgsMap;
     }
 
+    function getSemestersList() {
+      if (cachedSemestersList && cachedSemestersList.length > 0) return cachedSemestersList;
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY_SEMESTERS) || 'null');
+      if (Array.isArray(saved) && saved.length > 0) {
+        cachedSemestersList = saved;
+        return cachedSemestersList;
+      }
+      cachedSemestersList = [...DEFAULT_SEMESTERS];
+      localStorage.setItem(STORAGE_KEY_SEMESTERS, JSON.stringify(cachedSemestersList));
+      return cachedSemestersList;
+    }
+
     async function loadOrganizationsFromCloud() {
       if (!db) return;
       try {
         const docSnap = await db.collection("app_settings").doc("organizations").get();
-        if (docSnap.exists && docSnap.data().orgMap && Object.keys(docSnap.data().orgMap).length > 0) {
-          cachedOrgsMap = docSnap.data().orgMap;
-          localStorage.setItem(STORAGE_KEY_CUSTOM_ORGS, JSON.stringify(cachedOrgsMap));
+        if (docSnap.exists) {
+          const data = docSnap.data();
+          if (data.orgMap && Object.keys(data.orgMap).length > 0) {
+            cachedOrgsMap = data.orgMap;
+            localStorage.setItem(STORAGE_KEY_CUSTOM_ORGS, JSON.stringify(cachedOrgsMap));
+          }
+          if (Array.isArray(data.semesters) && data.semesters.length > 0) {
+            cachedSemestersList = data.semesters;
+            localStorage.setItem(STORAGE_KEY_SEMESTERS, JSON.stringify(cachedSemestersList));
+          }
+          if (data.matrixThresholds) {
+            matrixThresholds = {
+              green: Number(data.matrixThresholds.green || 90),
+              yellow: Number(data.matrixThresholds.yellow || 70),
+              orange: Number(data.matrixThresholds.orange || 50)
+            };
+            const gEl = document.getElementById('threshGreenInput');
+            const yEl = document.getElementById('threshYellowInput');
+            const oEl = document.getElementById('threshOrangeInput');
+            if (gEl) gEl.value = matrixThresholds.green;
+            if (yEl) yEl.value = matrixThresholds.yellow;
+            if (oEl) oEl.value = matrixThresholds.orange;
+          }
           renderInstitutionAndClassDropdowns();
         }
       } catch (err) {
-        console.warn("기관 설정 클라우드 로드 건너뜀:", err.message);
+        console.warn("기관/학기 설정 클라우드 로드 건너뜀:", err.message);
       }
     }
 
-    async function saveOrganizationsMap(mapObj) {
+    async function saveOrganizationsMap(mapObj, semestersArr) {
       cachedOrgsMap = mapObj;
+      const sems = semestersArr || getSemestersList();
+      cachedSemestersList = sems;
       localStorage.setItem(STORAGE_KEY_CUSTOM_ORGS, JSON.stringify(mapObj));
+      localStorage.setItem(STORAGE_KEY_SEMESTERS, JSON.stringify(sems));
       renderInstitutionAndClassDropdowns();
       if (db && currentUserRole === 'MAIN_ADMIN') {
         try {
           await db.collection("app_settings").doc("organizations").set({
             orgMap: mapObj,
+            semesters: sems,
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-          });
+          }, { merge: true });
         } catch (err) {
           alert("클라우드 동기화 오류 (로컬에는 저장됨): " + err.message);
         }
       }
+    }
+
+    async function addCustomSemester() {
+      const input = document.getElementById('newSemesterInput');
+      const val = input.value.trim();
+      if (!val) {
+        alert("추가할 학기를 입력해 주세요. (예: 27-1)");
+        return;
+      }
+      const list = [...getSemestersList()];
+      if (!list.includes(val)) {
+        list.push(val);
+        await saveOrganizationsMap(getOrganizationsMap(), list);
+      }
+      document.getElementById('manageSemesterSelect').value = val;
+      input.value = '';
+      alert(`[${val}] 학기가 추가되었습니다.`);
+    }
+
+    async function deleteSelectedSemester() {
+      const sel = document.getElementById('manageSemesterSelect');
+      const val = sel?.value;
+      if (!val) return;
+      const list = getSemestersList();
+      if (list.length <= 1) {
+        alert("최소 1개 이상의 학기는 유지되어야 합니다.");
+        return;
+      }
+      if (!confirm(`[${val}] 학기를 삭제하시겠습니까?`)) return;
+      const nextList = list.filter(s => s !== val);
+      await saveOrganizationsMap(getOrganizationsMap(), nextList);
+      alert(`[${val}] 학기가 삭제되었습니다.`);
     }
 
     function syncAllInstitutionAndClassDropdowns() {
@@ -5603,11 +6854,38 @@ ${JSON.stringify(rawLines)}`;
       loadOrganizationsFromCloud();
     }
 
+    function onStudentInstSelectChange() {
+      const orgMap = getOrganizationsMap();
+      const instSel = document.getElementById('userInstSelect');
+      const clsSel = document.getElementById('userClassSelect');
+      if (!instSel || !clsSel) return;
+      const classes = orgMap[instSel.value] || [];
+      const prev = clsSel.value;
+      clsSel.innerHTML = classes.map(c => `<option value="${c}">${c}</option>`).join('');
+      if (prev && classes.includes(prev)) clsSel.value = prev;
+    }
+
     function renderInstitutionAndClassDropdowns() {
       const orgMap = getOrganizationsMap();
       const orgNames = Object.keys(orgMap);
+      const sems = getSemestersList();
 
-      ['manageInstSelect', 'newTeacherInstSelect'].forEach(selId => {
+      ['userSemesterSelect', 'manageSemesterSelect'].forEach(selId => {
+        const sel = document.getElementById(selId);
+        if (!sel) return;
+        const prev = sel.value;
+        sel.innerHTML = sems.map(s => `<option value="${s}">${s}</option>`).join('');
+        if (prev && sems.includes(prev)) sel.value = prev;
+      });
+      ['adminFilterSemester', 'rosterFilterSemester'].forEach(selId => {
+        const sel = document.getElementById(selId);
+        if (!sel) return;
+        const prev = sel.value;
+        sel.innerHTML = `<option value="ALL">전체 학기</option>` + sems.map(s => `<option value="${s}">${s}</option>`).join('');
+        if (prev) sel.value = prev;
+      });
+
+      ['manageInstSelect', 'newTeacherInstSelect', 'userInstSelect'].forEach(selId => {
         const sel = document.getElementById(selId);
         if (!sel) return;
         const prevVal = sel.value;
@@ -5617,6 +6895,7 @@ ${JSON.stringify(rawLines)}`;
 
       onManageInstSelectChange();
       onTeacherInstSelectChange();
+      onStudentInstSelectChange();
 
       const allClasses = [];
       orgNames.forEach(org => {
@@ -5625,18 +6904,31 @@ ${JSON.stringify(rawLines)}`;
         });
       });
 
-      const userClsSel = document.getElementById('userClassSelect');
-      if (userClsSel && allClasses.length > 0) {
-        const prev = userClsSel.value;
-        userClsSel.innerHTML = allClasses.map(c => `<option value="${c}">${c}</option>`).join('');
-        if (prev && allClasses.includes(prev)) userClsSel.value = prev;
-      }
-
       const adminFilterCls = document.getElementById('adminFilterClass');
       if (adminFilterCls && !adminFilterCls.disabled) {
         const prev = adminFilterCls.value;
-        adminFilterCls.innerHTML = `<option value="ALL">전체 급수/수업</option>` + allClasses.map(c => `<option value="${c}">${c}</option>`).join('');
+        adminFilterCls.innerHTML = `<option value="ALL">전체 급수/수업</option>` +
+          allClasses.map(c => `<option value="${c}">${c}</option>`).join('') +
+          `<option value="UNASSIGNED">⚠️ 미지정 (소속 없음)</option>`;
         if (prev) adminFilterCls.value = prev;
+      }
+
+      const bulkAssignCls = document.getElementById('bulkAssignClassSelect');
+      if (bulkAssignCls) {
+        bulkAssignCls.innerHTML = allClasses.map(c => `<option value="${c}">${c}</option>`).join('');
+      }
+
+      const rosterFilterCls = document.getElementById('rosterFilterClass');
+      if (rosterFilterCls) {
+        if (currentUserRole === 'TEACHER' && assignedTeacherClass !== 'ALL') {
+          rosterFilterCls.innerHTML = `<option value="${assignedTeacherClass}">${assignedTeacherClass}</option>`;
+          rosterFilterCls.disabled = true;
+        } else {
+          const prev = rosterFilterCls.value;
+          rosterFilterCls.disabled = false;
+          rosterFilterCls.innerHTML = `<option value="ALL">전체 반</option>` + allClasses.map(c => `<option value="${c}">${c}</option>`).join('');
+          if (prev) rosterFilterCls.value = prev;
+        }
       }
 
       const sheetClsSel = document.getElementById('sheetClassSelect');
