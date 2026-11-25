@@ -1869,19 +1869,26 @@
         <!-- Institution & Class Registry Box -->
         <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:12px; padding:1rem; margin-bottom:1rem;">
           <h3 style="font-size:0.98rem; font-weight:800; color:var(--primary); margin-bottom:0.4rem;">🏫 기관명 및 하위 급수·수업 커스텀 등록 (자동 저장)</h3>
-          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:0.75rem;">
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:0.75rem;">
             <div style="background:white; padding:0.7rem; border-radius:10px; border:1px solid #dbeafe;">
-              <label style="font-size:0.76rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.3rem;">1. 새 기관명 추가 (드롭다운 자동 누적)</label>
+              <label style="font-size:0.76rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.3rem;">1. 새 기관명 추가 (클라우드 자동 저장)</label>
               <div style="display:flex; gap:0.4rem;">
-                <input type="text" id="newInstitutionNameInput" placeholder="예: 용인대학교 한국어학당, 온라인 세종학당" class="typing-input" style="flex:1; padding:0.45rem 0.65rem; font-size:0.84rem; margin-bottom:0; text-align:left;" />
+                <input type="text" id="newInstitutionNameInput" placeholder="예: 용인대학교 한국어학당, 중앙대학교 한국어학당" class="typing-input" style="flex:1; padding:0.45rem 0.65rem; font-size:0.84rem; margin-bottom:0; text-align:left;" />
                 <button type="button" class="btn btn-primary btn-sm" onclick="addCustomInstitution()">+ 기관 추가</button>
               </div>
             </div>
             <div style="background:white; padding:0.7rem; border-radius:10px; border:1px solid #dbeafe;">
-              <label style="font-size:0.76rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.3rem;">2. 선택한 기관에 새 급수 / 수업 추가</label>
+              <label style="font-size:0.76rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.3rem;">2. 기관별 급수·수업 추가 및 삭제</label>
+              <div style="display:flex; gap:0.4rem; flex-wrap:wrap; margin-bottom:0.45rem;">
+                <select id="manageInstSelect" style="flex:1; min-width:150px; padding:0.45rem; font-size:0.83rem;" onchange="onManageInstSelectChange()"></select>
+                <button type="button" class="btn btn-danger btn-sm" onclick="deleteSelectedInstitution()">기관 삭제</button>
+              </div>
+              <div style="display:flex; gap:0.4rem; flex-wrap:wrap; margin-bottom:0.45rem;">
+                <select id="manageClassSelect" style="flex:1; min-width:150px; padding:0.45rem; font-size:0.83rem;"></select>
+                <button type="button" class="btn btn-outline btn-sm" style="color:var(--danger); border-color:#fca5a5;" onclick="deleteSelectedClassFromInstitution()">수업 삭제</button>
+              </div>
               <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
-                <select id="manageInstSelect" style="width:155px; padding:0.45rem; font-size:0.83rem;"></select>
-                <input type="text" id="newClassUnderInstInput" placeholder="예: 1급 오전반, TOPIK 3급" class="typing-input" style="flex:1; min-width:120px; padding:0.45rem 0.65rem; font-size:0.84rem; margin-bottom:0; text-align:left;" />
+                <input type="text" id="newClassUnderInstInput" placeholder="새 수업명 (예: 1급 오전반, TOPIK 3급)" class="typing-input" style="flex:1; min-width:130px; padding:0.45rem 0.65rem; font-size:0.84rem; margin-bottom:0; text-align:left;" />
                 <button type="button" class="btn btn-success btn-sm" onclick="addCustomClassToInstitution()">+ 수업 추가</button>
               </div>
             </div>
@@ -5547,25 +5554,59 @@ ${JSON.stringify(rawLines)}`;
       '02100 KOREAN': ['TOPIK I 집중반', 'TOPIK II 실전반']
     };
 
+    let cachedOrgsMap = null;
+
     function getOrganizationsMap() {
+      if (cachedOrgsMap && Object.keys(cachedOrgsMap).length > 0) return cachedOrgsMap;
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEY_CUSTOM_ORGS) || 'null');
       if (saved && typeof saved === 'object' && Object.keys(saved).length > 0) {
-        return saved;
+        cachedOrgsMap = saved;
+        return cachedOrgsMap;
       }
-      localStorage.setItem(STORAGE_KEY_CUSTOM_ORGS, JSON.stringify(DEFAULT_ORGS_MAP));
-      return { ...DEFAULT_ORGS_MAP };
+      cachedOrgsMap = { ...DEFAULT_ORGS_MAP };
+      localStorage.setItem(STORAGE_KEY_CUSTOM_ORGS, JSON.stringify(cachedOrgsMap));
+      return cachedOrgsMap;
     }
 
-    function saveOrganizationsMap(mapObj) {
+    async function loadOrganizationsFromCloud() {
+      if (!db) return;
+      try {
+        const docSnap = await db.collection("app_settings").doc("organizations").get();
+        if (docSnap.exists && docSnap.data().orgMap && Object.keys(docSnap.data().orgMap).length > 0) {
+          cachedOrgsMap = docSnap.data().orgMap;
+          localStorage.setItem(STORAGE_KEY_CUSTOM_ORGS, JSON.stringify(cachedOrgsMap));
+          renderInstitutionAndClassDropdowns();
+        }
+      } catch (err) {
+        console.warn("기관 설정 클라우드 로드 건너뜀:", err.message);
+      }
+    }
+
+    async function saveOrganizationsMap(mapObj) {
+      cachedOrgsMap = mapObj;
       localStorage.setItem(STORAGE_KEY_CUSTOM_ORGS, JSON.stringify(mapObj));
-      syncAllInstitutionAndClassDropdowns();
+      renderInstitutionAndClassDropdowns();
+      if (db && currentUserRole === 'MAIN_ADMIN') {
+        try {
+          await db.collection("app_settings").doc("organizations").set({
+            orgMap: mapObj,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        } catch (err) {
+          alert("클라우드 동기화 오류 (로컬에는 저장됨): " + err.message);
+        }
+      }
     }
 
     function syncAllInstitutionAndClassDropdowns() {
+      renderInstitutionAndClassDropdowns();
+      loadOrganizationsFromCloud();
+    }
+
+    function renderInstitutionAndClassDropdowns() {
       const orgMap = getOrganizationsMap();
       const orgNames = Object.keys(orgMap);
 
-      // 1. Admin Teacher Tab Institution Dropdowns
       ['manageInstSelect', 'newTeacherInstSelect'].forEach(selId => {
         const sel = document.getElementById(selId);
         if (!sel) return;
@@ -5574,9 +5615,9 @@ ${JSON.stringify(rawLines)}`;
         if (prevVal && orgNames.includes(prevVal)) sel.value = prevVal;
       });
 
+      onManageInstSelectChange();
       onTeacherInstSelectChange();
 
-      // 2. Sync Student Entry Modal & Admin Filter Class Dropdowns
       const allClasses = [];
       orgNames.forEach(org => {
         (orgMap[org] || []).forEach(cls => {
@@ -5602,6 +5643,17 @@ ${JSON.stringify(rawLines)}`;
       if (sheetClsSel) populateAllClassesIntoSelect(sheetClsSel, sheetClsSel.disabled ? sheetClsSel.value : null);
     }
 
+    function onManageInstSelectChange() {
+      const orgMap = getOrganizationsMap();
+      const instSel = document.getElementById('manageInstSelect');
+      const clsSel = document.getElementById('manageClassSelect');
+      if (!instSel || !clsSel) return;
+      const classes = orgMap[instSel.value] || [];
+      clsSel.innerHTML = classes.length > 0
+        ? classes.map(c => `<option value="${c}">${c}</option>`).join('')
+        : `<option value="">(등록된 수업 없음)</option>`;
+    }
+
     function populateAllClassesIntoSelect(selectEl, lockedClass) {
       if (!selectEl) return;
       const orgMap = getOrganizationsMap();
@@ -5622,26 +5674,42 @@ ${JSON.stringify(rawLines)}`;
       clsSel.innerHTML = classes.map(c => `<option value="${c}">${c}</option>`).join('') + `<option value="ALL">기관 내 전체 급수</option>`;
     }
 
-    function addCustomInstitution() {
+    async function addCustomInstitution() {
       const input = document.getElementById('newInstitutionNameInput');
       const name = input.value.trim();
       if (!name) {
         alert("추가할 기관명을 입력해 주세요.");
         return;
       }
-      const orgMap = getOrganizationsMap();
+      const orgMap = { ...getOrganizationsMap() };
       if (!orgMap[name]) {
         orgMap[name] = [`${name} 1반`];
-        saveOrganizationsMap(orgMap);
+        await saveOrganizationsMap(orgMap);
       }
       document.getElementById('manageInstSelect').value = name;
       document.getElementById('newTeacherInstSelect').value = name;
+      onManageInstSelectChange();
       onTeacherInstSelectChange();
       input.value = '';
-      alert(`[${name}] 기관이 등록되어 드롭다운에 추가되었습니다.`);
+      alert(`[${name}] 기관이 추가 및 클라우드에 저장되었습니다.`);
     }
 
-    function addCustomClassToInstitution() {
+    async function deleteSelectedInstitution() {
+      const instSel = document.getElementById('manageInstSelect');
+      const instName = instSel?.value;
+      if (!instName) return;
+      const orgMap = { ...getOrganizationsMap() };
+      if (Object.keys(orgMap).length <= 1) {
+        alert("최소 1개 이상의 기관은 유지되어야 합니다.");
+        return;
+      }
+      if (!confirm(`[${instName}] 기관과 하위 수업 목록을 삭제하시겠습니까?`)) return;
+      delete orgMap[instName];
+      await saveOrganizationsMap(orgMap);
+      alert(`[${instName}] 기관이 삭제되었습니다.`);
+    }
+
+    async function addCustomClassToInstitution() {
       const instName = document.getElementById('manageInstSelect').value;
       const clsInput = document.getElementById('newClassUnderInstInput');
       const clsName = clsInput.value.trim();
@@ -5649,17 +5717,32 @@ ${JSON.stringify(rawLines)}`;
         alert("기관을 선택하고 추가할 급수/수업명을 입력해 주세요.");
         return;
       }
-      const orgMap = getOrganizationsMap();
+      const orgMap = { ...getOrganizationsMap() };
       if (!orgMap[instName]) orgMap[instName] = [];
       if (!orgMap[instName].includes(clsName)) {
-        orgMap[instName].push(clsName);
-        saveOrganizationsMap(orgMap);
+        orgMap[instName] = [...orgMap[instName], clsName];
+        await saveOrganizationsMap(orgMap);
       }
       document.getElementById('newTeacherInstSelect').value = instName;
+      onManageInstSelectChange();
       onTeacherInstSelectChange();
       document.getElementById('newTeacherClass').value = clsName;
       clsInput.value = '';
       alert(`[${instName}]에 [${clsName}] 수업이 추가되었습니다.`);
+    }
+
+    async function deleteSelectedClassFromInstitution() {
+      const instName = document.getElementById('manageInstSelect')?.value;
+      const clsName = document.getElementById('manageClassSelect')?.value;
+      if (!instName || !clsName) {
+        alert("삭제할 수업을 선택해 주세요.");
+        return;
+      }
+      if (!confirm(`[${instName}]의 [${clsName}] 수업을 삭제하시겠습니까?`)) return;
+      const orgMap = { ...getOrganizationsMap() };
+      orgMap[instName] = (orgMap[instName] || []).filter(c => c !== clsName);
+      await saveOrganizationsMap(orgMap);
+      alert(`[${clsName}] 수업이 삭제되었습니다.`);
     }
 
     async function registerNewTeacher() {
