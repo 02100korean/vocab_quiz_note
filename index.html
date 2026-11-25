@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>다국어 한국어 어휘 학습 & 실전 퀴즈 플랫폼 v2.1</title>
+  <title>다국어 한국어 어휘 학습 & 실전 퀴즈 플랫폼 v2.3</title>
   <!-- Google Fonts & Libraries -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700;800&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700;800&family=Noto+Sans+KR:wght@400;500;700;900&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
@@ -34,7 +34,7 @@
       --radius: 16px;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', 'Noto Sans KR', sans-serif; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Noto Sans KR', 'Noto Sans SC', 'Pretendard', sans-serif; }
     body { background-color: var(--bg); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; }
 
     header {
@@ -737,10 +737,10 @@
       margin-bottom: 0.85rem;
     }
     .color-item {
-      display: flex;
+      display: inline-flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 0.4rem;
+      justify-content: flex-start;
+      gap: 0.45rem;
       font-size: 0.8rem;
       font-weight: 700;
       color: var(--text-main);
@@ -859,37 +859,6 @@
     /* Dedicated Print Area for PPT PDF Export */
     #pptPdfPrintContainer { display: none; }
 
-    @media print {
-      body * { visibility: hidden; }
-      body.print-mode-sheet #printSheetPreview,
-      body.print-mode-sheet #printSheetPreview * { visibility: visible; }
-      body.print-mode-sheet #printSheetPreview {
-        position: absolute; left: 0; top: 0; width: 100%; border: none; padding: 0; margin: 0;
-      }
-
-      body.print-mode-ppt #pptPdfPrintContainer,
-      body.print-mode-ppt #pptPdfPrintContainer * { visibility: visible; }
-      body.print-mode-ppt #pptPdfPrintContainer {
-        display: block !important;
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-      }
-      .pdf-ppt-page {
-        width: 100%;
-        aspect-ratio: 4 / 3;
-        page-break-after: always;
-        break-after: page;
-        position: relative;
-        overflow: hidden;
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-      }
-      .no-print { display: none !important; }
-    }
-
-
     /* Landscape A4 Workbook Print Styles */
     #workbookPrintContainer { display: none; }
     .wb-preview-frame {
@@ -910,14 +879,14 @@
       aspect-ratio: 297 / 210;
       background: #ffffff;
       color: #0f172a;
-      padding: 1.5rem 1.75rem;
+      padding: 1.1rem 1.4rem 0.8rem 1.4rem;
       box-shadow: 0 8px 20px rgba(0,0,0,0.12);
       position: relative;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       box-sizing: border-box;
-      font-family: 'Malgun Gothic', 'Noto Sans KR', sans-serif;
+      font-family: 'Noto Sans KR', 'Noto Sans SC', 'Malgun Gothic', sans-serif;
     }
     .wb-cover-box {
       border: 2.5px solid #1e293b;
@@ -974,41 +943,49 @@
       justify-content: space-between;
       align-items: center;
       border-bottom: 2px solid #1e3a8a;
-      padding-bottom: 0.35rem;
-      margin-bottom: 0.55rem;
+      padding-bottom: 0.25rem;
+      margin-bottom: 0.35rem;
       font-weight: 800;
       color: #1e3a8a;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
+      flex-shrink: 0;
     }
     .wb-two-col-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 0.85rem;
+      gap: 0.75rem;
       flex: 1;
-      align-items: start;
+      align-items: stretch;
     }
     .wb-one-col-wrap {
       flex: 1;
+      display: flex;
+      flex-direction: column;
     }
     .wb-table {
       width: 100%;
       border-collapse: collapse;
       table-layout: fixed;
     }
+    .wb-table.wb-practice-table {
+      flex: 1;
+      height: 100%;
+    }
     .wb-table th {
       background: #1e3a8a;
       color: #ffffff;
       border: 1px solid #1e3a8a;
-      padding: 0.28rem 0.25rem;
-      font-size: 0.76rem;
+      padding: 0.22rem 0.2rem;
+      font-size: 0.74rem;
       font-weight: 700;
       text-align: center;
+      height: 24px;
     }
     .wb-table td {
       border: 1px solid #94a3b8;
-      padding: 0.24rem 0.3rem;
+      padding: 0.16rem 0.28rem;
       vertical-align: middle;
-      line-height: 1.18;
+      line-height: 1.15;
       overflow: hidden;
       display: table-cell;
     }
@@ -1021,10 +998,12 @@
     }
     .wb-footer-num {
       text-align: center;
-      font-size: 0.78rem;
+      font-size: 0.75rem;
       font-weight: 700;
       color: #64748b;
-      margin-top: 0.35rem;
+      margin-top: 0.2rem;
+      flex-shrink: 0;
+      line-height: 1.2;
     }
     .wb-colophon-box {
       height: 100%;
@@ -1042,30 +1021,174 @@
       color: #1e293b;
     }
 
+    /* Unit tree shared style inside admin tabs */
+    .admin-unit-tree-box {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.55rem;
+      max-height: 145px;
+      overflow-y: auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 0.45rem;
+    }
+    .admin-unit-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 0.35rem 0.5rem;
+      font-size: 0.8rem;
+    }
+    .admin-unit-card-hdr {
+      font-weight: 800;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      cursor: pointer;
+    }
+    .admin-unit-card-subs {
+      padding-left: 1.1rem;
+      margin-top: 0.2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+    .admin-unit-card-subs label {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.76rem;
+      color: var(--text-main);
+      cursor: pointer;
+    }
+
+    /* Language order chip list for workbook */
+    .wb-lang-order-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.4rem;
+    }
+    .wb-lang-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      background: #eff6ff;
+      border: 1px solid #93c5fd;
+      color: #1e3a8a;
+      border-radius: 8px;
+      padding: 0.22rem 0.5rem;
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+    .wb-lang-chip button {
+      background: white;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      padding: 0 4px;
+      font-size: 0.7rem;
+      cursor: pointer;
+      color: #334155;
+    }
+    .wb-lang-chip button:hover { background: #dbeafe; }
+
     @media print {
-      @page { size: A4 landscape; margin: 8mm; }
-      body.print-mode-workbook #workbookPrintContainer,
-      body.print-mode-workbook #workbookPrintContainer * { visibility: visible; }
-      body.print-mode-workbook #workbookPrintContainer {
+      body * { visibility: hidden; }
+      .no-print { display: none !important; }
+
+      /* Unlock modal scroll constraints so multi-page quiz sheets print all pages */
+      body.print-mode-sheet .modal-overlay,
+      body.print-mode-sheet .modal-box {
+        position: static !important;
+        overflow: visible !important;
+        max-height: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        background: white !important;
         display: block !important;
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
       }
-      body.print-mode-workbook .wb-page {
-        width: 100%;
-        max-width: none;
-        height: 190mm;
-        aspect-ratio: auto;
-        box-shadow: none;
-        padding: 4mm 6mm;
-        page-break-after: always;
-        break-after: page;
+      body.print-mode-sheet #printSheetPreview,
+      body.print-mode-sheet #printSheetPreview * {
+        visibility: visible !important;
+      }
+      body.print-mode-sheet #printSheetPreview {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        border: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      body.print-mode-sheet.hide-answer-key .sheet-answer-section {
+        display: none !important;
+      }
+      body.print-mode-sheet.only-answer-key .sheet-student-section {
+        display: none !important;
+      }
+      body.print-mode-sheet.only-answer-key .sheet-answer-section {
+        page-break-before: auto !important;
+        break-before: auto !important;
+        border-top: none !important;
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+      }
+
+      /* PPT 4:3 Exact 1-Slide-Per-Page PDF Export */
+      body.print-mode-ppt #pptPdfPrintContainer,
+      body.print-mode-ppt #pptPdfPrintContainer * {
+        visibility: visible !important;
+      }
+      body.print-mode-ppt #pptPdfPrintContainer {
+        display: block !important;
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+      }
+      body.print-mode-ppt .pdf-ppt-page {
+        width: 100vw !important;
+        height: 100vh !important;
+        page-break-after: always !important;
+        break-after: page !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        position: relative !important;
+        overflow: hidden !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
       }
-      body.print-mode-workbook .wb-blank-page span { display: none; }
+
+      /* Landscape A4 Workbook Print (20 rows flush to bottom footer) */
+      body.print-mode-workbook #workbookPrintContainer,
+      body.print-mode-workbook #workbookPrintContainer * {
+        visibility: visible !important;
+      }
+      body.print-mode-workbook #workbookPrintContainer {
+        display: block !important;
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+      }
+      body.print-mode-workbook .wb-page {
+        width: 100% !important;
+        max-width: none !important;
+        height: 194mm !important;
+        aspect-ratio: auto !important;
+        box-shadow: none !important;
+        padding: 3mm 5mm 2mm 5mm !important;
+        page-break-after: always !important;
+        break-after: page !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      body.print-mode-workbook .wb-blank-page span { display: none !important; }
     }
 
     @keyframes shake {
@@ -1255,13 +1378,15 @@
         </div>
       </div>
 
-      <!-- SUB-TAB 2: Classroom PPT & Slideshow Studio (5 Themes, H/V Layout, Custom Colors, Anim/2-Slide, Web/PPTX/PDF) -->
+      <!-- SUB-TAB 2: Classroom PPT & Slideshow Studio -->
       <div id="adminViewPptStudio" class="no-print" style="display:none;">
         <div style="background:#f8fafc; border:1px solid var(--border); border-radius:14px; padding:1.1rem;">
-          <h3 style="font-size:1.05rem; font-weight:800; color:var(--primary); margin-bottom:0.75rem;">📽️ 수업용 어휘 카드 PPT & 웹 슬라이드쇼 자동 제작 (4:3 비율)</h3>
+          <!-- Step 1: 5 Design Presets moved to the very top -->
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.45rem; flex-wrap:wrap; gap:0.4rem;">
+            <h3 style="font-size:1.05rem; font-weight:800; color:var(--primary);">📽️ 수업용 어휘 카드 PPT & 웹 슬라이드쇼 자동 제작 (4:3 비율)</h3>
+            <span style="font-size:0.78rem; color:var(--text-muted); font-weight:700;">Noto Sans 폰트 통일 적용</span>
+          </div>
 
-          <!-- Step 1: 5 Design Presets -->
-          <label style="font-size:0.78rem; font-weight:800; color:var(--text-muted); display:block; margin-bottom:0.35rem;">1. 디자인 시안 선택 (5종 기본 프리셋)</label>
           <div class="ppt-theme-grid" id="pptThemeGrid">
             <button type="button" class="ppt-theme-btn active" data-theme="clean_white" onclick="selectPptTheme('clean_white')">
               <div class="theme-swatch-row">
@@ -1305,11 +1430,11 @@
             </button>
           </div>
 
-          <!-- Step 2: Individual Custom Color Pickers -->
-          <label style="font-size:0.78rem; font-weight:800; color:var(--text-muted); display:block; margin-bottom:0.35rem;">2. 세부 색상 커스터마이징 (배경 · 한국어 글자 · 다국어 글자 · 글박스 색)</label>
+          <!-- Step 2: Individual Custom Color Pickers (Color box right next to label) -->
+          <label style="font-size:0.78rem; font-weight:800; color:var(--text-muted); display:block; margin-bottom:0.3rem;">세부 색상 커스터마이징</label>
           <div class="color-picker-group">
             <div class="color-item">
-              <span>배경 / 메인면 색</span>
+              <span>배경/메인면 색</span>
               <input type="color" id="pptColorBg" value="#FFFFFF" onchange="updatePptPreview()" />
             </div>
             <div class="color-item">
@@ -1321,12 +1446,12 @@
               <input type="color" id="pptColorMulti" value="#1B2A4A" onchange="updatePptPreview()" />
             </div>
             <div class="color-item">
-              <span>글박스 / 카드 색</span>
+              <span>글박스/카드 색</span>
               <input type="color" id="pptColorBox" value="#EEF2FA" onchange="updatePptPreview()" />
             </div>
           </div>
 
-          <!-- Step 3: Layout, Order, Reveal Mode, Languages & Institution Footer -->
+          <!-- Step 3: Layout, Order, Reveal Mode, Dynamic Languages & Right-Bottom Institution Footer -->
           <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(175px, 1fr)); gap:0.6rem; margin-bottom:0.75rem;">
             <div>
               <label style="font-size:0.76rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.25rem;">배열 방식</label>
@@ -1353,7 +1478,7 @@
             <div>
               <label style="font-size:0.76rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.25rem;">정답 공개 방식 (PPTX/PDF)</label>
               <select id="pptRevealMode" style="padding:0.48rem; font-size:0.84rem;" onchange="updatePptPreview()">
-                <option value="single_anim">단일 슬라이드 + 클릭 애니메이션</option>
+                <option value="single_anim">단일 슬라이드 + 정답 글박스 애니메이션</option>
                 <option value="two_slide">2장 세트 (문제 숨김 ➔ 다음장 공개)</option>
               </select>
             </div>
@@ -1361,35 +1486,28 @@
 
           <div style="display:grid; grid-template-columns: 1.4fr 1fr; gap:0.65rem; margin-bottom:0.75rem;">
             <div>
-              <label style="font-size:0.76rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.25rem;">제시할 다국어 선택 (복수 선택 가능)</label>
-              <div style="display:flex; flex-wrap:wrap; gap:0.55rem; background:white; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border); font-size:0.82rem; font-weight:700;">
-                <label style="display:inline-flex; align-items:center; gap:0.25rem; cursor:pointer;"><input type="checkbox" class="ppt-lang-cb" value="en" checked onchange="updatePptPreview()" /> EN 영어</label>
-                <label style="display:inline-flex; align-items:center; gap:0.25rem; cursor:pointer;"><input type="checkbox" class="ppt-lang-cb" value="vi" checked onchange="updatePptPreview()" /> VI 베트남어</label>
-                <label style="display:inline-flex; align-items:center; gap:0.25rem; cursor:pointer;"><input type="checkbox" class="ppt-lang-cb" value="zh" checked onchange="updatePptPreview()" /> 中文 중국어</label>
-                <label style="display:inline-flex; align-items:center; gap:0.25rem; cursor:pointer;"><input type="checkbox" class="ppt-lang-cb" value="ja" onchange="updatePptPreview()" /> 日本語 일본어</label>
-                <label style="display:inline-flex; align-items:center; gap:0.25rem; cursor:pointer;"><input type="checkbox" class="ppt-lang-cb" value="mn" onchange="updatePptPreview()" /> MN 몽골어</label>
-                <label style="display:inline-flex; align-items:center; gap:0.25rem; cursor:pointer;"><input type="checkbox" class="ppt-lang-cb" value="ru" onchange="updatePptPreview()" /> RU 러시아어</label>
-              </div>
+              <label style="font-size:0.76rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.25rem;">제시할 다국어 선택 (현재 교재 데이터 기준 자동 연동)</label>
+              <div id="pptLangCheckboxes" style="display:flex; flex-wrap:wrap; gap:0.55rem; background:white; padding:0.5rem 0.7rem; border-radius:10px; border:1px solid var(--border); font-size:0.82rem; font-weight:700;"></div>
             </div>
             <div>
-              <label style="font-size:0.76rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.25rem;">하단 기관명 문구 (기본값: 없음)</label>
-              <input type="text" id="pptFooterText" placeholder="입력 시 하단 표시 (예: 용인대학교 한국어학당)" class="typing-input" style="padding:0.48rem 0.7rem; font-size:0.83rem; margin-bottom:0; text-align:left;" oninput="updatePptPreview()" />
+              <label style="font-size:0.76rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.25rem;">우측 하단 기관명 문구 (기본값: 없음)</label>
+              <input type="text" id="pptFooterText" placeholder="입력 시 우측 하단 표시 (페이지 번호와 분리)" class="typing-input" style="padding:0.48rem 0.7rem; font-size:0.83rem; margin-bottom:0; text-align:left;" oninput="updatePptPreview()" />
             </div>
           </div>
 
-          <!-- Unit Scope for PPT -->
+          <!-- Unit & Section Hierarchical Selection for PPT -->
           <div style="margin-bottom:0.85rem;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.3rem;">
-              <label style="font-size:0.76rem; font-weight:700; color:var(--text-muted);">출제 단원 선택 (복수 체크 가능)</label>
+              <label style="font-size:0.76rem; font-weight:700; color:var(--text-muted);">단원 / 소단원 선택 (1단원 전체 또는 1-1, 1-2 개별 선택 가능)</label>
               <div style="display:flex; gap:0.35rem;">
-                <button type="button" class="btn btn-outline btn-sm" style="padding:0.2rem 0.5rem; font-size:0.75rem;" onclick="toggleAllPptUnits(true)">전체 선택</button>
-                <button type="button" class="btn btn-outline btn-sm" style="padding:0.2rem 0.5rem; font-size:0.75rem;" onclick="toggleAllPptUnits(false)">전체 해제</button>
+                <button type="button" class="btn btn-outline btn-sm" style="padding:0.2rem 0.5rem; font-size:0.75rem;" onclick="toggleAllTreeCheckboxes('ppt', true)">전체 선택</button>
+                <button type="button" class="btn btn-outline btn-sm" style="padding:0.2rem 0.5rem; font-size:0.75rem;" onclick="toggleAllTreeCheckboxes('ppt', false)">전체 해제</button>
               </div>
             </div>
-            <div id="pptUnitCheckboxes" style="display:flex; flex-wrap:wrap; gap:0.4rem; background:white; padding:0.55rem; border-radius:10px; border:1px solid var(--border); max-height:95px; overflow-y:auto;"></div>
+            <div id="pptUnitTreeContainer" class="admin-unit-tree-box"></div>
           </div>
 
-          <!-- Three Action Buttons: Web Slideshow, Download PPTX, Save PDF -->
+          <!-- Three Action Buttons -->
           <div style="display:flex; gap:0.55rem; flex-wrap:wrap; align-items:center; justify-content:space-between; background:white; padding:0.75rem; border-radius:12px; border:1.5px solid #bfdbfe;">
             <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
               <button type="button" class="btn btn-success btn-sm" onclick="openLiveSlideshow()">🖥️ 사이트에서 직접 슬라이드쇼 보기</button>
@@ -1402,7 +1520,7 @@
           <!-- Interactive Live 4:3 Slide Preview -->
           <div class="ppt-preview-wrapper">
             <div style="display:flex; justify-content:space-between; align-items:center; width:100%; max-width:680px; font-size:0.82rem; font-weight:700; color:#334155;">
-              <span>👁️ 실시간 4:3 슬라이드 미리보기 (카드를 클릭하면 정답 박스 애니메이션 확인)</span>
+              <span>👁️ 실시간 4:3 슬라이드 미리보기 (클릭하면 두 번째 정답 글박스 나타내기 확인)</span>
               <div style="display:flex; gap:0.35rem; align-items:center;">
                 <button type="button" class="btn btn-outline btn-sm" style="padding:0.2rem 0.55rem;" onclick="previewSlideStep(-1)">◀</button>
                 <span id="previewSlideIdxLabel">1 / 1</span>
@@ -1415,82 +1533,86 @@
       </div>
 
       <!-- SUB-TAB 3: Printable A4 Quiz Sheet Generator -->
-      <div id="adminViewPrintSheet" style="display:none;">
+      <div id="adminViewPrintSheet">
         <div class="no-print" style="background:#f8fafc; border:1px solid var(--border); border-radius:12px; padding:1rem; margin-bottom:1rem;">
-          <h3 style="font-size:1rem; font-weight:800; color:var(--primary); margin-bottom:0.65rem;">🖨️ 담당 반 맞춤형 A4 단어 시험지 자동 생성</h3>
-          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:0.65rem; margin-bottom:0.75rem;">
+          <h3 style="font-size:1rem; font-weight:800; color:var(--primary); margin-bottom:0.65rem;">🖨️ 맞춤형 A4 단어 시험지 자동 생성</h3>
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap:0.65rem; margin-bottom:0.75rem;">
             <div>
-              <label style="font-size:0.76rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.25rem;">대상 급수 (분반)</label>
-              <select id="sheetClassSelect" style="padding:0.5rem; font-size:0.85rem;">
-                <option value="용인대 1급">용인대 1급</option>
-                <option value="용인대 2급">용인대 2급</option>
-                <option value="용인대 3급">용인대 3급</option>
-                <option value="용인대 4급" selected>용인대 4급</option>
-              </select>
+              <label style="font-size:0.76rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.25rem;">시험지 제목 (커스텀 입력)</label>
+              <input type="text" id="sheetCustomTitle" placeholder="예: 4급 1~3단원 어휘 쪽지시험" class="typing-input" style="padding:0.48rem 0.65rem; font-size:0.85rem; margin-bottom:0; text-align:left;" />
             </div>
             <div>
-              <label style="font-size:0.76rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.25rem;">출제 유형</label>
+              <label style="font-size:0.76rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.25rem;">시험 날짜 (오늘 날짜 또는 선택)</label>
+              <input type="date" id="sheetCustomDate" class="typing-input" style="padding:0.45rem 0.65rem; font-size:0.85rem; margin-bottom:0; text-align:left;" />
+            </div>
+            <div>
+              <label style="font-size:0.76rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.25rem;">대상 급수 / 반</label>
+              <select id="sheetClassSelect" style="padding:0.5rem; font-size:0.85rem;"></select>
+            </div>
+            <div>
+              <label style="font-size:0.76rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.25rem;">출제 유형 및 방향</label>
               <select id="sheetTypeSelect" style="padding:0.5rem; font-size:0.85rem;">
-                <option value="choice">4지선다 객관식 시험지</option>
-                <option value="subjective_kr">주관식: 뜻 보고 한국어 쓰기</option>
-                <option value="subjective_kr_hint">주관식: 뜻 + 초성 힌트 보고 쓰기</option>
-                <option value="subjective_trans">주관식: 한국어 보고 뜻 쓰기</option>
+                <option value="choice_mixed">4지선다 객관식 (한↔다국어 혼합)</option>
+                <option value="choice_kr_to_foreign">4지선다 객관식 (한국어 ➔ 다국어)</option>
+                <option value="choice_foreign_to_kr">4지선다 객관식 (다국어 ➔ 한국어)</option>
+                <option value="subjective_mixed">주관식: 한국어 / 다국어 혼합 출제</option>
+                <option value="subjective_kr">주관식: 다국어 보고 한국어 쓰기</option>
+                <option value="subjective_kr_hint">주관식: 다국어 + 초성 힌트 보고 쓰기</option>
+                <option value="subjective_trans">주관식: 한국어 보고 다국어 쓰기</option>
                 <option value="matching">선 연결하기 (좌우 매칭형)</option>
               </select>
             </div>
             <div>
-              <label style="font-size:0.76rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.25rem;">출제 방향 (4지선다/혼합)</label>
-              <select id="sheetDirSelect" style="padding:0.5rem; font-size:0.85rem;">
-                <option value="kr_to_foreign">한국어 ➔ 다국어</option>
-                <option value="foreign_to_kr">다국어 ➔ 한국어</option>
-                <option value="mixed" selected>혼합 버전 (랜덤 섞음)</option>
+              <label style="font-size:0.76rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.25rem;">출제 문항 수</label>
+              <select id="sheetCountSelect" style="padding:0.5rem; font-size:0.85rem;">
+                <option value="10">10문항</option>
+                <option value="15">15문항</option>
+                <option value="20" selected>20문항</option>
+                <option value="25">25문항</option>
+                <option value="30">30문항</option>
+                <option value="40">40문항</option>
+                <option value="50">50문항</option>
               </select>
-            </div>
-            <div>
-              <label style="font-size:0.76rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.25rem;">번역 언어 & 문항 수</label>
-              <div style="display:flex; gap:0.4rem;">
-                <select id="sheetLangSelect" style="padding:0.5rem; font-size:0.85rem; flex:1;">
-                  <option value="en">영어</option>
-                  <option value="zh">중국어</option>
-                  <option value="ja">일본어</option>
-                  <option value="mn">몽골어</option>
-                  <option value="vi">베트남어</option>
-                  <option value="ru">러시아어</option>
-                </select>
-                <select id="sheetCountSelect" style="padding:0.5rem; font-size:0.85rem; width:95px;">
-                  <option value="10">10문항</option>
-                  <option value="15">15문항</option>
-                  <option value="20" selected>20문항</option>
-                  <option value="25">25문항</option>
-                  <option value="30">30문항</option>
-                </select>
-              </div>
             </div>
           </div>
 
+          <!-- Multi-language Checkboxes for Quiz Sheet -->
           <div style="margin-bottom:0.75rem;">
-            <label style="font-size:0.76rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.35rem;">출제 단원 선택 (복수 선택 가능)</label>
-            <div id="sheetUnitCheckboxes" style="display:flex; flex-wrap:wrap; gap:0.45rem; background:white; padding:0.65rem; border-radius:10px; border:1px solid var(--border); max-height:110px; overflow-y:auto;"></div>
+            <label style="font-size:0.76rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.25rem;">번역 언어 선택 (다중 선택 가능 - 2개 이상 선택 시 병기 출제)</label>
+            <div id="sheetLangCheckboxes" style="display:flex; flex-wrap:wrap; gap:0.55rem; background:white; padding:0.48rem 0.7rem; border-radius:10px; border:1px solid var(--border); font-size:0.82rem; font-weight:700;"></div>
+          </div>
+
+          <!-- Hierarchical Unit/Section Selection (Default: None selected) -->
+          <div style="margin-bottom:0.75rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.3rem;">
+              <label style="font-size:0.76rem; font-weight:700; color:var(--text-muted);">출제 단원 선택 (기본: 미선택 · 대단원 또는 소단원 1-1, 1-2 개별 선택 가능)</label>
+              <div style="display:flex; gap:0.35rem;">
+                <button type="button" class="btn btn-outline btn-sm" style="padding:0.2rem 0.5rem; font-size:0.75rem;" onclick="toggleAllTreeCheckboxes('sheet', true)">전체 선택</button>
+                <button type="button" class="btn btn-outline btn-sm" style="padding:0.2rem 0.5rem; font-size:0.75rem;" onclick="toggleAllTreeCheckboxes('sheet', false)">전체 해제</button>
+              </div>
+            </div>
+            <div id="sheetUnitTreeContainer" class="admin-unit-tree-box"></div>
           </div>
 
           <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
-            <button class="btn btn-primary btn-sm" onclick="generatePrintableSheet()">📝 시험지 및 정답지 생성하기</button>
-            <button class="btn btn-accent btn-sm" onclick="printQuizSheetNow()">🖨️ A4 인쇄 / PDF 저장</button>
+            <button class="btn btn-primary btn-sm" onclick="generatePrintableSheet()">📝 시험지 및 교사용 정답지 생성</button>
+            <button class="btn btn-success btn-sm" onclick="printQuizSheetNow('student')">🖨️ 학생용 시험지 인쇄 / PDF</button>
+            <button class="btn btn-accent btn-sm" onclick="printQuizSheetNow('teacher')">📋 교사용 정답지 별도 인쇄 / PDF</button>
+            <button class="btn btn-outline btn-sm" onclick="printQuizSheetNow('both')">📑 학생용+교사용 함께 인쇄</button>
           </div>
         </div>
 
         <div id="printSheetPreview">
-          <p style="text-align:center; color:var(--text-muted); padding:2rem;">위 옵션을 선택한 후 <strong>[시험지 및 정답지 생성하기]</strong> 버튼을 눌러주세요.</p>
+          <p style="text-align:center; color:var(--text-muted); padding:2rem;">출제할 단원을 선택한 후 <strong>[시험지 및 교사용 정답지 생성]</strong> 버튼을 눌러주세요.</p>
         </div>
       </div>
 
-
-      <!-- SUB-TAB: Main Admin Only - Landscape A4 Vocabulary Booklet & Writing Practice Generator -->
+      <!-- SUB-TAB 4: Main Admin Only - Landscape A4 Vocabulary Booklet & Writing Practice Generator -->
       <div id="adminViewWorkbook" class="no-print" style="display:none;">
         <div style="background:#f8fafc; border:1px solid var(--border); border-radius:14px; padding:1.1rem;">
           <h3 style="font-size:1.05rem; font-weight:800; color:var(--primary); margin-bottom:0.35rem;">📒 최종 관리자 전용: 가로 A4 단어 자료집 & 쓰기 연습지 인쇄 제작기</h3>
           <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:0.85rem;">
-            표지(로고 없음) ➔ 표지 뒤 빈 페이지 ➔ 앞부분(단원별 다국어 단어장) ➔ 뒷부분(단어 쓰기 연습장) ➔ 마지막 판권 페이지까지 가로 A4 규격으로 자동 조판합니다.
+            표지(로고 없음) ➔ 표지 뒤 빈 페이지 ➔ 앞부분(단원별 다국어 단어장) ➔ 뒷부분(페이지당 20단어 꽉 찬 쓰기 연습장) ➔ 마지막 판권 페이지까지 가로 A4 규격으로 자동 조판합니다.
           </p>
 
           <!-- Section A: Cover Page Settings -->
@@ -1508,23 +1630,27 @@
             </div>
           </div>
 
-          <!-- Section B: Front Vocab Languages & Back Writing Practice Columns -->
+          <!-- Section B: Front Vocab Languages, Order & Back Writing Practice Columns -->
           <div style="background:white; border:1px solid var(--border); border-radius:10px; padding:0.8rem; margin-bottom:0.75rem;">
-            <div style="font-size:0.82rem; font-weight:800; color:var(--primary); margin-bottom:0.45rem;">2. 앞부분(다국어 단어장) & 뒷부분(쓰기 연습 칸) 구성</div>
-            <div style="display:grid; grid-template-columns: 1.6fr 1fr; gap:0.65rem; align-items:end; margin-bottom:0.6rem;">
+            <div style="font-size:0.82rem; font-weight:800; color:var(--primary); margin-bottom:0.45rem;">2. 앞부분(다국어 선택 및 배열 순서) & 뒷부분(쓰기 연습 칸) 구성</div>
+            <div style="display:grid; grid-template-columns: 1.6fr 1fr; gap:0.65rem; align-items:start; margin-bottom:0.6rem;">
               <div>
                 <label style="font-size:0.75rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.25rem;">앞부분 다국어 선택 (1~3개: 2단 배열 / 4개 이상: 1단 자동 전환)</label>
                 <div style="display:flex; flex-wrap:wrap; gap:0.55rem; background:#f8fafc; padding:0.48rem 0.65rem; border-radius:8px; border:1px solid var(--border); font-size:0.82rem; font-weight:700;">
-                  <label style="display:inline-flex; align-items:center; gap:0.25rem; cursor:pointer;"><input type="checkbox" class="wb-lang-cb" value="vi" checked onchange="renderWorkbookPreview()" /> 베트남어</label>
-                  <label style="display:inline-flex; align-items:center; gap:0.25rem; cursor:pointer;"><input type="checkbox" class="wb-lang-cb" value="en" checked onchange="renderWorkbookPreview()" /> 영어</label>
-                  <label style="display:inline-flex; align-items:center; gap:0.25rem; cursor:pointer;"><input type="checkbox" class="wb-lang-cb" value="zh" checked onchange="renderWorkbookPreview()" /> 중국어</label>
-                  <label style="display:inline-flex; align-items:center; gap:0.25rem; cursor:pointer;"><input type="checkbox" class="wb-lang-cb" value="ja" onchange="renderWorkbookPreview()" /> 일본어</label>
-                  <label style="display:inline-flex; align-items:center; gap:0.25rem; cursor:pointer;"><input type="checkbox" class="wb-lang-cb" value="mn" onchange="renderWorkbookPreview()" /> 몽골어</label>
-                  <label style="display:inline-flex; align-items:center; gap:0.25rem; cursor:pointer;"><input type="checkbox" class="wb-lang-cb" value="ru" onchange="renderWorkbookPreview()" /> 러시아어</label>
+                  <label style="display:inline-flex; align-items:center; gap:0.25rem; cursor:pointer;"><input type="checkbox" class="wb-lang-cb" value="vi" checked onchange="onWbLangCheckboxChange(this)" /> 베트남어</label>
+                  <label style="display:inline-flex; align-items:center; gap:0.25rem; cursor:pointer;"><input type="checkbox" class="wb-lang-cb" value="en" checked onchange="onWbLangCheckboxChange(this)" /> 영어</label>
+                  <label style="display:inline-flex; align-items:center; gap:0.25rem; cursor:pointer;"><input type="checkbox" class="wb-lang-cb" value="zh" checked onchange="onWbLangCheckboxChange(this)" /> 중국어</label>
+                  <label style="display:inline-flex; align-items:center; gap:0.25rem; cursor:pointer;"><input type="checkbox" class="wb-lang-cb" value="ja" onchange="onWbLangCheckboxChange(this)" /> 일본어</label>
+                  <label style="display:inline-flex; align-items:center; gap:0.25rem; cursor:pointer;"><input type="checkbox" class="wb-lang-cb" value="mn" onchange="onWbLangCheckboxChange(this)" /> 몽골어</label>
+                  <label style="display:inline-flex; align-items:center; gap:0.25rem; cursor:pointer;"><input type="checkbox" class="wb-lang-cb" value="ru" onchange="onWbLangCheckboxChange(this)" /> 러시아어</label>
+                </div>
+                <div style="margin-top:0.35rem;">
+                  <span style="font-size:0.73rem; font-weight:700; color:var(--text-muted);">열 배열 순서 조정 (◀/▶ 버튼으로 순서 변경):</span>
+                  <div id="wbLangOrderBar" class="wb-lang-order-list"></div>
                 </div>
               </div>
               <div>
-                <label style="font-size:0.75rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.25rem;">뒷부분 쓰기 연습 빈칸 수 선택</label>
+                <label style="font-size:0.75rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.25rem;">뒷부분 쓰기 연습 빈칸 수 선택 (페이지당 20단어 꽉 찬 조판)</label>
                 <select id="wbPracticeCols" style="padding:0.48rem; font-size:0.85rem;" onchange="renderWorkbookPreview()">
                   <option value="3">3칸 (1 ~ 3)</option>
                   <option value="4">4칸 (1 ~ 4)</option>
@@ -1591,17 +1717,29 @@
         </div>
       </div>
 
-      <!-- SUB-TAB 4: Main Admin Only - AI Multilingual Translator & JSON Builder -->
+      <!-- SUB-TAB 5: Main Admin Only - AI Multilingual Translator & JSON Builder -->
       <div id="adminViewBuilder" class="no-print" style="display:none;">
         <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:12px; padding:1rem; margin-bottom:1rem;">
-          <h3 style="font-size:1rem; font-weight:800; color:var(--primary); margin-bottom:0.35rem;">🤖 최종 관리자 전용: 한국어 단어 ➔ 6개 국어 AI 자동 번역 & JSON 제작기</h3>
+          <h3 style="font-size:1rem; font-weight:800; color:var(--primary); margin-bottom:0.35rem;">🤖 최종 관리자 전용: 한국어 단어 ➔ 다국어 AI 자동 번역 & JSON 제작기</h3>
           <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:0.75rem;">
-            본인만 사용하는 제작 도구입니다. Gemini API 키를 입력하고 한국어 표현을 입력하면 6개 국어 뜻을 자동으로 채워 JSON 파일로 다운로드합니다.
+            번역할 언어를 원하는 대로 선택하거나 새 언어를 직접 추가한 뒤 한국어 단어를 입력하면 JSON 파일로 자동 변환·다운로드합니다.
           </p>
           <div style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center; margin-bottom:0.75rem;">
             <input type="password" id="geminiApiKeyInput" placeholder="Gemini API Key 입력 (브라우저 로컬에만 안전 저장됨)" class="typing-input" style="flex:1; min-width:250px; padding:0.5rem 0.75rem; font-size:0.85rem; margin-bottom:0; text-align:left;" />
             <button class="btn btn-outline btn-sm" onclick="saveBuilderApiKey()">🔑 API 키 저장</button>
           </div>
+
+          <!-- Selectable & Custom Languages for AI Translation -->
+          <div style="background:white; border:1px solid #bfdbfe; border-radius:10px; padding:0.65rem; margin-bottom:0.65rem;">
+            <label style="font-size:0.76rem; font-weight:800; color:var(--primary); display:block; margin-bottom:0.35rem;">번역 언어 선택 및 커스텀 언어 추가</label>
+            <div id="builderLangCheckboxes" style="display:flex; flex-wrap:wrap; gap:0.55rem; font-size:0.82rem; font-weight:700; margin-bottom:0.5rem;"></div>
+            <div style="display:flex; gap:0.4rem; flex-wrap:wrap; align-items:center;">
+              <input type="text" id="customLangCodeInput" placeholder="언어 코드 (예: es, th, uz)" class="typing-input" style="width:145px; padding:0.35rem 0.6rem; font-size:0.8rem; margin-bottom:0; text-align:left;" />
+              <input type="text" id="customLangNameInput" placeholder="언어 이름 (예: 스페인어, 태국어, 우즈베크어)" class="typing-input" style="width:220px; padding:0.35rem 0.6rem; font-size:0.8rem; margin-bottom:0; text-align:left;" />
+              <button type="button" class="btn btn-outline btn-sm" style="padding:0.35rem 0.7rem;" onclick="addCustomBuilderLanguage()">+ 언어 추가</button>
+            </div>
+          </div>
+
           <div style="display:grid; grid-template-columns: 1fr 1fr 110px; gap:0.5rem; margin-bottom:0.6rem;">
             <input type="text" id="builderUnitInput" placeholder="대단원 (예: 1 진로와 적성 Career & Aptitude)" class="typing-input" style="padding:0.5rem; font-size:0.85rem; margin-bottom:0; text-align:left;" />
             <input type="text" id="builderSectionInput" placeholder="소단원 (예: 1-1 진로 Career)" class="typing-input" style="padding:0.5rem; font-size:0.85rem; margin-bottom:0; text-align:left;" />
@@ -1609,7 +1747,7 @@
           </div>
           <textarea id="builderRawWordsInput" rows="5" placeholder="한국어 단어를 한 줄에 하나씩 입력하세요.&#10;예시:&#10;진로를 정하다&#10;창업하다&#10;적성에 맞다" style="width:100%; padding:0.75rem; border-radius:10px; border:1.5px solid var(--border); font-size:0.9rem; margin-bottom:0.65rem;"></textarea>
           <div style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;">
-            <button id="btnRunAiTranslate" class="btn btn-primary btn-sm" onclick="runAiMultilingualTranslation()">✨ AI 6개 국어 자동 번역 실행</button>
+            <button id="btnRunAiTranslate" class="btn btn-primary btn-sm" onclick="runAiMultilingualTranslation()">✨ 선택한 언어로 AI 자동 번역 실행</button>
             <button class="btn btn-outline btn-sm" onclick="downloadBuiltJson()">💾 JSON 파일 다운로드</button>
             <span id="builderStatusText" style="font-size:0.82rem; font-weight:700; color:var(--primary);"></span>
           </div>
@@ -1617,43 +1755,56 @@
 
         <div class="admin-table-container" style="max-height:260px;">
           <table class="admin-table">
-            <thead>
+            <thead id="builderPreviewHead">
               <tr>
                 <th>대단원</th>
                 <th>소단원</th>
                 <th>한국어</th>
                 <th>영어(en)</th>
-                <th>중국어(zh)</th>
-                <th>일본어(ja)</th>
-                <th>몽골어(mn)</th>
-                <th>베트남어(vi)</th>
-                <th>러시아어(ru)</th>
                 <th>페이지</th>
               </tr>
             </thead>
             <tbody id="builderPreviewBody">
-              <tr><td colspan="10" style="text-align:center; padding:1.5rem; color:var(--text-muted);">위에서 한국어 단어를 입력하고 AI 자동 번역을 실행하면 결과가 이곳에 표시됩니다.</td></tr>
+              <tr><td colspan="5" style="text-align:center; padding:1.5rem; color:var(--text-muted);">위에서 번역할 언어를 선택하고 한국어 단어를 입력한 뒤 AI 자동 번역을 실행해 주세요.</td></tr>
             </tbody>
           </table>
         </div>
       </div>
 
-      <!-- SUB-TAB 5: Teacher Account & Class Assignment (Main Admin Only) -->
+      <!-- SUB-TAB 6: Teacher Account & Custom Institution / Class Management (Main Admin Only) -->
       <div id="adminViewTeachers" class="no-print" style="display:none;">
+        <!-- Institution & Class Registry Box -->
+        <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:12px; padding:1rem; margin-bottom:1rem;">
+          <h3 style="font-size:0.98rem; font-weight:800; color:var(--primary); margin-bottom:0.4rem;">🏫 기관명 및 하위 급수·수업 커스텀 등록 (자동 저장)</h3>
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:0.75rem;">
+            <div style="background:white; padding:0.7rem; border-radius:10px; border:1px solid #dbeafe;">
+              <label style="font-size:0.76rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.3rem;">1. 새 기관명 추가 (드롭다운 자동 누적)</label>
+              <div style="display:flex; gap:0.4rem;">
+                <input type="text" id="newInstitutionNameInput" placeholder="예: 용인대학교 한국어학당, 온라인 세종학당" class="typing-input" style="flex:1; padding:0.45rem 0.65rem; font-size:0.84rem; margin-bottom:0; text-align:left;" />
+                <button type="button" class="btn btn-primary btn-sm" onclick="addCustomInstitution()">+ 기관 추가</button>
+              </div>
+            </div>
+            <div style="background:white; padding:0.7rem; border-radius:10px; border:1px solid #dbeafe;">
+              <label style="font-size:0.76rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.3rem;">2. 선택한 기관에 새 급수 / 수업 추가</label>
+              <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
+                <select id="manageInstSelect" style="width:155px; padding:0.45rem; font-size:0.83rem;"></select>
+                <input type="text" id="newClassUnderInstInput" placeholder="예: 1급 오전반, TOPIK 3급" class="typing-input" style="flex:1; min-width:120px; padding:0.45rem 0.65rem; font-size:0.84rem; margin-bottom:0; text-align:left;" />
+                <button type="button" class="btn btn-success btn-sm" onclick="addCustomClassToInstitution()">+ 수업 추가</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Teacher Assignment Box -->
         <div style="background:#f8fafc; border:1px solid var(--border); border-radius:12px; padding:1.1rem; margin-bottom:1rem;">
-          <h3 style="font-size:1rem; font-weight:800; color:var(--primary); margin-bottom:0.35rem;">➕ 담당 선생님 등록 및 급수 배정</h3>
+          <h3 style="font-size:1rem; font-weight:800; color:var(--primary); margin-bottom:0.35rem;">➕ 담당 선생님 등록 및 기관·급수 배정</h3>
           <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:0.85rem;">
-            등록된 선생님 구글 계정으로 PC나 모바일에서 로그인하면 지정된 담당 급수의 기록 열람, PPT 제작 및 시험지 인쇄가 자동으로 연결됩니다.
+            기관을 먼저 선택하면 해당 기관에 등록된 급수·수업 목록이 드롭다운에 자동으로 나타납니다.
           </p>
           <div style="display:flex; flex-wrap:wrap; gap:0.65rem; align-items:center; margin-bottom:0.7rem;">
-            <input type="email" id="newTeacherEmail" placeholder="선생님 구글 이메일 (예: teacher@gmail.com)" class="typing-input" style="flex:1; min-width:230px; padding:0.55rem 0.85rem; font-size:0.88rem; margin-bottom:0; text-align:left;" />
-            <select id="newTeacherClass" style="width:165px; padding:0.55rem; font-size:0.88rem;">
-              <option value="용인대 1급">담당: 용인대 1급</option>
-              <option value="용인대 2급">담당: 용인대 2급</option>
-              <option value="용인대 3급">담당: 용인대 3급</option>
-              <option value="용인대 4급">담당: 용인대 4급</option>
-              <option value="ALL">전체 급수 허용</option>
-            </select>
+            <input type="email" id="newTeacherEmail" placeholder="선생님 구글 이메일 (예: teacher@gmail.com)" class="typing-input" style="flex:1; min-width:220px; padding:0.55rem 0.85rem; font-size:0.88rem; margin-bottom:0; text-align:left;" />
+            <select id="newTeacherInstSelect" style="width:185px; padding:0.55rem; font-size:0.86rem;" onchange="onTeacherInstSelectChange()"></select>
+            <select id="newTeacherClass" style="width:175px; padding:0.55rem; font-size:0.86rem;"></select>
             <button class="btn btn-primary btn-sm" onclick="registerNewTeacher()">선생님 등록</button>
           </div>
           <div style="display:flex; gap:1.25rem; align-items:center; font-size:0.83rem; font-weight:700;">
@@ -1671,7 +1822,8 @@
             <thead>
               <tr>
                 <th>선생님 구글 이메일</th>
-                <th>담당 급수</th>
+                <th>소속 기관</th>
+                <th>담당 급수/수업</th>
                 <th>엑셀 다운로드</th>
                 <th>기록 삭제 권한</th>
                 <th>등록일</th>
@@ -1679,7 +1831,7 @@
               </tr>
             </thead>
             <tbody id="teacherTableBody">
-              <tr><td colspan="6" style="text-align:center; padding:1.5rem; color:var(--text-muted);">선생님 목록을 불러오는 중...</td></tr>
+              <tr><td colspan="7" style="text-align:center; padding:1.5rem; color:var(--text-muted);">선생님 목록을 불러오는 중...</td></tr>
             </tbody>
           </table>
         </div>
@@ -2151,6 +2303,7 @@
       loadUserProfile();
       await loadBooksAndInitialVocab();
       bindEvents();
+      syncAllInstitutionAndClassDropdowns();
       checkAndOfferResumeProgress();
     });
 
@@ -3294,6 +3447,8 @@
         tabBuilderBtn.style.display = 'inline-flex';
         tabWorkbookBtn.style.display = 'inline-flex';
         initWorkbookControls();
+        initBuilderLanguageUI();
+        syncAllInstitutionAndClassDropdowns();
         btnExport.style.display = 'inline-flex';
         delColHeader.style.display = 'table-cell';
         classFilterSelect.disabled = false;
@@ -3341,6 +3496,8 @@
       if (tab === 'printSheet') initPrintSheetControls();
       if (tab === 'pptStudio') initPptStudioControls();
       if (tab === 'workbook') initWorkbookControls();
+        initBuilderLanguageUI();
+        syncAllInstitutionAndClassDropdowns();
     }
 
     function logoutAdmin() {
@@ -3475,7 +3632,7 @@
     }
 
     /* ==========================================================================
-       12. PPT & WEB SLIDESHOW STUDIO (5 THEMES, H/V LAYOUT, CUSTOM COLORS, ANIM/2-SLIDE)
+       12. PPT & WEB SLIDESHOW STUDIO (5 THEMES, H/V LAYOUT, NOTO SANS, FIXED ANIM, 4:3 PDF)
     ========================================================================== */
     const PPT_THEMES = {
       clean_white: {
@@ -3536,36 +3693,105 @@
     };
 
     const LANG_BADGE_META = {
-      en: { code: 'EN', pillBg: '#E07A5F' },
-      vi: { code: 'VI', pillBg: '#3D8C95' },
-      zh: { code: '中文', pillBg: '#D9A440' },
-      ja: { code: '日本語', pillBg: '#6366F1' },
-      mn: { code: 'MN', pillBg: '#0EA5E9' },
-      ru: { code: 'RU', pillBg: '#EC4899' }
+      en: { code: 'EN', label: 'EN 영어', pillBg: '#E07A5F', fontFace: 'Noto Sans' },
+      vi: { code: 'VI', label: 'VI 베트남어', pillBg: '#3D8C95', fontFace: 'Noto Sans' },
+      zh: { code: '中文', label: '中文 중국어', pillBg: '#D9A440', fontFace: 'Noto Sans SC' },
+      ja: { code: '日本語', label: '日本語 일본어', pillBg: '#6366F1', fontFace: 'Noto Sans JP' },
+      mn: { code: 'MN', label: 'MN 몽골어', pillBg: '#0EA5E9', fontFace: 'Noto Sans' },
+      ru: { code: 'RU', label: 'RU 러시아어', pillBg: '#EC4899', fontFace: 'Noto Sans' }
     };
 
     let currentPptThemeKey = 'clean_white';
-    let pptDeckSlides = []; // Array of { part: 'kr_to_multi' | 'multi_to_kr', item, num, total }
+    let pptDeckSlides = [];
     let previewSlideIdx = 0;
     let previewRevealed = true;
     let slideshowIdx = 0;
     let slideshowRevealed = false;
 
-    function initPptStudioControls() {
-      const unitBox = document.getElementById('pptUnitCheckboxes');
-      if (!unitBox) return;
-      const units = Array.from(new Set(RAW_VOCAB.map(v => v.unit)));
-      unitBox.innerHTML = units.map((u, i) => `
-        <label style="display:inline-flex; align-items:center; gap:0.28rem; font-size:0.8rem; background:#f8fafc; padding:0.28rem 0.55rem; border-radius:8px; border:1px solid var(--border); cursor:pointer;">
-          <input type="checkbox" class="ppt-unit-cb" value="${u}" ${i === 0 ? 'checked' : ''} onchange="rebuildPptDeck()" />
-          <span>${u.split(' ')[0]}단원</span>
-        </label>
-      `).join('');
-      rebuildPptDeck();
+    function detectAvailableLanguagesInVocab() {
+      const candidateKeys = ['en', 'vi', 'zh', 'ja', 'mn', 'ru', 'es', 'th', 'uz', 'ar', 'id'];
+      const found = [];
+      candidateKeys.forEach(k => {
+        if (RAW_VOCAB.some(item => item[k] && String(item[k]).trim() !== '')) {
+          found.push(k);
+        }
+      });
+      return found.length > 0 ? found : ['en', 'vi', 'zh'];
     }
 
-    function toggleAllPptUnits(checked) {
-      document.querySelectorAll('.ppt-unit-cb').forEach(cb => { cb.checked = checked; });
+    function renderHierarchicalUnitTree(containerId, prefix, defaultChecked) {
+      const box = document.getElementById(containerId);
+      if (!box) return;
+      const unitMap = new Map();
+      RAW_VOCAB.forEach(v => {
+        if (!unitMap.has(v.unit)) unitMap.set(v.unit, new Set());
+        if (v.section) unitMap.get(v.unit).add(v.section);
+      });
+
+      const onChangeFn = prefix === 'ppt' ? 'rebuildPptDeck()' : '';
+      box.innerHTML = Array.from(unitMap.keys()).map((u, uIdx) => {
+        const sections = Array.from(unitMap.get(u));
+        const isChecked = defaultChecked === 'first' ? (uIdx === 0) : Boolean(defaultChecked);
+        return `
+          <div class="admin-unit-card">
+            <label class="admin-unit-card-hdr">
+              <input type="checkbox" class="${prefix}-unit-parent" data-unit="${u}" ${isChecked ? 'checked' : ''} onchange="onTreeParentToggle('${prefix}', this)" />
+              <span>${u}</span>
+            </label>
+            <div class="admin-unit-card-subs">
+              ${sections.map(sec => `
+                <label>
+                  <input type="checkbox" class="${prefix}-sec-child" data-unit="${u}" data-section="${sec}" ${isChecked ? 'checked' : ''} onchange="onTreeChildToggle('${prefix}')" />
+                  <span>${sec}</span>
+                </label>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function onTreeParentToggle(prefix, parentCb) {
+      const u = parentCb.dataset.unit;
+      document.querySelectorAll(`.${prefix}-sec-child[data-unit="${CSS.escape(u)}"]`).forEach(cb => {
+        cb.checked = parentCb.checked;
+      });
+      if (prefix === 'ppt') rebuildPptDeck();
+    }
+
+    function onTreeChildToggle(prefix) {
+      document.querySelectorAll(`.${prefix}-unit-parent`).forEach(parentCb => {
+        const u = parentCb.dataset.unit;
+        const children = Array.from(document.querySelectorAll(`.${prefix}-sec-child[data-unit="${CSS.escape(u)}"]`));
+        parentCb.checked = children.every(c => c.checked);
+      });
+      if (prefix === 'ppt') rebuildPptDeck();
+    }
+
+    function toggleAllTreeCheckboxes(prefix, checked) {
+      document.querySelectorAll(`.${prefix}-unit-parent, .${prefix}-sec-child`).forEach(cb => {
+        cb.checked = checked;
+      });
+      if (prefix === 'ppt') rebuildPptDeck();
+    }
+
+    function getSelectedTreeSections(prefix) {
+      return new Set(Array.from(document.querySelectorAll(`.${prefix}-sec-child:checked`)).map(cb => cb.dataset.section));
+    }
+
+    function initPptStudioControls() {
+      // Dynamic language checkboxes based on loaded RAW_VOCAB
+      const availLangs = detectAvailableLanguagesInVocab();
+      const langBox = document.getElementById('pptLangCheckboxes');
+      if (langBox) {
+        langBox.innerHTML = availLangs.map((code, idx) => {
+          const meta = LANG_BADGE_META[code] || { label: code.toUpperCase() };
+          const defaultChk = ['en', 'vi', 'zh'].includes(code) || idx < 3;
+          return `<label style="display:inline-flex; align-items:center; gap:0.25rem; cursor:pointer;"><input type="checkbox" class="ppt-lang-cb" value="${code}" ${defaultChk ? 'checked' : ''} onchange="updatePptPreview()" /> ${meta.label}</label>`;
+        }).join('');
+      }
+
+      renderHierarchicalUnitTree('pptUnitTreeContainer', 'ppt', 'first');
       rebuildPptDeck();
     }
 
@@ -3600,8 +3826,8 @@
     }
 
     function rebuildPptDeck() {
-      const selectedUnits = Array.from(document.querySelectorAll('.ppt-unit-cb:checked')).map(cb => cb.value);
-      let pool = RAW_VOCAB.filter(v => selectedUnits.includes(v.unit));
+      const secSet = getSelectedTreeSections('ppt');
+      let pool = RAW_VOCAB.filter(v => secSet.has(v.section));
       const orderMode = document.getElementById('pptOrderMode')?.value || 'sequential';
       const partMode = document.getElementById('pptPartMode')?.value || 'both';
 
@@ -3643,7 +3869,7 @@
 
       if (pptDeckSlides.length === 0) {
         idxLabel.textContent = '0 / 0';
-        stage.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100%;background:#fff;color:#64748b;font-weight:700;">단원을 1개 이상 선택해 주세요.</div>`;
+        stage.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100%;background:#fff;color:#64748b;font-weight:700;">단원 또는 소단원을 1개 이상 선택해 주세요.</div>`;
         return;
       }
 
@@ -3664,7 +3890,7 @@
       updatePptPreview();
     }
 
-    /* Render 4:3 HTML Slide matching the 5 uploaded designs & Horizontal/Vertical layouts */
+    /* Render 4:3 HTML Slide (Noto Sans KR/SC unified, Bottom-Center Page Num, Bottom-Right Institution Name) */
     function renderSlideHtml(slideObj, cfg, showAnswer) {
       const { part, item, num } = slideObj;
       const isKrFirst = (part === 'kr_to_multi');
@@ -3673,15 +3899,15 @@
 
       const langCards = cfg.langs.map(lCode => {
         const meta = LANG_BADGE_META[lCode] || { code: lCode.toUpperCase(), pillBg: '#3b82f6' };
-        return { code: meta.code, pillBg: meta.pillBg, text: item[lCode] || item.en || '' };
+        return { code: meta.code, pillBg: meta.pillBg, text: item[lCode] || item.en || '', isZh: lCode === 'zh' };
       });
 
+      const metaTextColor = (tKey === 'coral_split') ? '#64748B' : cfg.krColor;
+      const numHtml = `<div style="position:absolute; bottom:2%; left:0; right:0; text-align:center; font-size:0.78em; font-weight:700; opacity:0.68; color:${metaTextColor}; z-index:4;">${num}</div>`;
       const footerHtml = cfg.footerText
-        ? `<div style="position:absolute; bottom:1.4%; left:0; right:0; text-align:center; font-size:0.72em; font-weight:600; opacity:0.75; color:${tKey === 'coral_split' ? '#64748B' : cfg.krColor};">${cfg.footerText}</div>`
+        ? `<div style="position:absolute; bottom:2%; right:3.5%; text-align:right; font-size:0.72em; font-weight:700; opacity:0.78; color:${metaTextColor}; z-index:4;">${cfg.footerText}</div>`
         : '';
-      const numHtml = `<div style="position:absolute; bottom:1.6%; ${tKey === 'coral_split' ? 'right:3.5%' : 'left:0; right:0; text-align:center'}; font-size:0.78em; font-weight:700; opacity:0.65; color:${tKey === 'coral_split' ? '#64748B' : cfg.krColor};">${num}</div>`;
 
-      // Base container style per theme
       let outerBg = cfg.bg;
       let innerFrameHtml = '';
       if (tKey === 'midnight_navy') {
@@ -3699,82 +3925,80 @@
       }
 
       const ansVisibility = showAnswer ? 'opacity:1; transform:translateY(0);' : 'opacity:0; pointer-events:none;';
+      const fontStack = "'Noto Sans KR', 'Noto Sans SC', sans-serif";
 
-      // Theme-specific rendering
       if (tKey === 'coral_split') {
         if (isHoriz) {
           if (isKrFirst) {
             return `
-              <div style="width:100%; height:100%; background:#FFFFFF; position:relative; display:flex; flex-direction:column;">
+              <div style="width:100%; height:100%; background:#FFFFFF; position:relative; display:flex; flex-direction:column; font-family:${fontStack};">
                 <div style="height:45%; background:${cfg.bg}; display:flex; align-items:center; justify-content:center; padding:4%;">
-                  <div style="font-size:clamp(2rem, 5.5vw, 4.2rem); font-weight:900; color:${cfg.krColor}; text-align:center; word-break:keep-all;">${item.kr}</div>
+                  <div style="font-size:clamp(2rem, 5.5vw, 4.2rem); font-weight:700; color:${cfg.krColor}; text-align:center; word-break:keep-all;">${item.kr}</div>
                 </div>
                 <div style="flex:1; display:grid; grid-template-columns:repeat(${langCards.length}, 1fr); padding:3.5% 4% 7% 4%; transition:all 0.25s; ${ansVisibility}">
                   ${langCards.map((c, idx) => `
                     <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding:0 6%; ${idx > 0 ? 'border-left:1.5px solid #E3E4EC;' : ''}">
-                      <div style="font-size:0.85em; font-weight:800; color:${cfg.bg}; margin-bottom:0.4em;">${c.code}</div>
-                      <div style="font-size:clamp(1rem, 2.2vw, 1.55rem); font-weight:800; color:${cfg.multiColor}; text-align:center; word-break:keep-all; line-height:1.25;">${c.text}</div>
+                      <div style="font-size:0.85em; font-weight:700; color:${cfg.bg}; margin-bottom:0.4em;">${c.code}</div>
+                      <div style="font-size:clamp(1rem, 2.2vw, 1.55rem); font-weight:700; color:${cfg.multiColor}; text-align:center; word-break:keep-all; line-height:1.25;">${c.text}</div>
                     </div>
                   `).join('')}
                 </div>
-                ${footerHtml}${numHtml}
+                ${numHtml}${footerHtml}
               </div>`;
           } else {
             return `
-              <div style="width:100%; height:100%; background:#FFFFFF; position:relative; display:flex; flex-direction:column;">
+              <div style="width:100%; height:100%; background:#FFFFFF; position:relative; display:flex; flex-direction:column; font-family:${fontStack};">
                 <div style="height:53%; background:${cfg.bg}; display:grid; grid-template-columns:repeat(${langCards.length}, 1fr); padding:4%;">
                   ${langCards.map((c, idx) => `
                     <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding:0 6%; ${idx > 0 ? 'border-left:1.5px solid rgba(255,255,255,0.35);' : ''}">
-                      <div style="font-size:0.85em; font-weight:800; color:rgba(255,255,255,0.8); margin-bottom:0.4em;">${c.code}</div>
-                      <div style="font-size:clamp(1rem, 2.2vw, 1.55rem); font-weight:800; color:#FFFFFF; text-align:center; word-break:keep-all; line-height:1.25;">${c.text}</div>
+                      <div style="font-size:0.85em; font-weight:700; color:rgba(255,255,255,0.8); margin-bottom:0.4em;">${c.code}</div>
+                      <div style="font-size:clamp(1rem, 2.2vw, 1.55rem); font-weight:700; color:#FFFFFF; text-align:center; word-break:keep-all; line-height:1.25;">${c.text}</div>
                     </div>
                   `).join('')}
                 </div>
                 <div style="flex:1; display:flex; align-items:center; justify-content:center; padding:3% 12% 7% 12%; transition:all 0.25s; ${ansVisibility}">
-                  <div style="width:100%; height:100%; background:${cfg.boxColor}; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:clamp(1.8rem, 4.5vw, 3.4rem); font-weight:900; color:${cfg.multiColor};">${item.kr}</div>
+                  <div style="width:100%; height:100%; background:${cfg.boxColor}; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:clamp(1.8rem, 4.5vw, 3.4rem); font-weight:700; color:${cfg.multiColor};">${item.kr}</div>
                 </div>
-                ${footerHtml}${numHtml}
+                ${numHtml}${footerHtml}
               </div>`;
           }
         } else {
-          // Coral Split Vertical (Left 48.4% / Right 51.6%)
           if (isKrFirst) {
             return `
-              <div style="width:100%; height:100%; background:#FFFFFF; position:relative; display:flex;">
+              <div style="width:100%; height:100%; background:#FFFFFF; position:relative; display:flex; font-family:${fontStack};">
                 <div style="width:48.4%; height:100%; background:${cfg.bg}; display:flex; align-items:center; justify-content:center; padding:4%;">
-                  <div style="font-size:clamp(1.7rem, 4.2vw, 3.2rem); font-weight:900; color:${cfg.krColor}; text-align:center; word-break:keep-all;">${item.kr}</div>
+                  <div style="font-size:clamp(1.7rem, 4.2vw, 3.2rem); font-weight:700; color:${cfg.krColor}; text-align:center; word-break:keep-all;">${item.kr}</div>
                 </div>
                 <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:6%; padding:6% 5% 8% 5%; transition:all 0.25s; ${ansVisibility}">
                   ${langCards.map(c => `
                     <div>
-                      <div style="font-size:0.82em; font-weight:800; color:${cfg.bg}; margin-bottom:0.15em;">${c.code}</div>
-                      <div style="font-size:clamp(1.05rem, 2.3vw, 1.65rem); font-weight:800; color:${cfg.multiColor}; line-height:1.2;">${c.text}</div>
+                      <div style="font-size:0.82em; font-weight:700; color:${cfg.bg}; margin-bottom:0.15em;">${c.code}</div>
+                      <div style="font-size:clamp(1.05rem, 2.3vw, 1.65rem); font-weight:700; color:${cfg.multiColor}; line-height:1.2;">${c.text}</div>
                     </div>
                   `).join('')}
                 </div>
-                ${footerHtml}${numHtml}
+                ${numHtml}${footerHtml}
               </div>`;
           } else {
             return `
-              <div style="width:100%; height:100%; background:#FFFFFF; position:relative; display:flex;">
+              <div style="width:100%; height:100%; background:#FFFFFF; position:relative; display:flex; font-family:${fontStack};">
                 <div style="width:55%; height:100%; background:${cfg.bg}; display:flex; flex-direction:column; justify-content:center; gap:6%; padding:6% 5%;">
                   ${langCards.map(c => `
                     <div>
-                      <div style="font-size:0.82em; font-weight:800; color:rgba(255,255,255,0.8); margin-bottom:0.15em;">${c.code}</div>
-                      <div style="font-size:clamp(1.05rem, 2.3vw, 1.65rem); font-weight:800; color:#FFFFFF; line-height:1.2;">${c.text}</div>
+                      <div style="font-size:0.82em; font-weight:700; color:rgba(255,255,255,0.8); margin-bottom:0.15em;">${c.code}</div>
+                      <div style="font-size:clamp(1.05rem, 2.3vw, 1.65rem); font-weight:700; color:#FFFFFF; line-height:1.2;">${c.text}</div>
                     </div>
                   `).join('')}
                 </div>
                 <div style="flex:1; display:flex; align-items:center; justify-content:center; padding:12% 3.5%; transition:all 0.25s; ${ansVisibility}">
-                  <div style="width:100%; height:100%; background:${cfg.boxColor}; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:clamp(1.5rem, 3.6vw, 2.7rem); font-weight:900; color:${cfg.multiColor}; text-align:center; padding:4%;">${item.kr}</div>
+                  <div style="width:100%; height:100%; background:${cfg.boxColor}; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:clamp(1.5rem, 3.6vw, 2.7rem); font-weight:700; color:${cfg.multiColor}; text-align:center; padding:4%;">${item.kr}</div>
                 </div>
-                ${footerHtml}${numHtml}
+                ${numHtml}${footerHtml}
               </div>`;
           }
         }
       }
 
-      // Standard Themes (Clean White, Midnight Navy, Sage Flashcard, Chalkboard)
       const krBoxBg = (tKey === 'midnight_navy') ? cfg.boxColor : (tKey === 'chalkboard' ? 'transparent' : cfg.krColor);
       const krBoxText = (tKey === 'midnight_navy') ? cfg.bg : (tKey === 'chalkboard' ? cfg.boxColor : '#FFFFFF');
       const krBoxBorder = (tKey === 'chalkboard') ? `2.5px solid ${cfg.boxColor}` : 'none';
@@ -3786,8 +4010,8 @@
           ? `<div style="flex:1; display:grid; grid-template-columns:repeat(${langCards.length}, 1fr); gap:2.2%; padding:0 5% 8% 5%; z-index:2; transition:all 0.25s; ${ansVisibility}">
               ${langCards.map(c => `
                 <div style="background:${cardBg}; border:${cardBorder}; border-radius:12px; padding:6% 5%; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
-                  <span style="font-size:0.78em; font-weight:800; padding:2px 10px; border-radius:999px; margin-bottom:0.5em; ${tKey==='sage_flashcard' ? `background:${c.pillBg};color:#fff;` : `color:${tKey==='chalkboard'?cfg.boxColor:'#64748B'};`}">${c.code}</span>
-                  <div style="font-size:clamp(0.95rem, 2.1vw, 1.5rem); font-weight:800; color:${cfg.multiColor}; word-break:keep-all; line-height:1.25;">${c.text}</div>
+                  <span style="font-size:0.78em; font-weight:700; padding:2px 10px; border-radius:999px; margin-bottom:0.5em; ${tKey==='sage_flashcard' ? `background:${c.pillBg};color:#fff;` : `color:${tKey==='chalkboard'?cfg.boxColor:'#64748B'};`}">${c.code}</span>
+                  <div style="font-size:clamp(0.95rem, 2.1vw, 1.5rem); font-weight:700; color:${cfg.multiColor}; word-break:keep-all; line-height:1.25;">${c.text}</div>
                 </div>
               `).join('')}
             </div>`
@@ -3795,58 +4019,56 @@
               <div style="width:100%; height:100%; background:${cardBg}; border:${cardBorder}; border-radius:14px; padding:3% 5%; display:flex; flex-direction:column; justify-content:space-around;">
                 ${langCards.map(c => `
                   <div style="display:flex; align-items:center; gap:4%;">
-                    <span style="min-width:54px; text-align:center; font-size:0.8em; font-weight:800; padding:3px 8px; border-radius:8px; ${tKey==='sage_flashcard' ? `background:${c.pillBg};color:#fff;` : `color:${tKey==='chalkboard'?cfg.boxColor:'#64748B'};`}">${c.code}</span>
-                    <span style="font-size:clamp(1.05rem, 2.3vw, 1.65rem); font-weight:800; color:${cfg.multiColor}; word-break:keep-all;">${c.text}</span>
+                    <span style="min-width:54px; text-align:center; font-size:0.8em; font-weight:700; padding:3px 8px; border-radius:8px; ${tKey==='sage_flashcard' ? `background:${c.pillBg};color:#fff;` : `color:${tKey==='chalkboard'?cfg.boxColor:'#64748B'};`}">${c.code}</span>
+                    <span style="font-size:clamp(1.05rem, 2.3vw, 1.65rem); font-weight:700; color:${cfg.multiColor}; word-break:keep-all;">${c.text}</span>
                   </div>
                 `).join('')}
               </div>
             </div>`;
 
         return `
-          <div style="width:100%; height:100%; background:${outerBg}; position:relative; display:flex; flex-direction:column;">
+          <div style="width:100%; height:100%; background:${outerBg}; position:relative; display:flex; flex-direction:column; font-family:${fontStack};">
             ${innerFrameHtml}
             <div style="height:44%; display:flex; align-items:center; justify-content:center; padding:4% 6% 1% 6%; z-index:2;">
-              <div style="font-size:clamp(2rem, 5.5vw, 4.2rem); font-weight:900; color:${cfg.krColor}; text-align:center; word-break:keep-all;">${item.kr}</div>
+              <div style="font-size:clamp(2rem, 5.5vw, 4.2rem); font-weight:700; color:${cfg.krColor}; text-align:center; word-break:keep-all;">${item.kr}</div>
             </div>
             ${lowerHtml}
-            ${footerHtml}${numHtml}
+            ${numHtml}${footerHtml}
           </div>`;
       } else {
-        // Multi -> KR
         const upperHtml = isHoriz
           ? `<div style="height:52%; display:grid; grid-template-columns:repeat(${langCards.length}, 1fr); gap:2.2%; padding:5% 5% 2% 5%; z-index:2;">
               ${langCards.map(c => `
                 <div style="background:${tKey==='midnight_navy' ? '#2E3A87' : cardBg}; border:${cardBorder}; border-radius:12px; padding:5%; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
-                  <span style="font-size:0.78em; font-weight:800; padding:2px 10px; border-radius:999px; margin-bottom:0.45em; ${tKey==='sage_flashcard' ? `background:${c.pillBg};color:#fff;` : `color:${tKey==='midnight_navy'?'#CADCFC':(tKey==='chalkboard'?cfg.boxColor:'#64748B')};`}">${c.code}</span>
-                  <div style="font-size:clamp(0.95rem, 2.1vw, 1.5rem); font-weight:800; color:${tKey==='midnight_navy'?'#FFFFFF':cfg.multiColor}; word-break:keep-all; line-height:1.25;">${c.text}</div>
+                  <span style="font-size:0.78em; font-weight:700; padding:2px 10px; border-radius:999px; margin-bottom:0.45em; ${tKey==='sage_flashcard' ? `background:${c.pillBg};color:#fff;` : `color:${tKey==='midnight_navy'?'#CADCFC':(tKey==='chalkboard'?cfg.boxColor:'#64748B')};`}">${c.code}</span>
+                  <div style="font-size:clamp(0.95rem, 2.1vw, 1.5rem); font-weight:700; color:${tKey==='midnight_navy'?'#FFFFFF':cfg.multiColor}; word-break:keep-all; line-height:1.25;">${c.text}</div>
                 </div>
               `).join('')}
             </div>`
           : `<div style="height:54%; padding:5% 7% 2% 7%; display:flex; flex-direction:column; justify-content:space-around; z-index:2;">
               ${langCards.map(c => `
                 <div style="display:flex; align-items:center; gap:4%;">
-                  <span style="min-width:54px; text-align:center; font-size:0.8em; font-weight:800; padding:3px 8px; border-radius:8px; ${tKey==='sage_flashcard' ? `background:${c.pillBg};color:#fff;` : `color:${tKey==='chalkboard'?cfg.boxColor:'#64748B'};`}">${c.code}</span>
-                  <span style="font-size:clamp(1.1rem, 2.4vw, 1.75rem); font-weight:800; color:${tKey==='midnight_navy'?'#FFFFFF':cfg.multiColor}; word-break:keep-all;">${c.text}</span>
+                  <span style="min-width:54px; text-align:center; font-size:0.8em; font-weight:700; padding:3px 8px; border-radius:8px; ${tKey==='sage_flashcard' ? `background:${c.pillBg};color:#fff;` : `color:${tKey==='chalkboard'?cfg.boxColor:'#64748B'};`}">${c.code}</span>
+                  <span style="font-size:clamp(1.1rem, 2.4vw, 1.75rem); font-weight:700; color:${tKey==='midnight_navy'?'#FFFFFF':cfg.multiColor}; word-break:keep-all;">${c.text}</span>
                 </div>
               `).join('')}
             </div>`;
 
         return `
-          <div style="width:100%; height:100%; background:${outerBg}; position:relative; display:flex; flex-direction:column;">
+          <div style="width:100%; height:100%; background:${outerBg}; position:relative; display:flex; flex-direction:column; font-family:${fontStack};">
             ${innerFrameHtml}
             ${upperHtml}
             <div style="flex:1; padding:1.5% 12% 8.5% 12%; z-index:2; transition:all 0.25s; ${ansVisibility}">
-              <div style="width:100%; height:100%; background:${krBoxBg}; border:${krBoxBorder}; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:clamp(1.8rem, 4.6vw, 3.4rem); font-weight:900; color:${krBoxText};">${item.kr}</div>
+              <div style="width:100%; height:100%; background:${krBoxBg}; border:${krBoxBorder}; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:clamp(1.8rem, 4.6vw, 3.4rem); font-weight:700; color:${krBoxText};">${item.kr}</div>
             </div>
-            ${footerHtml}${numHtml}
+            ${numHtml}${footerHtml}
           </div>`;
       }
     }
 
-    /* --- ACTION 1: LIVE FULLSCREEN WEB SLIDESHOW --- */
     function openLiveSlideshow() {
       if (pptDeckSlides.length === 0) {
-        alert("먼저 출제할 단원을 1개 이상 선택해 주세요.");
+        alert("먼저 출제할 단원 또는 소단원을 1개 이상 선택해 주세요.");
         return;
       }
       slideshowIdx = 0;
@@ -3907,10 +4129,10 @@
       }
     }
 
-    /* --- ACTION 2: EXPORT ACTUAL .PPTX FILE (WITH CLICK ANIMATION OR 2-SLIDE SET) --- */
+    /* --- EXPORT ACTUAL .PPTX FILE WITH EXACT ANSWER-ONLY CLICK ANIMATION --- */
     async function exportActualPptxFile() {
       if (pptDeckSlides.length === 0) {
-        alert("먼저 출제할 단원을 1개 이상 선택해 주세요.");
+        alert("먼저 출제할 단원 또는 소단원을 1개 이상 선택해 주세요.");
         return;
       }
       if (typeof PptxGenJS === 'undefined') {
@@ -3921,15 +4143,20 @@
       const cfg = getPptCustomConfig();
       const isTwoSlide = (cfg.revealMode === 'two_slide');
       const pptx = new PptxGenJS();
-      pptx.layout = 'LAYOUT_4x3'; // 10 x 7.5 inches
+      pptx.layout = 'LAYOUT_4x3';
       pptx.title = `${currentBook?.title || '한국어'} 어휘 카드`;
 
       const hexClean = (h) => h.replace('#', '').toUpperCase();
       const tKey = cfg.themeKey;
       const isHoriz = (cfg.layoutDir === 'horizontal');
       const langCardsData = (item) => cfg.langs.map(lCode => {
-        const meta = LANG_BADGE_META[lCode] || { code: lCode.toUpperCase(), pillBg: '#3b82f6' };
-        return { code: meta.code, pillBg: hexClean(meta.pillBg), text: item[lCode] || item.en || '' };
+        const meta = LANG_BADGE_META[lCode] || { code: lCode.toUpperCase(), pillBg: '#3b82f6', fontFace: 'Noto Sans' };
+        return {
+          code: meta.code,
+          pillBg: hexClean(meta.pillBg),
+          text: item[lCode] || item.en || '',
+          fontFace: lCode === 'zh' ? 'Noto Sans SC' : 'Noto Sans KR'
+        };
       });
 
       const slidePairsToBuild = [];
@@ -3942,13 +4169,17 @@
         }
       });
 
+      // Track per-slide exact count of non-animated (static prompt) shapes so OOXML animation targets ONLY answer shapes
+      const staticShapeCountsPerSlide = [];
+
       slidePairsToBuild.forEach((sObj, pageIdx) => {
         const slide = pptx.addSlide();
         const { part, item, showAnswer } = sObj;
         const isKrFirst = (part === 'kr_to_multi');
         const cards = langCardsData(item);
+        let staticShapes = 0;
 
-        // Background & Theme Decorative Frames
+        // 1. Background & Decorative Frame Shapes (Static)
         if (tKey === 'chalkboard') {
           slide.background = { color: '8B5E3C' };
           slide.addShape(pptx.ShapeType.rect, {
@@ -3956,6 +4187,7 @@
             fill: { color: hexClean(cfg.bg) },
             line: { color: '6E4A2F', width: 2.5 }
           });
+          staticShapes += 1;
         } else if (tKey === 'coral_split') {
           slide.background = { color: 'FFFFFF' };
         } else {
@@ -3963,111 +4195,61 @@
           if (tKey === 'midnight_navy') {
             slide.addShape(pptx.ShapeType.ellipse, { x: 6.6, y: -2.4, w: 5.5, h: 5.5, fill: { color: '2A3577' } });
             slide.addShape(pptx.ShapeType.ellipse, { x: -1.8, y: 5.2, w: 3.6, h: 3.6, fill: { color: '243070' } });
+            staticShapes += 2;
           } else if (tKey === 'sage_flashcard') {
             slide.addShape(pptx.ShapeType.roundRect, { x: 0.3, y: 0.3, w: 9.4, h: 6.6, rectRadius: 0.04, fill: { color: 'FFFFFF' } });
+            staticShapes += 1;
           }
         }
 
-        // Render Content by Layout & Theme
+        // 2. First Prompt Area (Static - NEVER animated, always visible immediately)
         if (tKey === 'coral_split') {
           if (isHoriz) {
             if (isKrFirst) {
               slide.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 10, h: 3.4, fill: { color: hexClean(cfg.bg) } });
-              slide.addText(item.kr, { x: 0.4, y: 0.3, w: 9.2, h: 2.85, fontSize: 64, bold: true, color: hexClean(cfg.krColor), align: 'center', valign: 'middle', fontFace: 'Malgun Gothic' });
-              if (showAnswer) {
-                const colW = 9.0 / cards.length;
-                cards.forEach((c, i) => {
-                  const cx = 0.5 + i * colW;
-                  if (i > 0) slide.addShape(pptx.ShapeType.line, { x: cx, y: 3.8, w: 0, h: 2.8, line: { color: 'E3E4EC', width: 1.2 } });
-                  slide.addText(c.code, { x: cx, y: 3.78, w: colW, h: 0.45, fontSize: 16, bold: true, color: hexClean(cfg.bg), align: 'center', fontFace: 'Malgun Gothic' });
-                  slide.addText(c.text, { x: cx + 0.1, y: 4.35, w: colW - 0.2, h: 2.3, fontSize: 26, bold: true, color: hexClean(cfg.multiColor), align: 'center', valign: 'middle', fontFace: 'Malgun Gothic' });
-                });
-              }
+              slide.addText(item.kr, { x: 0.4, y: 0.3, w: 9.2, h: 2.85, fontSize: 64, bold: true, color: hexClean(cfg.krColor), align: 'center', valign: 'middle', fontFace: 'Noto Sans KR' });
+              staticShapes += 2;
             } else {
               slide.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 10, h: 4.0, fill: { color: hexClean(cfg.bg) } });
+              staticShapes += 1;
               const colW = 9.0 / cards.length;
               cards.forEach((c, i) => {
                 const cx = 0.5 + i * colW;
-                if (i > 0) slide.addShape(pptx.ShapeType.line, { x: cx, y: 0.55, w: 0, h: 3.1, line: { color: 'FFB3AE', width: 1.2 } });
-                slide.addText(c.code, { x: cx, y: 0.53, w: colW, h: 0.45, fontSize: 16, bold: true, color: 'FFD6D3', align: 'center', fontFace: 'Malgun Gothic' });
-                slide.addText(c.text, { x: cx + 0.1, y: 1.1, w: colW - 0.2, h: 2.6, fontSize: 26, bold: true, color: 'FFFFFF', align: 'center', valign: 'middle', fontFace: 'Malgun Gothic' });
+                if (i > 0) {
+                  slide.addShape(pptx.ShapeType.line, { x: cx, y: 0.55, w: 0, h: 3.1, line: { color: 'FFB3AE', width: 1.2 } });
+                  staticShapes += 1;
+                }
+                slide.addText(c.code, { x: cx, y: 0.53, w: colW, h: 0.45, fontSize: 16, bold: true, color: 'FFD6D3', align: 'center', fontFace: 'Noto Sans KR' });
+                slide.addText(c.text, { x: cx + 0.1, y: 1.1, w: colW - 0.2, h: 2.6, fontSize: 26, bold: true, color: 'FFFFFF', align: 'center', valign: 'middle', fontFace: c.fontFace });
+                staticShapes += 2;
               });
-              if (showAnswer) {
-                slide.addShape(pptx.ShapeType.roundRect, { x: 1.2, y: 4.35, w: 7.6, h: 2.4, rectRadius: 0.08, fill: { color: hexClean(cfg.boxColor) } });
-                slide.addText(item.kr, { x: 1.2, y: 4.35, w: 7.6, h: 2.4, fontSize: 54, bold: true, color: hexClean(cfg.multiColor), align: 'center', valign: 'middle', fontFace: 'Malgun Gothic' });
-              }
             }
           } else {
-            // Coral Vertical
             if (isKrFirst) {
               slide.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 4.84, h: 7.5, fill: { color: hexClean(cfg.bg) } });
-              slide.addText(item.kr, { x: 0.2, y: 0.5, w: 4.44, h: 6.3, fontSize: 54, bold: true, color: hexClean(cfg.krColor), align: 'center', valign: 'middle', fontFace: 'Malgun Gothic' });
-              if (showAnswer) {
-                const rowH = 6.0 / cards.length;
-                cards.forEach((c, i) => {
-                  const ry = 0.55 + i * rowH;
-                  slide.addText(c.code, { x: 5.19, y: ry, w: 4.4, h: 0.4, fontSize: 16, bold: true, color: hexClean(cfg.bg), fontFace: 'Malgun Gothic' });
-                  slide.addText(c.text, { x: 5.19, y: ry + 0.42, w: 4.4, h: rowH - 0.5, fontSize: 26, bold: true, color: hexClean(cfg.multiColor), valign: 'top', fontFace: 'Malgun Gothic' });
-                });
-              }
+              slide.addText(item.kr, { x: 0.2, y: 0.5, w: 4.44, h: 6.3, fontSize: 54, bold: true, color: hexClean(cfg.krColor), align: 'center', valign: 'middle', fontFace: 'Noto Sans KR' });
+              staticShapes += 2;
             } else {
               slide.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 5.6, h: 7.5, fill: { color: hexClean(cfg.bg) } });
+              staticShapes += 1;
               const rowH = 6.0 / cards.length;
               cards.forEach((c, i) => {
                 const ry = 0.55 + i * rowH;
-                slide.addText(c.code, { x: 0.4, y: ry, w: 4.9, h: 0.4, fontSize: 16, bold: true, color: 'FFD6D3', fontFace: 'Malgun Gothic' });
-                slide.addText(c.text, { x: 0.4, y: ry + 0.42, w: 4.9, h: rowH - 0.5, fontSize: 26, bold: true, color: 'FFFFFF', valign: 'top', fontFace: 'Malgun Gothic' });
+                slide.addText(c.code, { x: 0.4, y: ry, w: 4.9, h: 0.4, fontSize: 16, bold: true, color: 'FFD6D3', fontFace: 'Noto Sans KR' });
+                slide.addText(c.text, { x: 0.4, y: ry + 0.42, w: 4.9, h: rowH - 0.5, fontSize: 26, bold: true, color: 'FFFFFF', valign: 'top', fontFace: c.fontFace });
+                staticShapes += 2;
               });
-              if (showAnswer) {
-                slide.addShape(pptx.ShapeType.roundRect, { x: 5.9, y: 1.0, w: 3.8, h: 5.4, rectRadius: 0.08, fill: { color: hexClean(cfg.boxColor) } });
-                slide.addText(item.kr, { x: 5.9, y: 1.0, w: 3.8, h: 5.4, fontSize: 44, bold: true, color: hexClean(cfg.multiColor), align: 'center', valign: 'middle', fontFace: 'Malgun Gothic' });
-              }
             }
           }
         } else {
-          // Standard 4 Themes
-          const krBoxBg = (tKey === 'midnight_navy') ? hexClean(cfg.boxColor) : (tKey === 'chalkboard' ? hexClean(cfg.bg) : hexClean(cfg.krColor));
-          const krBoxTxt = (tKey === 'midnight_navy') ? hexClean(cfg.bg) : (tKey === 'chalkboard' ? hexClean(cfg.boxColor) : 'FFFFFF');
-          const krBoxLine = (tKey === 'chalkboard') ? { color: hexClean(cfg.boxColor), width: 2.2 } : undefined;
+          // Standard 4 Themes Prompt Area
           const cardBgHex = (tKey === 'chalkboard') ? hexClean(cfg.bg) : hexClean(cfg.boxColor);
           const cardLine = (tKey === 'chalkboard') ? { color: 'B9CFC4', width: 1 } : undefined;
 
           if (isKrFirst) {
-            slide.addText(item.kr, { x: 0.4, y: 0.4, w: 9.2, h: 2.75, fontSize: 64, bold: true, color: hexClean(cfg.krColor), align: 'center', valign: 'middle', fontFace: 'Malgun Gothic' });
-            if (showAnswer) {
-              if (isHoriz) {
-                const gap = 0.15;
-                const totalW = 9.0;
-                const colW = (totalW - gap * (cards.length - 1)) / cards.length;
-                cards.forEach((c, i) => {
-                  const cx = 0.5 + i * (colW + gap);
-                  slide.addShape(pptx.ShapeType.roundRect, { x: cx, y: 3.4, w: colW, h: 3.25, rectRadius: 0.06, fill: { color: cardBgHex }, line: cardLine });
-                  if (tKey === 'sage_flashcard') {
-                    slide.addShape(pptx.ShapeType.roundRect, { x: cx + (colW - 1.1)/2, y: 3.58, w: 1.1, h: 0.44, rectRadius: 0.2, fill: { color: c.pillBg } });
-                    slide.addText(c.code, { x: cx + (colW - 1.1)/2, y: 3.58, w: 1.1, h: 0.44, fontSize: 13, bold: true, color: 'FFFFFF', align: 'center', valign: 'middle', fontFace: 'Malgun Gothic' });
-                  } else {
-                    slide.addText(c.code, { x: cx, y: 3.58, w: colW, h: 0.42, fontSize: 15, bold: true, color: tKey === 'chalkboard' ? hexClean(cfg.boxColor) : '8A94A6', align: 'center', fontFace: 'Malgun Gothic' });
-                  }
-                  slide.addText(c.text, { x: cx + 0.12, y: 4.15, w: colW - 0.24, h: 2.35, fontSize: 25, bold: true, color: hexClean(cfg.multiColor), align: 'center', valign: 'middle', fontFace: 'Malgun Gothic' });
-                });
-              } else {
-                // Vertical rows
-                slide.addShape(pptx.ShapeType.roundRect, { x: 0.5, y: 3.3, w: 9.0, h: 3.35, rectRadius: 0.06, fill: { color: cardBgHex }, line: cardLine });
-                const rowH = 3.1 / cards.length;
-                cards.forEach((c, i) => {
-                  const ry = 3.42 + i * rowH;
-                  if (tKey === 'sage_flashcard') {
-                    slide.addShape(pptx.ShapeType.roundRect, { x: 0.85, y: ry + (rowH - 0.46)/2, w: 1.1, h: 0.46, rectRadius: 0.2, fill: { color: c.pillBg } });
-                    slide.addText(c.code, { x: 0.85, y: ry + (rowH - 0.46)/2, w: 1.1, h: 0.46, fontSize: 13, bold: true, color: 'FFFFFF', align: 'center', valign: 'middle', fontFace: 'Malgun Gothic' });
-                  } else {
-                    slide.addText(c.code, { x: 0.85, y: ry, w: 1.15, h: rowH, fontSize: 16, bold: true, color: tKey === 'chalkboard' ? hexClean(cfg.boxColor) : '8A94A6', align: 'center', valign: 'middle', fontFace: 'Malgun Gothic' });
-                  }
-                  slide.addText(c.text, { x: 2.15, y: ry, w: 7.1, h: rowH, fontSize: 28, bold: true, color: hexClean(cfg.multiColor), align: 'left', valign: 'middle', fontFace: 'Malgun Gothic' });
-                });
-              }
-            }
+            slide.addText(item.kr, { x: 0.4, y: 0.4, w: 9.2, h: 2.75, fontSize: 64, bold: true, color: hexClean(cfg.krColor), align: 'center', valign: 'middle', fontFace: 'Noto Sans KR' });
+            staticShapes += 1;
           } else {
-            // Multi -> KR
             if (isHoriz) {
               const gap = 0.15;
               const colW = (9.0 - gap * (cards.length - 1)) / cards.length;
@@ -4076,13 +4258,17 @@
               cards.forEach((c, i) => {
                 const cx = 0.5 + i * (colW + gap);
                 slide.addShape(pptx.ShapeType.roundRect, { x: cx, y: 0.5, w: colW, h: 3.4, rectRadius: 0.06, fill: { color: topCardBg }, line: cardLine });
+                staticShapes += 1;
                 if (tKey === 'sage_flashcard') {
                   slide.addShape(pptx.ShapeType.roundRect, { x: cx + (colW - 1.1)/2, y: 0.68, w: 1.1, h: 0.44, rectRadius: 0.2, fill: { color: c.pillBg } });
-                  slide.addText(c.code, { x: cx + (colW - 1.1)/2, y: 0.68, w: 1.1, h: 0.44, fontSize: 13, bold: true, color: 'FFFFFF', align: 'center', valign: 'middle', fontFace: 'Malgun Gothic' });
+                  slide.addText(c.code, { x: cx + (colW - 1.1)/2, y: 0.68, w: 1.1, h: 0.44, fontSize: 13, bold: true, color: 'FFFFFF', align: 'center', valign: 'middle', fontFace: 'Noto Sans KR' });
+                  staticShapes += 2;
                 } else {
-                  slide.addText(c.code, { x: cx, y: 0.68, w: colW, h: 0.42, fontSize: 15, bold: true, color: tKey === 'midnight_navy' ? 'CADCFC' : (tKey === 'chalkboard' ? hexClean(cfg.boxColor) : '8A94A6'), align: 'center', fontFace: 'Malgun Gothic' });
+                  slide.addText(c.code, { x: cx, y: 0.68, w: colW, h: 0.42, fontSize: 15, bold: true, color: tKey === 'midnight_navy' ? 'CADCFC' : (tKey === 'chalkboard' ? hexClean(cfg.boxColor) : '8A94A6'), align: 'center', fontFace: 'Noto Sans KR' });
+                  staticShapes += 1;
                 }
-                slide.addText(c.text, { x: cx + 0.12, y: 1.25, w: colW - 0.24, h: 2.45, fontSize: 25, bold: true, color: topTxtColor, align: 'center', valign: 'middle', fontFace: 'Malgun Gothic' });
+                slide.addText(c.text, { x: cx + 0.12, y: 1.25, w: colW - 0.24, h: 2.45, fontSize: 25, bold: true, color: topTxtColor, align: 'center', valign: 'middle', fontFace: c.fontFace });
+                staticShapes += 1;
               });
             } else {
               const rowH = 3.45 / cards.length;
@@ -4091,38 +4277,109 @@
                 const ry = 0.45 + i * rowH;
                 if (tKey === 'sage_flashcard') {
                   slide.addShape(pptx.ShapeType.roundRect, { x: 0.75, y: ry + (rowH - 0.48)/2, w: 1.1, h: 0.48, rectRadius: 0.2, fill: { color: c.pillBg } });
-                  slide.addText(c.code, { x: 0.75, y: ry + (rowH - 0.48)/2, w: 1.1, h: 0.48, fontSize: 13, bold: true, color: 'FFFFFF', align: 'center', valign: 'middle', fontFace: 'Malgun Gothic' });
+                  slide.addText(c.code, { x: 0.75, y: ry + (rowH - 0.48)/2, w: 1.1, h: 0.48, fontSize: 13, bold: true, color: 'FFFFFF', align: 'center', valign: 'middle', fontFace: 'Noto Sans KR' });
+                  staticShapes += 2;
                 } else {
-                  slide.addText(c.code, { x: 0.75, y: ry, w: 1.15, h: rowH, fontSize: 16, bold: true, color: tKey === 'chalkboard' ? hexClean(cfg.boxColor) : '8A94A6', align: 'center', valign: 'middle', fontFace: 'Malgun Gothic' });
+                  slide.addText(c.code, { x: 0.75, y: ry, w: 1.15, h: rowH, fontSize: 16, bold: true, color: tKey === 'chalkboard' ? hexClean(cfg.boxColor) : '8A94A6', align: 'center', valign: 'middle', fontFace: 'Noto Sans KR' });
+                  staticShapes += 1;
                 }
-                slide.addText(c.text, { x: 2.05, y: ry, w: 7.3, h: rowH, fontSize: 30, bold: true, color: topTxtColor, align: 'left', valign: 'middle', fontFace: 'Malgun Gothic' });
+                slide.addText(c.text, { x: 2.05, y: ry, w: 7.3, h: rowH, fontSize: 30, bold: true, color: topTxtColor, align: 'left', valign: 'middle', fontFace: c.fontFace });
+                staticShapes += 1;
               });
-            }
-
-            if (showAnswer) {
-              slide.addShape(pptx.ShapeType.roundRect, { x: 1.2, y: 4.2, w: 7.6, h: 2.45, rectRadius: 0.08, fill: { color: krBoxBg }, line: krBoxLine });
-              slide.addText(item.kr, { x: 1.2, y: 4.2, w: 7.6, h: 2.45, fontSize: 54, bold: true, color: krBoxTxt, align: 'center', valign: 'middle', fontFace: 'Malgun Gothic' });
             }
           }
         }
 
-        // Slide Number & Optional Custom Institution Footer (empty by default)
-        const footerClr = tKey === 'coral_split' ? '64748B' : hexClean(cfg.krColor);
-        slide.addText(`${pageIdx + 1}`, { x: 4.5, y: 6.92, w: 1.0, h: 0.35, fontSize: 11, bold: true, color: footerClr, align: 'center', fontFace: 'Malgun Gothic' });
-        if (cfg.footerText) {
-          slide.addText(cfg.footerText, { x: 0.5, y: 7.12, w: 9.0, h: 0.3, fontSize: 10, color: footerClr, align: 'center', fontFace: 'Malgun Gothic' });
+        // 3. Second Answer Box Area (Animated on click in single_anim mode)
+        if (showAnswer) {
+          if (tKey === 'coral_split') {
+            if (isHoriz) {
+              if (isKrFirst) {
+                const colW = 9.0 / cards.length;
+                cards.forEach((c, i) => {
+                  const cx = 0.5 + i * colW;
+                  if (i > 0) slide.addShape(pptx.ShapeType.line, { x: cx, y: 3.8, w: 0, h: 2.8, line: { color: 'E3E4EC', width: 1.2 } });
+                  slide.addText(c.code, { x: cx, y: 3.78, w: colW, h: 0.45, fontSize: 16, bold: true, color: hexClean(cfg.bg), align: 'center', fontFace: 'Noto Sans KR' });
+                  slide.addText(c.text, { x: cx + 0.1, y: 4.35, w: colW - 0.2, h: 2.3, fontSize: 26, bold: true, color: hexClean(cfg.multiColor), align: 'center', valign: 'middle', fontFace: c.fontFace });
+                });
+              } else {
+                slide.addShape(pptx.ShapeType.roundRect, { x: 1.2, y: 4.35, w: 7.6, h: 2.4, rectRadius: 0.08, fill: { color: hexClean(cfg.boxColor) } });
+                slide.addText(item.kr, { x: 1.2, y: 4.35, w: 7.6, h: 2.4, fontSize: 54, bold: true, color: hexClean(cfg.multiColor), align: 'center', valign: 'middle', fontFace: 'Noto Sans KR' });
+              }
+            } else {
+              if (isKrFirst) {
+                const rowH = 6.0 / cards.length;
+                cards.forEach((c, i) => {
+                  const ry = 0.55 + i * rowH;
+                  slide.addText(c.code, { x: 5.19, y: ry, w: 4.4, h: 0.4, fontSize: 16, bold: true, color: hexClean(cfg.bg), fontFace: 'Noto Sans KR' });
+                  slide.addText(c.text, { x: 5.19, y: ry + 0.42, w: 4.4, h: rowH - 0.5, fontSize: 26, bold: true, color: hexClean(cfg.multiColor), valign: 'top', fontFace: c.fontFace });
+                });
+              } else {
+                slide.addShape(pptx.ShapeType.roundRect, { x: 5.9, y: 1.0, w: 3.8, h: 5.4, rectRadius: 0.08, fill: { color: hexClean(cfg.boxColor) } });
+                slide.addText(item.kr, { x: 5.9, y: 1.0, w: 3.8, h: 5.4, fontSize: 44, bold: true, color: hexClean(cfg.multiColor), align: 'center', valign: 'middle', fontFace: 'Noto Sans KR' });
+              }
+            }
+          } else {
+            const krBoxBg = (tKey === 'midnight_navy') ? hexClean(cfg.boxColor) : (tKey === 'chalkboard' ? hexClean(cfg.bg) : hexClean(cfg.krColor));
+            const krBoxTxt = (tKey === 'midnight_navy') ? hexClean(cfg.bg) : (tKey === 'chalkboard' ? hexClean(cfg.boxColor) : 'FFFFFF');
+            const krBoxLine = (tKey === 'chalkboard') ? { color: hexClean(cfg.boxColor), width: 2.2 } : undefined;
+            const cardBgHex = (tKey === 'chalkboard') ? hexClean(cfg.bg) : hexClean(cfg.boxColor);
+            const cardLine = (tKey === 'chalkboard') ? { color: 'B9CFC4', width: 1 } : undefined;
+
+            if (isKrFirst) {
+              if (isHoriz) {
+                const gap = 0.15;
+                const colW = (9.0 - gap * (cards.length - 1)) / cards.length;
+                cards.forEach((c, i) => {
+                  const cx = 0.5 + i * (colW + gap);
+                  slide.addShape(pptx.ShapeType.roundRect, { x: cx, y: 3.4, w: colW, h: 3.25, rectRadius: 0.06, fill: { color: cardBgHex }, line: cardLine });
+                  if (tKey === 'sage_flashcard') {
+                    slide.addShape(pptx.ShapeType.roundRect, { x: cx + (colW - 1.1)/2, y: 3.58, w: 1.1, h: 0.44, rectRadius: 0.2, fill: { color: c.pillBg } });
+                    slide.addText(c.code, { x: cx + (colW - 1.1)/2, y: 3.58, w: 1.1, h: 0.44, fontSize: 13, bold: true, color: 'FFFFFF', align: 'center', valign: 'middle', fontFace: 'Noto Sans KR' });
+                  } else {
+                    slide.addText(c.code, { x: cx, y: 3.58, w: colW, h: 0.42, fontSize: 15, bold: true, color: tKey === 'chalkboard' ? hexClean(cfg.boxColor) : '8A94A6', align: 'center', fontFace: 'Noto Sans KR' });
+                  }
+                  slide.addText(c.text, { x: cx + 0.12, y: 4.15, w: colW - 0.24, h: 2.35, fontSize: 25, bold: true, color: hexClean(cfg.multiColor), align: 'center', valign: 'middle', fontFace: c.fontFace });
+                });
+              } else {
+                slide.addShape(pptx.ShapeType.roundRect, { x: 0.5, y: 3.3, w: 9.0, h: 3.35, rectRadius: 0.06, fill: { color: cardBgHex }, line: cardLine });
+                const rowH = 3.1 / cards.length;
+                cards.forEach((c, i) => {
+                  const ry = 3.42 + i * rowH;
+                  if (tKey === 'sage_flashcard') {
+                    slide.addShape(pptx.ShapeType.roundRect, { x: 0.85, y: ry + (rowH - 0.46)/2, w: 1.1, h: 0.46, rectRadius: 0.2, fill: { color: c.pillBg } });
+                    slide.addText(c.code, { x: 0.85, y: ry + (rowH - 0.46)/2, w: 1.1, h: 0.46, fontSize: 13, bold: true, color: 'FFFFFF', align: 'center', valign: 'middle', fontFace: 'Noto Sans KR' });
+                  } else {
+                    slide.addText(c.code, { x: 0.85, y: ry, w: 1.15, h: rowH, fontSize: 16, bold: true, color: tKey === 'chalkboard' ? hexClean(cfg.boxColor) : '8A94A6', align: 'center', valign: 'middle', fontFace: 'Noto Sans KR' });
+                  }
+                  slide.addText(c.text, { x: 2.15, y: ry, w: 7.1, h: rowH, fontSize: 28, bold: true, color: hexClean(cfg.multiColor), align: 'left', valign: 'middle', fontFace: c.fontFace });
+                });
+              }
+            } else {
+              slide.addShape(pptx.ShapeType.roundRect, { x: 1.2, y: 4.2, w: 7.6, h: 2.45, rectRadius: 0.08, fill: { color: krBoxBg }, line: krBoxLine });
+              slide.addText(item.kr, { x: 1.2, y: 4.2, w: 7.6, h: 2.45, fontSize: 54, bold: true, color: krBoxTxt, align: 'center', valign: 'middle', fontFace: 'Noto Sans KR' });
+            }
+          }
         }
+
+        // 4. Bottom Center Slide Number & Bottom Right Institution Footer (Static, separated cleanly)
+        const footerClr = tKey === 'coral_split' ? '64748B' : hexClean(cfg.krColor);
+        slide.addText(`${pageIdx + 1}`, { x: 4.5, y: 7.05, w: 1.0, h: 0.32, fontSize: 11, bold: true, color: footerClr, align: 'center', fontFace: 'Noto Sans KR' });
+        if (cfg.footerText) {
+          slide.addText(cfg.footerText, { x: 6.2, y: 7.05, w: 3.45, h: 0.32, fontSize: 9.5, bold: true, color: footerClr, align: 'right', fontFace: 'Noto Sans KR' });
+        }
+
+        staticShapeCountsPerSlide.push(staticShapes);
       });
 
-      // Generate PPTX blob and if 'single_anim', inject native OOXML click-to-appear animation on answer shapes
       const rawBuffer = await pptx.write({ outputType: 'arraybuffer' });
       let finalBlob = new Blob([rawBuffer], { type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation' });
 
       if (!isTwoSlide && typeof JSZip !== 'undefined') {
         try {
-          finalBlob = await injectClickAppearAnimations(rawBuffer, tKey);
+          finalBlob = await injectClickAppearAnimations(rawBuffer, staticShapeCountsPerSlide);
         } catch (animErr) {
-          console.warn("Animation post-process fallback:", animErr);
+          console.warn("Animation injection fallback:", animErr);
         }
       }
 
@@ -4134,35 +4391,25 @@
       a.click();
     }
 
-    /* Inject native PowerPoint On-Click Appear (<p:timing>) XML for lower answer shapes */
-    async function injectClickAppearAnimations(arrayBuffer, tKey) {
+    async function injectClickAppearAnimations(arrayBuffer, staticCounts) {
       const zip = await JSZip.loadAsync(arrayBuffer);
-      const slideFiles = Object.keys(zip.files).filter(f => /^ppt\/slides\/slide\d+\.xml$/.test(f));
+      const hasFooter = document.getElementById('pptFooterText').value.trim().length > 0;
+      const tailCount = hasFooter ? 2 : 1; // Bottom center page num + optional bottom right institution
 
-      // Fixed background shape count per theme so only answer shapes animate on click
-      const bgShapeCountMap = {
-        clean_white: 0,
-        midnight_navy: 2,
-        sage_flashcard: 1,
-        coral_split: 0,
-        chalkboard: 1
-      };
-      const bgOffset = bgShapeCountMap[tKey] || 0;
+      for (let i = 0; i < staticCounts.length; i++) {
+        const sFile = `ppt/slides/slide${i + 1}.xml`;
+        const fileObj = zip.file(sFile);
+        if (!fileObj) continue;
 
-      for (const sFile of slideFiles) {
-        let xml = await zip.file(sFile).async('string');
+        let xml = await fileObj.async('string');
         const idMatches = [...xml.matchAll(/<p:cNvPr id="(\d+)"/g)].map(m => parseInt(m[1], 10));
-        // id="1" is group shape; prompt shapes come right after bgOffset
-        const contentShapeIds = idMatches.filter(id => id > 1 + bgOffset);
-        // First content shape(s) are prompt; remaining shapes (excluding bottom page number / footer text at the end) are answer box shapes
-        if (contentShapeIds.length <= 2) continue;
+        // id="1" is root group; next `staticCounts[i]` shapes are background + first prompt area
+        const contentIds = idMatches.filter(id => id > 1);
+        const sCount = staticCounts[i];
+        if (contentIds.length <= sCount + tailCount) continue;
 
-        // Exclude last 1 or 2 text shapes (page number & optional footer)
-        const hasFooter = document.getElementById('pptFooterText').value.trim().length > 0;
-        const tailCount = hasFooter ? 2 : 1;
-        const mainShapes = contentShapeIds.slice(0, contentShapeIds.length - tailCount);
-        const answerShapeIds = mainShapes.slice(1); // Everything after prompt shape(s)
-
+        // Only shapes strictly between static prompt shapes and bottom footer/page-num shapes get animated!
+        const answerShapeIds = contentIds.slice(sCount, contentIds.length - tailCount);
         if (answerShapeIds.length === 0) continue;
 
         let tnId = 2;
@@ -4223,10 +4470,9 @@
       return await zip.generateAsync({ type: 'blob' });
     }
 
-    /* --- ACTION 3: SAVE AS PDF (SINGLE PAGE OR 2-PAGE SET) --- */
     function exportPptAsPdf() {
       if (pptDeckSlides.length === 0) {
-        alert("먼저 출제할 단원을 1개 이상 선택해 주세요.");
+        alert("먼저 출제할 단원 또는 소단원을 1개 이상 선택해 주세요.");
         return;
       }
       const cfg = getPptCustomConfig();
@@ -4244,20 +4490,31 @@
         }
       });
 
+      // Inject dynamic @page 4:3 exact size so slide never clips on print
+      let styleTag = document.getElementById('dynamicPrintPageStyle');
+      if (!styleTag) {
+        styleTag = document.createElement('style');
+        styleTag.id = 'dynamicPrintPageStyle';
+        document.head.appendChild(styleTag);
+      }
+      styleTag.textContent = `@media print { @page { size: 254mm 190.5mm; margin: 0; } }`;
+
       container.innerHTML = pagesHtml;
-      document.body.classList.remove('print-mode-sheet');
+      document.body.classList.remove('print-mode-sheet', 'print-mode-workbook');
       document.body.classList.add('print-mode-ppt');
       setTimeout(() => {
         window.print();
         document.body.classList.remove('print-mode-ppt');
+        styleTag.textContent = '';
       }, 250);
     }
 
     /* ==========================================================================
-       13. PRINTABLE A4 QUIZ SHEET GENERATOR
+       13. PRINTABLE A4 QUIZ SHEET GENERATOR (MULTI-PAGE PRINT, SEPARATE TEACHER KEY, CUSTOM TITLE/DATE)
     ========================================================================== */
     function initPrintSheetControls() {
       const sheetClassSel = document.getElementById('sheetClassSelect');
+      populateAllClassesIntoSelect(sheetClassSel, currentUserRole === 'TEACHER' && assignedTeacherClass !== 'ALL' ? assignedTeacherClass : null);
       if (currentUserRole === 'TEACHER' && assignedTeacherClass !== 'ALL') {
         sheetClassSel.value = assignedTeacherClass;
         sheetClassSel.disabled = true;
@@ -4265,41 +4522,76 @@
         sheetClassSel.disabled = false;
       }
 
-      const unitBox = document.getElementById('sheetUnitCheckboxes');
-      const units = Array.from(new Set(RAW_VOCAB.map(v => v.unit)));
-      unitBox.innerHTML = units.map(u => `
-        <label style="display:inline-flex; align-items:center; gap:0.3rem; font-size:0.82rem; background:#f8fafc; padding:0.3rem 0.6rem; border-radius:8px; border:1px solid var(--border); cursor:pointer;">
-          <input type="checkbox" class="sheet-unit-cb" value="${u}" checked />
-          <span>${u.split(' ')[0]}단원 (${u.split(' ').slice(1, 3).join(' ')})</span>
-        </label>
-      `).join('');
+      // Default today's date in date picker
+      const dateInput = document.getElementById('sheetCustomDate');
+      if (dateInput && !dateInput.value) {
+        dateInput.value = new Date().toISOString().split('T')[0];
+      }
+
+      // Multi-language checkboxes
+      const availLangs = detectAvailableLanguagesInVocab();
+      const langBox = document.getElementById('sheetLangCheckboxes');
+      if (langBox) {
+        langBox.innerHTML = availLangs.map(code => {
+          const meta = LANG_BADGE_META[code] || { label: code.toUpperCase() };
+          return `<label style="display:inline-flex; align-items:center; gap:0.25rem; cursor:pointer;"><input type="checkbox" class="sheet-lang-cb" value="${code}" ${code === 'en' ? 'checked' : ''} /> ${meta.label}</label>`;
+        }).join('');
+      }
+
+      // Hierarchical unit/section checkboxes (DEFAULT: NONE SELECTED)
+      renderHierarchicalUnitTree('sheetUnitTreeContainer', 'sheet', false);
     }
 
-    function printQuizSheetNow() {
-      document.body.classList.remove('print-mode-ppt');
-      document.body.classList.add('print-mode-sheet');
-      window.print();
-      document.body.classList.remove('print-mode-sheet');
-    }
-
-    function generatePrintableSheet() {
-      const selectedUnits = Array.from(document.querySelectorAll('.sheet-unit-cb:checked')).map(cb => cb.value);
-      if (selectedUnits.length === 0) {
-        alert("시험지에 출제할 단원을 1개 이상 선택해 주세요.");
+    function printQuizSheetNow(mode) {
+      const previewEl = document.getElementById('printSheetPreview');
+      if (!previewEl.querySelector('.sheet-student-section')) {
+        alert("먼저 [시험지 및 교사용 정답지 생성] 버튼을 눌러 시험지를 만들어 주세요.");
         return;
       }
 
+      let styleTag = document.getElementById('dynamicPrintPageStyle');
+      if (!styleTag) {
+        styleTag = document.createElement('style');
+        styleTag.id = 'dynamicPrintPageStyle';
+        document.head.appendChild(styleTag);
+      }
+      styleTag.textContent = `@media print { @page { size: A4 portrait; margin: 12mm; } }`;
+
+      document.body.classList.remove('print-mode-ppt', 'print-mode-workbook', 'hide-answer-key', 'only-answer-key');
+      document.body.classList.add('print-mode-sheet');
+      if (mode === 'student') document.body.classList.add('hide-answer-key');
+      else if (mode === 'teacher') document.body.classList.add('only-answer-key');
+
+      setTimeout(() => {
+        window.print();
+        document.body.classList.remove('print-mode-sheet', 'hide-answer-key', 'only-answer-key');
+        styleTag.textContent = '';
+      }, 200);
+    }
+
+    function generatePrintableSheet() {
+      const selectedSecs = getSelectedTreeSections('sheet');
+      if (selectedSecs.size === 0) {
+        alert("시험지에 출제할 단원(또는 소단원)을 1개 이상 선택해 주세요.");
+        return;
+      }
+
+      const selectedLangs = Array.from(document.querySelectorAll('.sheet-lang-cb:checked')).map(cb => cb.value);
+      const langs = selectedLangs.length > 0 ? selectedLangs : ['en'];
+
+      const customTitle = document.getElementById('sheetCustomTitle').value.trim() || `${currentBook?.title || '한국어'} 어휘 평가 시험지`;
+      const rawDate = document.getElementById('sheetCustomDate').value;
+      const formattedDate = rawDate ? rawDate.replace(/-/g, '. ') : new Date().toLocaleDateString('ko-KR');
+
       const clsName = document.getElementById('sheetClassSelect').value;
       const sheetType = document.getElementById('sheetTypeSelect').value;
-      const sheetDir = document.getElementById('sheetDirSelect').value;
-      const lang = document.getElementById('sheetLangSelect').value;
       const count = parseInt(document.getElementById('sheetCountSelect').value, 10);
 
-      const pool = RAW_VOCAB.filter(v => selectedUnits.includes(v.unit));
+      const pool = RAW_VOCAB.filter(v => selectedSecs.has(v.section));
       const picked = [...pool].sort(() => 0.5 - Math.random()).slice(0, Math.min(count, pool.length));
 
-      const unitLabels = selectedUnits.map(u => u.split(' ')[0] + '단원').join(', ');
-      const today = new Date().toLocaleDateString('ko-KR');
+      const formatMultiText = (item) => langs.map(l => item[l] || item.en || '').filter(Boolean).join(' / ');
+      const unitScopeLabel = Array.from(selectedSecs).slice(0, 3).join(', ') + (selectedSecs.size > 3 ? ` 외 ${selectedSecs.size - 3}개` : '');
 
       let questionsHtml = '';
       let answersHtml = '';
@@ -4309,33 +4601,31 @@
         const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         questionsHtml = `<div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem;">
           <div>
-            ${picked.map((item, idx) => `<div style="padding:0.55rem 0; border-bottom:1px dashed #cbd5e1;"><strong>${idx + 1}.</strong> ${item.kr} &nbsp;&nbsp; ( &nbsp;&nbsp;&nbsp; )</div>`).join('')}
+            ${picked.map((item, idx) => `<div style="padding:0.55rem 0; border-bottom:1px dashed #cbd5e1; break-inside:avoid;"><strong>${idx + 1}.</strong> ${item.kr} &nbsp;&nbsp; ( &nbsp;&nbsp;&nbsp; )</div>`).join('')}
           </div>
           <div>
-            ${rightShuffled.map((item, idx) => `<div style="padding:0.55rem 0; border-bottom:1px dashed #cbd5e1;"><strong>${letters[idx % 26]}.</strong> ${item[lang] || item.en}</div>`).join('')}
+            ${rightShuffled.map((item, idx) => `<div style="padding:0.55rem 0; border-bottom:1px dashed #cbd5e1; break-inside:avoid;"><strong>${letters[idx % 26]}.</strong> ${formatMultiText(item)}</div>`).join('')}
           </div>
         </div>`;
 
         answersHtml = picked.map((item, idx) => {
           const matchIdx = rightShuffled.findIndex(r => r.kr === item.kr);
-          return `<span style="display:inline-block; min-width:90px; margin:0.2rem 0.4rem;">${idx + 1}번: <strong>${letters[matchIdx % 26]}</strong></span>`;
+          return `<span style="display:inline-block; min-width:95px; margin:0.2rem 0.4rem;">${idx + 1}번: <strong>${letters[matchIdx % 26]}</strong></span>`;
         }).join('');
       } else {
         questionsHtml = `<div class="sheet-q-grid">`;
         picked.forEach((item, idx) => {
           let isKrPrompt = true;
-          if (sheetType === 'subjective_kr' || sheetType === 'subjective_kr_hint') isKrPrompt = false;
-          else if (sheetType === 'subjective_trans') isKrPrompt = true;
-          else if (sheetDir === 'kr_to_foreign') isKrPrompt = true;
-          else if (sheetDir === 'foreign_to_kr') isKrPrompt = false;
-          else isKrPrompt = (idx % 2 === 0);
+          if (sheetType === 'choice_kr_to_foreign' || sheetType === 'subjective_trans') isKrPrompt = true;
+          else if (sheetType === 'choice_foreign_to_kr' || sheetType === 'subjective_kr' || sheetType === 'subjective_kr_hint') isKrPrompt = false;
+          else isKrPrompt = (idx % 2 === 0); // choice_mixed or subjective_mixed
 
-          const qText = isKrPrompt ? item.kr : (item[lang] || item.en);
-          const ansText = isKrPrompt ? (item[lang] || item.en) : item.kr;
+          const qText = isKrPrompt ? item.kr : formatMultiText(item);
+          const ansText = isKrPrompt ? formatMultiText(item) : item.kr;
 
-          if (sheetType === 'choice') {
+          if (sheetType.startsWith('choice')) {
             const others = RAW_VOCAB.filter(v => v.kr !== item.kr).sort(() => 0.5 - Math.random()).slice(0, 3);
-            const opts = [...others.map(o => isKrPrompt ? (o[lang] || o.en) : o.kr), ansText].sort(() => 0.5 - Math.random());
+            const opts = [...others.map(o => isKrPrompt ? formatMultiText(o) : o.kr), ansText].sort(() => 0.5 - Math.random());
             const ansNum = opts.indexOf(ansText) + 1;
             questionsHtml += `
               <div class="sheet-q-item">
@@ -4346,9 +4636,11 @@
                 </div>
               </div>
             `;
-            answersHtml += `<div style="font-size:0.88rem; margin-bottom:0.25rem;"><strong>${idx + 1}번:</strong> ①②③④ 중 <strong>${ansNum}번</strong> (${ansText})</div>`;
+            answersHtml += `<div style="font-size:0.88rem; margin-bottom:0.25rem;"><strong>${idx + 1}번:</strong> <strong>${ansNum}번</strong> (${ansText})</div>`;
           } else {
-            const chosungBadge = (sheetType === 'subjective_kr_hint') ? ` <span style="color:#475569; font-size:0.85rem;">[힌트: ${getChosungString(item.kr)}]</span>` : '';
+            const chosungBadge = (sheetType === 'subjective_kr_hint' && !isKrPrompt)
+              ? ` <span style="color:#475569; font-size:0.84rem;">[힌트: ${getChosungString(item.kr)}]</span>`
+              : '';
             questionsHtml += `
               <div class="sheet-q-item">
                 <div><strong>${idx + 1}.</strong> ${qText}${chosungBadge}</div>
@@ -4362,29 +4654,37 @@
       }
 
       document.getElementById('printSheetPreview').innerHTML = `
-        <div class="sheet-header-box">
-          <div class="sheet-title">${currentBook?.title || '한국어'} 어휘 평가 시험지</div>
-          <div class="sheet-meta-row">
-            <span>소속: <strong>${clsName}</strong></span>
-            <span>출제 범위: <strong>${unitLabels} (${picked.length}문항)</strong></span>
-            <span>날짜: ${today}</span>
-            <span>이름: _______________</span>
-            <span>점수: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; / ${picked.length}</span>
+        <div class="sheet-student-section">
+          <div class="sheet-header-box">
+            <div class="sheet-title">${customTitle}</div>
+            <div class="sheet-meta-row">
+              <span>소속: <strong>${clsName}</strong></span>
+              <span>범위: <strong>${unitScopeLabel} (${picked.length}문항)</strong></span>
+              <span>날짜: ${formattedDate}</span>
+              <span>이름: _______________</span>
+              <span>점수: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; / ${picked.length}</span>
+            </div>
           </div>
+          ${questionsHtml}
         </div>
-        ${questionsHtml}
         <div class="sheet-answer-section">
-          <h3 style="font-size:1.1rem; font-weight:800; margin-bottom:0.65rem;">[교사 채점용 정답지 - Answer Key] (${clsName} · ${unitLabels})</h3>
-          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.25rem 1.5rem;">
+          <div class="sheet-header-box" style="background:#f8fafc;">
+            <div class="sheet-title">[교사용 정답지] ${customTitle}</div>
+            <div class="sheet-meta-row">
+              <span>소속: <strong>${clsName}</strong></span>
+              <span>출제 범위: <strong>${unitScopeLabel} (${picked.length}문항)</strong></span>
+              <span>날짜: ${formattedDate}</span>
+            </div>
+          </div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.3rem 1.5rem;">
             ${answersHtml}
           </div>
         </div>
       `;
     }
 
-
     /* ==========================================================================
-       13-B. MAIN ADMIN ONLY: LANDSCAPE A4 VOCABULARY WORKBOOK & PRACTICE GENERATOR
+       13-B. MAIN ADMIN ONLY: LANDSCAPE A4 WORKBOOK (CUSTOM LANG ORDER + 20 ROWS FLUSH TO FOOTER)
     ========================================================================== */
     const COLOPHON_PRESETS = {
       yongin: {
@@ -4410,15 +4710,8 @@
         notice: '※ 본 교재의 무단 복제 및 배포를 금하며, 교육 목적 사용 시 출처를 밝혀 주시기 바랍니다.'
       },
       custom: {
-        bookName: '',
-        pubDate: '',
-        authors: '',
-        publisher: '',
-        address: '',
-        telFax: '',
-        homepage: '',
-        editorPress: '',
-        notice: ''
+        bookName: '', pubDate: '', authors: '', publisher: '',
+        address: '', telFax: '', homepage: '', editorPress: '', notice: ''
       }
     };
 
@@ -4432,6 +4725,7 @@
     };
 
     let wbInitialized = false;
+    let wbOrderedLangs = ['vi', 'en', 'zh'];
 
     function initWorkbookControls() {
       if (currentUserRole !== 'MAIN_ADMIN') return;
@@ -4446,12 +4740,50 @@
         </label>
       `).join('');
 
+      renderWbLangOrderBar();
       if (!wbInitialized) {
         wbInitialized = true;
         applyColophonPreset();
       } else {
         renderWorkbookPreview();
       }
+    }
+
+    function onWbLangCheckboxChange(cb) {
+      const val = cb.value;
+      if (cb.checked) {
+        if (!wbOrderedLangs.includes(val)) wbOrderedLangs.push(val);
+      } else {
+        wbOrderedLangs = wbOrderedLangs.filter(l => l !== val);
+      }
+      renderWbLangOrderBar();
+      renderWorkbookPreview();
+    }
+
+    function moveWbLangOrder(idx, delta) {
+      const target = idx + delta;
+      if (target < 0 || target >= wbOrderedLangs.length) return;
+      const temp = wbOrderedLangs[idx];
+      wbOrderedLangs[idx] = wbOrderedLangs[target];
+      wbOrderedLangs[target] = temp;
+      renderWbLangOrderBar();
+      renderWorkbookPreview();
+    }
+
+    function renderWbLangOrderBar() {
+      const bar = document.getElementById('wbLangOrderBar');
+      if (!bar) return;
+      if (wbOrderedLangs.length === 0) {
+        bar.innerHTML = '<span style="font-size:0.76rem; color:#ef4444;">언어를 1개 이상 선택해 주세요.</span>';
+        return;
+      }
+      bar.innerHTML = wbOrderedLangs.map((code, idx) => `
+        <span class="wb-lang-chip">
+          <span>${idx + 1}. ${WB_LANG_NAMES[code] || code.toUpperCase()}</span>
+          <button type="button" onclick="moveWbLangOrder(${idx}, -1)" title="앞으로 이동">◀</button>
+          <button type="button" onclick="moveWbLangOrder(${idx}, 1)" title="뒤로 이동">▶</button>
+        </span>
+      `).join('');
     }
 
     function toggleAllWbUnits(checked) {
@@ -4480,7 +4812,6 @@
         if (langCount <= 2) return len > 22 ? '0.64rem' : (len > 14 ? '0.7rem' : '0.76rem');
         return len > 20 ? '0.58rem' : (len > 12 ? '0.64rem' : '0.7rem');
       } else {
-        // 1-column full width (4+ languages)
         if (langCount >= 5) return len > 24 ? '0.62rem' : (len > 15 ? '0.68rem' : '0.74rem');
         return len > 26 ? '0.66rem' : (len > 16 ? '0.72rem' : '0.78rem');
       }
@@ -4489,8 +4820,7 @@
     function buildWorkbookPagesHtml() {
       const coverTitle = document.getElementById('wbCoverTitle').value.trim() || '한국어 단어 자료집';
       const coverTagline = document.getElementById('wbCoverTagline').value.trim();
-      const selectedLangs = Array.from(document.querySelectorAll('.wb-lang-cb:checked')).map(cb => cb.value);
-      const langs = selectedLangs.length > 0 ? selectedLangs : ['vi', 'en', 'zh'];
+      const langs = wbOrderedLangs.length > 0 ? [...wbOrderedLangs] : ['vi', 'en', 'zh'];
       const practiceCols = parseInt(document.getElementById('wbPracticeCols').value, 10) || 5;
       const selectedUnits = Array.from(document.querySelectorAll('.wb-unit-cb:checked')).map(cb => cb.value);
       const includeColophon = document.getElementById('wbIncludeColophon').checked;
@@ -4498,7 +4828,7 @@
       const isTwoCol = langs.length <= 3;
       const pages = [];
 
-      // Page 1: Cover Page (No Logo + Custom Title + Class/Name/Phone/Goal writing boxes)
+      // Page 1: Cover Page (No Logo)
       pages.push(`
         <div class="wb-page">
           <div class="wb-cover-box">
@@ -4523,7 +4853,7 @@
               </tr>
             </table>
             <div style="text-align:center; font-size:0.85rem; color:#64748b; font-weight:700;">
-              수록 언어: ${langs.map(l => WB_LANG_NAMES[l]).join(' · ')} &nbsp;|&nbsp; 쓰기 연습: ${practiceCols}회 반복
+              수록 언어: ${langs.map(l => WB_LANG_NAMES[l] || l).join(' · ')} &nbsp;|&nbsp; 쓰기 연습: ${practiceCols}회 반복
             </div>
           </div>
         </div>
@@ -4538,14 +4868,13 @@
 
       let bodyPageNum = 1;
 
-      // PART 1: Front Vocabulary Reference Section (By Unit)
-      const rowsPerBlock = 17; // Fits cleanly on landscape A4 height
+      // PART 1: Front Vocabulary Reference Section (Custom language order)
+      const rowsPerBlock = 18;
       selectedUnits.forEach(unitName => {
         const unitItems = RAW_VOCAB.filter(v => v.unit === unitName);
         if (unitItems.length === 0) return;
 
         if (isTwoCol) {
-          // 2-column layout (34 items per page: 17 left + 17 right)
           const perPage = rowsPerBlock * 2;
           for (let i = 0; i < unitItems.length; i += perPage) {
             const leftSlice = unitItems.slice(i, i + rowsPerBlock);
@@ -4554,12 +4883,12 @@
             const renderHalfTable = (slice, startIdx) => {
               if (slice.length === 0) return '<div></div>';
               return `
-                <table class="wb-table">
+                <table class="wb-table" style="height:100%;">
                   <thead>
                     <tr>
                       <th style="width:8%;">번호</th>
                       <th style="width:26%;">한국어</th>
-                      ${langs.map(l => `<th>${WB_LANG_NAMES[l]}</th>`).join('')}
+                      ${langs.map(l => `<th>${WB_LANG_NAMES[l] || l}</th>`).join('')}
                     </tr>
                   </thead>
                   <tbody>
@@ -4568,7 +4897,7 @@
                       return `
                         <tr>
                           <td style="text-align:center; font-weight:700; font-size:0.72rem; color:#475569;">${startIdx + idx + 1}</td>
-                          <td style="font-weight:800; font-size:${krFs};"><div class="wb-cell-clamp">${item.kr}</div></td>
+                          <td style="font-weight:700; font-size:${krFs};"><div class="wb-cell-clamp">${item.kr}</div></td>
                           ${langs.map(l => {
                             const txt = item[l] || '';
                             const fs = calcAutoFontSize(txt, langs.length, true);
@@ -4584,10 +4913,10 @@
 
             pages.push(`
               <div class="wb-page">
-                <div>
+                <div style="flex:1; display:flex; flex-direction:column;">
                   <div class="wb-header-bar">
                     <span>📘 ${unitName}</span>
-                    <span style="font-size:0.8rem; color:#475569;">다국어 어휘 정리 (${langs.map(l => WB_LANG_NAMES[l]).join(', ')})</span>
+                    <span style="font-size:0.8rem; color:#475569;">다국어 어휘 정리 (${langs.map(l => WB_LANG_NAMES[l] || l).join(' · ')})</span>
                   </div>
                   <div class="wb-two-col-grid">
                     ${renderHalfTable(leftSlice, i)}
@@ -4599,8 +4928,7 @@
             `);
           }
         } else {
-          // 1-column full-width layout (4 or more languages, 18 items per page)
-          const perPage = 18;
+          const perPage = 20;
           for (let i = 0; i < unitItems.length; i += perPage) {
             const slice = unitItems.slice(i, i + perPage);
             pages.push(`
@@ -4608,14 +4936,14 @@
                 <div class="wb-one-col-wrap">
                   <div class="wb-header-bar">
                     <span>📘 ${unitName}</span>
-                    <span style="font-size:0.8rem; color:#475569;">다국어 어휘 정리 (${langs.map(l => WB_LANG_NAMES[l]).join(', ')})</span>
+                    <span style="font-size:0.8rem; color:#475569;">다국어 어휘 정리 (${langs.map(l => WB_LANG_NAMES[l] || l).join(' · ')})</span>
                   </div>
-                  <table class="wb-table">
+                  <table class="wb-table" style="flex:1;">
                     <thead>
                       <tr>
                         <th style="width:5%;">번호</th>
                         <th style="width:18%;">한국어</th>
-                        ${langs.map(l => `<th>${WB_LANG_NAMES[l]}</th>`).join('')}
+                        ${langs.map(l => `<th>${WB_LANG_NAMES[l] || l}</th>`).join('')}
                       </tr>
                     </thead>
                     <tbody>
@@ -4624,7 +4952,7 @@
                         return `
                           <tr>
                             <td style="text-align:center; font-weight:700; font-size:0.74rem; color:#475569;">${i + idx + 1}</td>
-                            <td style="font-weight:800; font-size:${krFs};"><div class="wb-cell-clamp">${item.kr}</div></td>
+                            <td style="font-weight:700; font-size:${krFs};"><div class="wb-cell-clamp">${item.kr}</div></td>
                             ${langs.map(l => {
                               const txt = item[l] || '';
                               const fs = calcAutoFontSize(txt, langs.length, false);
@@ -4643,8 +4971,8 @@
         }
       });
 
-      // PART 2: Back Writing Practice Section (Korean Word + Meaning Blank + N Writing Columns)
-      const pracPerPage = 17;
+      // PART 2: Back Writing Practice Section (EXACTLY 20 ROWS PER PAGE, FULL HEIGHT TO FOOTER WITH ZERO WASTED BOTTOM GAP)
+      const pracPerPage = 20;
       selectedUnits.forEach(unitName => {
         const unitItems = RAW_VOCAB.filter(v => v.unit === unitName);
         if (unitItems.length === 0) return;
@@ -4654,6 +4982,12 @@
 
         for (let i = 0; i < unitItems.length; i += pracPerPage) {
           const slice = unitItems.slice(i, i + pracPerPage);
+          // Pad up to 20 rows on the final page of each unit so cell height stays generously uniform down to the footer
+          const paddedRows = [...slice];
+          while (paddedRows.length < pracPerPage) {
+            paddedRows.push(null);
+          }
+
           pages.push(`
             <div class="wb-page">
               <div class="wb-one-col-wrap">
@@ -4661,7 +4995,7 @@
                   <span>✍️ ${unitName} · 단어 쓰기 연습</span>
                   <span style="font-size:0.8rem; color:#475569;">뜻을 쓰고 한국어를 ${practiceCols}번씩 연습하세요</span>
                 </div>
-                <table class="wb-table">
+                <table class="wb-table wb-practice-table">
                   <thead>
                     <tr>
                       <th style="width:5%;">번호</th>
@@ -4671,10 +5005,10 @@
                     </tr>
                   </thead>
                   <tbody>
-                    ${slice.map((item, idx) => `
-                      <tr style="height:24px;">
-                        <td style="text-align:center; font-weight:700; font-size:0.74rem; color:#475569;">${i + idx + 1}</td>
-                        <td style="font-weight:800; font-size:0.78rem;"><div class="wb-cell-clamp">${item.kr}</div></td>
+                    ${paddedRows.map((item, idx) => `
+                      <tr style="height:5%;">
+                        <td style="text-align:center; font-weight:700; font-size:0.74rem; color:#475569;">${item ? (i + idx + 1) : ''}</td>
+                        <td style="font-weight:700; font-size:0.8rem;"><div class="wb-cell-clamp">${item ? item.kr : ''}</div></td>
                         <td></td>
                         ${practiceEmptyCells}
                       </tr>
@@ -4726,7 +5060,7 @@
       if (currentUserRole !== 'MAIN_ADMIN') return;
       const { pages, isTwoCol } = buildWorkbookPagesHtml();
       const layoutTxt = isTwoCol ? '2단 배열 (다국어 1~3개)' : '1단 배열 (다국어 4개 이상)';
-      document.getElementById('wbPageSummaryBadge').textContent = `총 ${pages.length}페이지 구성 (${layoutTxt})`;
+      document.getElementById('wbPageSummaryBadge').textContent = `총 ${pages.length}페이지 구성 (${layoutTxt} · 쓰기 20단어/쪽)`;
       document.getElementById('wbLivePreviewContainer').innerHTML = pages.join('');
     }
 
@@ -4740,17 +5074,65 @@
       const printBox = document.getElementById('workbookPrintContainer');
       printBox.innerHTML = pages.join('');
 
+      let styleTag = document.getElementById('dynamicPrintPageStyle');
+      if (!styleTag) {
+        styleTag = document.createElement('style');
+        styleTag.id = 'dynamicPrintPageStyle';
+        document.head.appendChild(styleTag);
+      }
+      styleTag.textContent = `@media print { @page { size: A4 landscape; margin: 6mm; } }`;
+
       document.body.classList.remove('print-mode-sheet', 'print-mode-ppt');
       document.body.classList.add('print-mode-workbook');
       setTimeout(() => {
         window.print();
         document.body.classList.remove('print-mode-workbook');
+        styleTag.textContent = '';
       }, 250);
     }
 
     /* ==========================================================================
-       14. MAIN ADMIN ONLY: AI MULTILINGUAL TRANSLATOR & JSON BUILDER
+       14. MAIN ADMIN ONLY: AI MULTILINGUAL TRANSLATOR & JSON BUILDER (SELECTABLE + CUSTOM LANGUAGES)
     ========================================================================== */
+    let builderAvailableLangs = [
+      { code: 'en', name: '영어', checked: true },
+      { code: 'zh', name: '중국어', checked: true },
+      { code: 'ja', name: '일본어', checked: true },
+      { code: 'mn', name: '몽골어', checked: false },
+      { code: 'vi', name: '베트남어', checked: true },
+      { code: 'ru', name: '러시아어', checked: false },
+      { code: 'es', name: '스페인어', checked: false },
+      { code: 'th', name: '태국어', checked: false }
+    ];
+
+    function initBuilderLanguageUI() {
+      const box = document.getElementById('builderLangCheckboxes');
+      if (!box) return;
+      box.innerHTML = builderAvailableLangs.map((l, idx) => `
+        <label style="display:inline-flex; align-items:center; gap:0.25rem; cursor:pointer;">
+          <input type="checkbox" ${l.checked ? 'checked' : ''} onchange="builderAvailableLangs[${idx}].checked = this.checked" />
+          <span>${l.name}(${l.code})</span>
+        </label>
+      `).join('');
+    }
+
+    function addCustomBuilderLanguage() {
+      const code = document.getElementById('customLangCodeInput').value.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '');
+      const name = document.getElementById('customLangNameInput').value.trim();
+      if (!code || !name) {
+        alert("언어 코드(예: uz)와 언어 이름(예: 우즈베크어)을 모두 입력해 주세요.");
+        return;
+      }
+      if (builderAvailableLangs.some(l => l.code === code)) {
+        alert("이미 목록에 있는 언어 코드입니다.");
+        return;
+      }
+      builderAvailableLangs.push({ code, name, checked: true });
+      document.getElementById('customLangCodeInput').value = '';
+      document.getElementById('customLangNameInput').value = '';
+      initBuilderLanguageUI();
+    }
+
     function saveBuilderApiKey() {
       const key = document.getElementById('geminiApiKeyInput').value.trim();
       if (!key) {
@@ -4769,11 +5151,18 @@
         return;
       }
 
+      const activeLangs = builderAvailableLangs.filter(l => l.checked);
+      if (activeLangs.length === 0) {
+        alert("번역할 언어를 1개 이상 선택해 주세요.");
+        return;
+      }
+
       const unitName = document.getElementById('builderUnitInput').value.trim() || '1단원';
       const sectionName = document.getElementById('builderSectionInput').value.trim() || '1-1 어휘';
       const pageNum = document.getElementById('builderPageInput').value.trim() || '1';
       const rawLines = document.getElementById('builderRawWordsInput').value
-        .split('\n')
+        .split('
+')
         .map(l => l.trim())
         .filter(Boolean);
 
@@ -4785,10 +5174,13 @@
       const btn = document.getElementById('btnRunAiTranslate');
       const statusEl = document.getElementById('builderStatusText');
       btn.disabled = true;
-      statusEl.textContent = `⏳ AI가 ${rawLines.length}개 단어를 6개 국어로 번역하고 있습니다...`;
+      statusEl.textContent = `⏳ AI가 ${rawLines.length}개 단어를 ${activeLangs.length}개 언어로 번역하고 있습니다...`;
 
-      const prompt = `You are a professional Korean language textbook lexicographer. Translate each Korean vocabulary item below into natural textbook dictionary definitions in 6 languages: English (en), Simplified Chinese (zh), Japanese (ja), Mongolian (mn), Vietnamese (vi), and Russian (ru).
-Return ONLY a valid JSON array of objects with exact keys: "kr", "en", "zh", "ja", "mn", "vi", "ru". Do not include markdown fences.
+      const langSpecDesc = activeLangs.map(l => `${l.name} (${l.code})`).join(', ');
+      const exactKeys = ['kr', ...activeLangs.map(l => l.code)];
+
+      const prompt = `You are a professional Korean language textbook lexicographer. Translate each Korean vocabulary item below into natural textbook dictionary definitions in these languages: ${langSpecDesc}.
+Return ONLY a valid JSON array of objects with exact keys: ${JSON.stringify(exactKeys)}. Do not include markdown fences.
 
 Korean vocabulary list:
 ${JSON.stringify(rawLines)}`;
@@ -4809,22 +5201,22 @@ ${JSON.stringify(rawLines)}`;
         const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '[]';
         const translatedArray = JSON.parse(rawText);
 
-        builtJsonData = translatedArray.map((item, idx) => ({
-          id: `CUSTOM_U_${idx + 1}`,
-          unit: unitName,
-          section: sectionName,
-          kr: item.kr || rawLines[idx],
-          en: item.en || '',
-          zh: item.zh || '',
-          ja: item.ja || '',
-          mn: item.mn || '',
-          vi: item.vi || '',
-          ru: item.ru || '',
-          page: pageNum
-        }));
+        builtJsonData = translatedArray.map((item, idx) => {
+          const rowObj = {
+            id: `CUSTOM_U_${idx + 1}`,
+            unit: unitName,
+            section: sectionName,
+            kr: item.kr || rawLines[idx],
+            page: pageNum
+          };
+          activeLangs.forEach(l => {
+            rowObj[l.code] = item[l.code] || '';
+          });
+          return rowObj;
+        });
 
-        renderBuilderPreview();
-        statusEl.textContent = `✅ 총 ${builtJsonData.length}개 단어 6개 국어 번역 완료!`;
+        renderBuilderPreview(activeLangs);
+        statusEl.textContent = `✅ 총 ${builtJsonData.length}개 단어 (${activeLangs.map(l => l.name).join(', ')}) 번역 완료!`;
       } catch (err) {
         statusEl.textContent = `❌ 오류: ${err.message}`;
       } finally {
@@ -4832,19 +5224,24 @@ ${JSON.stringify(rawLines)}`;
       }
     }
 
-    function renderBuilderPreview() {
+    function renderBuilderPreview(activeLangs) {
+      const thead = document.getElementById('builderPreviewHead');
       const tbody = document.getElementById('builderPreviewBody');
+      thead.innerHTML = `
+        <tr>
+          <th>대단원</th>
+          <th>소단원</th>
+          <th>한국어</th>
+          ${activeLangs.map(l => `<th>${l.name}(${l.code})</th>`).join('')}
+          <th>페이지</th>
+        </tr>
+      `;
       tbody.innerHTML = builtJsonData.map(row => `
         <tr>
           <td>${row.unit}</td>
           <td>${row.section}</td>
           <td><strong>${row.kr}</strong></td>
-          <td>${row.en}</td>
-          <td>${row.zh}</td>
-          <td>${row.ja}</td>
-          <td>${row.mn}</td>
-          <td>${row.vi}</td>
-          <td>${row.ru}</td>
+          ${activeLangs.map(l => `<td>${row[l.code] || ''}</td>`).join('')}
           <td>${row.page}</td>
         </tr>
       `).join('');
@@ -4863,10 +5260,134 @@ ${JSON.stringify(rawLines)}`;
     }
 
     /* ==========================================================================
-       15. TEACHER REGISTRATION & CLASS ASSIGNMENT
+       15. TEACHER REGISTRATION & CUSTOM INSTITUTION / CLASS MANAGEMENT
     ========================================================================== */
+    const STORAGE_KEY_CUSTOM_ORGS = 'YONGIN_CUSTOM_ORGS_V2';
+
+    const DEFAULT_ORGS_MAP = {
+      '용인대학교 한국어학당': ['용인대 1급', '용인대 2급', '용인대 3급', '용인대 4급'],
+      '온라인 세종학당': ['세종 초급1', '세종 초급2', '세종 중급1', '세종 중급2'],
+      '02100 KOREAN': ['TOPIK I 집중반', 'TOPIK II 실전반']
+    };
+
+    function getOrganizationsMap() {
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY_CUSTOM_ORGS) || 'null');
+      if (saved && typeof saved === 'object' && Object.keys(saved).length > 0) {
+        return saved;
+      }
+      localStorage.setItem(STORAGE_KEY_CUSTOM_ORGS, JSON.stringify(DEFAULT_ORGS_MAP));
+      return { ...DEFAULT_ORGS_MAP };
+    }
+
+    function saveOrganizationsMap(mapObj) {
+      localStorage.setItem(STORAGE_KEY_CUSTOM_ORGS, JSON.stringify(mapObj));
+      syncAllInstitutionAndClassDropdowns();
+    }
+
+    function syncAllInstitutionAndClassDropdowns() {
+      const orgMap = getOrganizationsMap();
+      const orgNames = Object.keys(orgMap);
+
+      // 1. Admin Teacher Tab Institution Dropdowns
+      ['manageInstSelect', 'newTeacherInstSelect'].forEach(selId => {
+        const sel = document.getElementById(selId);
+        if (!sel) return;
+        const prevVal = sel.value;
+        sel.innerHTML = orgNames.map(o => `<option value="${o}">${o}</option>`).join('');
+        if (prevVal && orgNames.includes(prevVal)) sel.value = prevVal;
+      });
+
+      onTeacherInstSelectChange();
+
+      // 2. Sync Student Entry Modal & Admin Filter Class Dropdowns
+      const allClasses = [];
+      orgNames.forEach(org => {
+        (orgMap[org] || []).forEach(cls => {
+          if (!allClasses.includes(cls)) allClasses.push(cls);
+        });
+      });
+
+      const userClsSel = document.getElementById('userClassSelect');
+      if (userClsSel && allClasses.length > 0) {
+        const prev = userClsSel.value;
+        userClsSel.innerHTML = allClasses.map(c => `<option value="${c}">${c}</option>`).join('');
+        if (prev && allClasses.includes(prev)) userClsSel.value = prev;
+      }
+
+      const adminFilterCls = document.getElementById('adminFilterClass');
+      if (adminFilterCls && !adminFilterCls.disabled) {
+        const prev = adminFilterCls.value;
+        adminFilterCls.innerHTML = `<option value="ALL">전체 급수/수업</option>` + allClasses.map(c => `<option value="${c}">${c}</option>`).join('');
+        if (prev) adminFilterCls.value = prev;
+      }
+
+      const sheetClsSel = document.getElementById('sheetClassSelect');
+      if (sheetClsSel) populateAllClassesIntoSelect(sheetClsSel, sheetClsSel.disabled ? sheetClsSel.value : null);
+    }
+
+    function populateAllClassesIntoSelect(selectEl, lockedClass) {
+      if (!selectEl) return;
+      const orgMap = getOrganizationsMap();
+      const allClasses = [];
+      Object.values(orgMap).forEach(arr => arr.forEach(c => { if (!allClasses.includes(c)) allClasses.push(c); }));
+      if (lockedClass && !allClasses.includes(lockedClass)) allClasses.unshift(lockedClass);
+      selectEl.innerHTML = allClasses.map(c => `<option value="${c}">${c}</option>`).join('');
+    }
+
+    function onTeacherInstSelectChange() {
+      const orgMap = getOrganizationsMap();
+      const instSel = document.getElementById('newTeacherInstSelect');
+      const clsSel = document.getElementById('newTeacherClass');
+      if (!instSel || !clsSel) return;
+
+      const selectedOrg = instSel.value;
+      const classes = orgMap[selectedOrg] || [];
+      clsSel.innerHTML = classes.map(c => `<option value="${c}">${c}</option>`).join('') + `<option value="ALL">기관 내 전체 급수</option>`;
+    }
+
+    function addCustomInstitution() {
+      const input = document.getElementById('newInstitutionNameInput');
+      const name = input.value.trim();
+      if (!name) {
+        alert("추가할 기관명을 입력해 주세요.");
+        return;
+      }
+      const orgMap = getOrganizationsMap();
+      if (!orgMap[name]) {
+        orgMap[name] = [`${name} 1반`];
+        saveOrganizationsMap(orgMap);
+      }
+      document.getElementById('manageInstSelect').value = name;
+      document.getElementById('newTeacherInstSelect').value = name;
+      onTeacherInstSelectChange();
+      input.value = '';
+      alert(`[${name}] 기관이 등록되어 드롭다운에 추가되었습니다.`);
+    }
+
+    function addCustomClassToInstitution() {
+      const instName = document.getElementById('manageInstSelect').value;
+      const clsInput = document.getElementById('newClassUnderInstInput');
+      const clsName = clsInput.value.trim();
+      if (!instName || !clsName) {
+        alert("기관을 선택하고 추가할 급수/수업명을 입력해 주세요.");
+        return;
+      }
+      const orgMap = getOrganizationsMap();
+      if (!orgMap[instName]) orgMap[instName] = [];
+      if (!orgMap[instName].includes(clsName)) {
+        orgMap[instName].push(clsName);
+        saveOrganizationsMap(orgMap);
+      }
+      document.getElementById('newTeacherInstSelect').value = instName;
+      onTeacherInstSelectChange();
+      document.getElementById('newTeacherClass').value = clsName;
+      clsInput.value = '';
+      alert(`[${instName}]에 [${clsName}] 수업이 추가되었습니다.`);
+    }
+
     async function registerNewTeacher() {
       const email = document.getElementById('newTeacherEmail').value.trim().toLowerCase();
+      const assignedInstitution = document.getElementById('newTeacherInstSelect').value;
       const assignedClass = document.getElementById('newTeacherClass').value;
       if (!email || !email.includes('@')) {
         alert('올바른 구글 이메일 주소를 입력해 주세요.');
@@ -4876,13 +5397,14 @@ ${JSON.stringify(rawLines)}`;
       try {
         await db.collection("teacher_roles").doc(email).set({
           email,
+          assignedInstitution,
           assignedClass,
           canExportCSV: document.getElementById('permExportCSV').checked,
           canDeleteRecord: document.getElementById('permDeleteRecord').checked,
           createdAt: firebase.firestore.FieldValue.serverTimestamp(),
           registeredDate: new Date().toLocaleString('ko-KR')
         });
-        alert(`${email} 선생님이 [${assignedClass === 'ALL' ? '전체 급수' : assignedClass}] 담당으로 등록되었습니다.`);
+        alert(`${email} 선생님이 [${assignedInstitution} · ${assignedClass === 'ALL' ? '전체 급수' : assignedClass}] 담당으로 등록되었습니다.`);
         document.getElementById('newTeacherEmail').value = '';
         loadTeacherList();
       } catch (err) {
@@ -4891,27 +5413,31 @@ ${JSON.stringify(rawLines)}`;
     }
 
     async function loadTeacherList() {
+      syncAllInstitutionAndClassDropdowns();
       const tbody = document.getElementById('teacherTableBody');
       if (!db) return;
+      const orgMap = getOrganizationsMap();
+      const allClasses = [];
+      Object.values(orgMap).forEach(arr => arr.forEach(c => { if (!allClasses.includes(c)) allClasses.push(c); }));
+
       try {
         const snapshot = await db.collection("teacher_roles").get();
         if (snapshot.empty) {
-          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:1.5rem; color:var(--text-muted);">등록된 담당 선생님이 없습니다.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:1.5rem; color:var(--text-muted);">등록된 담당 선생님이 없습니다.</td></tr>';
           return;
         }
         let html = '';
         snapshot.forEach(doc => {
           const t = doc.data();
+          const clsOptions = Array.from(new Set([...allClasses, t.assignedClass].filter(Boolean)));
           html += `
             <tr>
               <td><strong>${t.email}</strong></td>
+              <td>${t.assignedInstitution || '용인대학교 한국어학당'}</td>
               <td>
                 <select style="padding:0.25rem 0.5rem; font-size:0.8rem;" onchange="updateTeacherField('${t.email}', 'assignedClass', this.value)">
-                  <option value="용인대 1급" ${t.assignedClass === '용인대 1급' ? 'selected' : ''}>용인대 1급</option>
-                  <option value="용인대 2급" ${t.assignedClass === '용인대 2급' ? 'selected' : ''}>용인대 2급</option>
-                  <option value="용인대 3급" ${t.assignedClass === '용인대 3급' ? 'selected' : ''}>용인대 3급</option>
-                  <option value="용인대 4급" ${t.assignedClass === '용인대 4급' ? 'selected' : ''}>용인대 4급</option>
-                  <option value="ALL" ${t.assignedClass === 'ALL' ? 'selected' : ''}>전체 급수</option>
+                  ${clsOptions.map(c => `<option value="${c}" ${t.assignedClass === c ? 'selected' : ''}>${c === 'ALL' ? '전체 급수' : c}</option>`).join('')}
+                  ${!clsOptions.includes('ALL') ? `<option value="ALL" ${t.assignedClass === 'ALL' ? 'selected' : ''}>전체 급수</option>` : ''}
                 </select>
               </td>
               <td><input type="checkbox" ${t.canExportCSV ? 'checked' : ''} onchange="updateTeacherField('${t.email}', 'canExportCSV', this.checked)" /> 허용</td>
@@ -4923,7 +5449,7 @@ ${JSON.stringify(rawLines)}`;
         });
         tbody.innerHTML = html;
       } catch (err) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--danger); padding:1.5rem;">선생님 목록 조회 오류</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--danger); padding:1.5rem;">선생님 목록 조회 오류</td></tr>';
       }
     }
 
