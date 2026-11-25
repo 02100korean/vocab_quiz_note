@@ -1,0 +1,47 @@
+{
+  "platformTitle": "다국어 어휘 학습 & 실전 퀴즈 플랫폼",
+  "defaultBookId": "snu4a",
+  "classes": [
+    {
+      "classId": "yongin_1",
+      "className": "용인대 1급",
+      "description": "용인대학교 한국어교육원 1급 분반",
+      "allowedBooks": [
+        "snu4a"
+      ]
+    },
+    {
+      "classId": "yongin_2",
+      "className": "용인대 2급",
+      "description": "용인대학교 한국어교육원 2급 분반",
+      "allowedBooks": [
+        "snu4a"
+      ]
+    },
+    {
+      "classId": "yongin_3",
+      "className": "용인대 3급",
+      "description": "용인대학교 한국어교육원 3급 분반",
+      "allowedBooks": [
+        "snu4a"
+      ]
+    },
+    {
+      "classId": "yongin_4",
+      "className": "용인대 4급",
+      "description": "용인대학교 한국어교육원 4급 분반",
+      "allowedBooks": [
+        "snu4a"
+      ]
+    }
+  ],
+  "books": [
+    {
+      "id": "snu4a",
+      "title": "서울대 한국어 + 4A",
+      "subtitle": "1~9단원 다국어 어휘 마스터 (총 570단어)",
+      "level": "4급",
+      "dataUrl": "data/snu4a.json"
+    }
+  ]
+}
