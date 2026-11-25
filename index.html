@@ -5161,8 +5161,7 @@
       const sectionName = document.getElementById('builderSectionInput').value.trim() || '1-1 어휘';
       const pageNum = document.getElementById('builderPageInput').value.trim() || '1';
       const rawLines = document.getElementById('builderRawWordsInput').value
-        .split('
-')
+        .split('\n')
         .map(l => l.trim())
         .filter(Boolean);
 
