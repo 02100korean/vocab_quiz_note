@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>다국어 한국어 어휘 학습 & 실전 퀴즈 플랫폼 v2.9</title>
+  <title>다국어 한국어 어휘 학습 & 실전 퀴즈 플랫폼 v3.0</title>
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
   <!-- Google Fonts & Libraries -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1320,22 +1321,27 @@
         <div id="recentProfilesList" style="display:flex; flex-wrap:wrap; gap:0.4rem;"></div>
       </div>
 
-      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.6rem; text-align:left; margin-bottom:0.75rem;">
+      <div style="display:grid; grid-template-columns: 1.35fr 0.65fr; gap:0.6rem; text-align:left; margin-bottom:0.75rem;">
         <div>
           <label style="font-size:0.78rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.25rem;">기관명</label>
-          <select id="userInstSelect" style="width:100%; padding:0.65rem; font-size:0.92rem;" onchange="onStudentInstSelectChange()"></select>
+          <select id="userInstSelect" style="width:100%; padding:0.65rem; font-size:0.9rem;" onchange="onStudentInstSelectChange()"></select>
+          <div id="userInstLockedBadge" style="display:none; width:100%; padding:0.65rem 0.75rem; font-size:0.9rem; font-weight:800; color:var(--primary); background:#eff6ff; border:1.5px solid #93c5fd; border-radius:10px;"></div>
         </div>
         <div>
           <label style="font-size:0.78rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.25rem;">학기</label>
-          <select id="userSemesterSelect" style="width:100%; padding:0.65rem; font-size:0.92rem;"></select>
+          <select id="userSemesterSelect" style="width:100%; padding:0.65rem; font-size:0.9rem;"></select>
         </div>
       </div>
 
-      <div style="text-align:left; margin-bottom:0.75rem;">
-        <label style="font-size:0.78rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.25rem;">반 이름 (소속 급수)</label>
-        <select id="userClassSelect" style="width:100%; padding:0.68rem; font-size:0.95rem;">
-          <option value="용인대 4급" selected>용인대 4급</option>
-        </select>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.6rem; text-align:left; margin-bottom:0.75rem;">
+        <div>
+          <label style="font-size:0.78rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.25rem;">급 선택</label>
+          <select id="userLevelSelect" style="width:100%; padding:0.68rem; font-size:0.93rem;" onchange="onStudentLevelSelectChange()"></select>
+        </div>
+        <div>
+          <label style="font-size:0.78rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.25rem;">반 선택</label>
+          <select id="userClassSelect" style="width:100%; padding:0.68rem; font-size:0.93rem;"></select>
+        </div>
       </div>
 
       <div style="text-align:left; margin-bottom:1.1rem;">
@@ -1385,6 +1391,14 @@
         <div style="display:flex; gap:0.45rem;">
           <button class="btn btn-outline btn-sm" onclick="logoutAdmin()">🔒 로그아웃</button>
           <button class="btn btn-outline btn-sm" onclick="closeAdminModal()">✕ 닫기</button>
+        </div>
+      </div>
+
+      <!-- Institution Student Link & QR Quick Share Bar -->
+      <div id="adminOrgShareBar" class="no-print" style="display:none; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:12px; padding:0.65rem 0.9rem; margin-bottom:0.85rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+          <span style="font-size:0.8rem; font-weight:800; color:#166534;">🔗 담당 기관 학생 전용 접속 링크 · QR 코드 공유 (학생 접속 시 기관명 자동 고정)</span>
+          <div id="adminOrgShareButtons" style="display:flex; flex-wrap:wrap; gap:0.45rem;"></div>
         </div>
       </div>
 
@@ -2043,51 +2057,83 @@
         </div>
       </div>
 
-      <!-- SUB-TAB 6: Teacher Account & Custom Institution / Class Management (Main Admin Only) -->
+      <!-- SUB-TAB 6: Teacher Account & Custom Institution / Level / Class Management (Main Admin Only) -->
       <div id="adminViewTeachers" class="no-print" style="display:none;">
-        <!-- Semester & Institution / Class Registry Box -->
+        <!-- Semester & 3-Level Hierarchy (Institution -> Level -> Class) Box -->
         <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:12px; padding:1rem; margin-bottom:1rem;">
-          <h3 style="font-size:0.98rem; font-weight:800; color:var(--primary); margin-bottom:0.4rem;">🏫 학기 · 기관명 · 하위 급수·수업 관리 (클라우드 자동 동기화)</h3>
-          <div style="background:white; padding:0.7rem; border-radius:10px; border:1px solid #dbeafe; margin-bottom:0.75rem;">
-            <label style="font-size:0.76rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.3rem;">0. 학기 관리 (예: 26-1, 26-2, 26-3, 26-4)</label>
-            <div style="display:flex; gap:0.4rem; flex-wrap:wrap; align-items:center;">
-              <input type="text" id="newSemesterInput" placeholder="새 학기 입력 (예: 27-1)" class="typing-input" style="width:170px; padding:0.42rem 0.65rem; font-size:0.84rem; margin-bottom:0; text-align:left;" />
-              <button type="button" class="btn btn-primary btn-sm" onclick="addCustomSemester()">+ 학기 추가</button>
-              <select id="manageSemesterSelect" style="width:140px; padding:0.42rem; font-size:0.83rem;"></select>
-              <button type="button" class="btn btn-danger btn-sm" onclick="deleteSelectedSemester()">학기 삭제</button>
+          <h3 style="font-size:0.98rem; font-weight:800; color:var(--primary); margin-bottom:0.45rem;">🏫 학기 · 기관(전용 링크/QR) · 급 · 하위 반 계층 관리 (클라우드 자동 동기화)</h3>
+
+          <!-- Step 0: Semester & New Institution -->
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:0.65rem; margin-bottom:0.7rem;">
+            <div style="background:white; padding:0.65rem; border-radius:10px; border:1px solid #dbeafe;">
+              <label style="font-size:0.75rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.3rem;">0. 학기 관리 (예: 26-1, 26-2, 26-3, 26-4)</label>
+              <div style="display:flex; gap:0.35rem; flex-wrap:wrap; align-items:center;">
+                <input type="text" id="newSemesterInput" placeholder="새 학기 (예: 27-1)" class="typing-input" style="width:130px; padding:0.4rem 0.6rem; font-size:0.83rem; margin-bottom:0; text-align:left;" />
+                <button type="button" class="btn btn-primary btn-sm" onclick="addCustomSemester()">+ 추가</button>
+                <select id="manageSemesterSelect" style="width:105px; padding:0.4rem; font-size:0.82rem;"></select>
+                <button type="button" class="btn btn-danger btn-sm" onclick="deleteSelectedSemester()">삭제</button>
+              </div>
             </div>
-          </div>
-          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:0.75rem;">
-            <div style="background:white; padding:0.7rem; border-radius:10px; border:1px solid #dbeafe;">
-              <label style="font-size:0.76rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.3rem;">1. 새 기관명 추가 (클라우드 자동 저장)</label>
+            <div style="background:white; padding:0.65rem; border-radius:10px; border:1px solid #dbeafe;">
+              <label style="font-size:0.75rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.3rem;">1. 새 기관 등록 (기관별 전용 학생 링크·QR 자동 발급)</label>
               <div style="display:flex; gap:0.4rem;">
-                <input type="text" id="newInstitutionNameInput" placeholder="예: 용인대학교 한국어학당, 중앙대학교 한국어학당" class="typing-input" style="flex:1; padding:0.45rem 0.65rem; font-size:0.84rem; margin-bottom:0; text-align:left;" />
+                <input type="text" id="newInstitutionNameInput" placeholder="예: 용인대학교 한국어학당, 중앙대학교 한국어학당" class="typing-input" style="flex:1; padding:0.42rem 0.65rem; font-size:0.83rem; margin-bottom:0; text-align:left;" />
                 <button type="button" class="btn btn-primary btn-sm" onclick="addCustomInstitution()">+ 기관 추가</button>
               </div>
             </div>
-            <div style="background:white; padding:0.7rem; border-radius:10px; border:1px solid #dbeafe;">
-              <label style="font-size:0.76rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.3rem;">2. 기관별 급수·수업 추가 및 삭제</label>
-              <div style="display:flex; gap:0.4rem; flex-wrap:wrap; margin-bottom:0.45rem;">
-                <select id="manageInstSelect" style="flex:1; min-width:150px; padding:0.45rem; font-size:0.83rem;" onchange="onManageInstSelectChange()"></select>
-                <button type="button" class="btn btn-danger btn-sm" onclick="deleteSelectedInstitution()">기관 삭제</button>
+          </div>
+
+          <!-- Registered Institutions Quick Link & QR List -->
+          <div style="background:white; padding:0.65rem; border-radius:10px; border:1px solid #dbeafe; margin-bottom:0.7rem;">
+            <div style="font-size:0.76rem; font-weight:800; color:var(--primary); margin-bottom:0.4rem;">🔗 등록된 기관별 학생 전용 접속 링크 & QR 코드 (학생 접속 시 해당 기관으로 자동 고정)</div>
+            <div id="adminInstLinksList" style="display:flex; flex-direction:column; gap:0.38rem;"></div>
+          </div>
+
+          <!-- Step 2: Institution -> Level -> Sub-Class 3-Tier Builder -->
+          <div style="background:white; padding:0.75rem; border-radius:10px; border:1px solid #dbeafe;">
+            <label style="font-size:0.76rem; font-weight:800; color:var(--primary); display:block; margin-bottom:0.45rem;">2. 기관별 [급] 및 하위 [반] 계층 구성 (예: 용인대학교 한국어학당 → 3급 → 3A, 3B, 3C)</label>
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:0.6rem;">
+              <!-- Col 1: Institution -->
+              <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:0.55rem;">
+                <div style="font-size:0.74rem; font-weight:800; color:#475569; margin-bottom:0.3rem;">① 대상 기관 선택</div>
+                <select id="manageInstSelect" style="width:100%; padding:0.42rem; font-size:0.83rem; margin-bottom:0.4rem;" onchange="onManageInstSelectChange()"></select>
+                <button type="button" class="btn btn-danger btn-sm" style="width:100%; font-size:0.76rem;" onclick="deleteSelectedInstitution()">선택 기관 삭제</button>
               </div>
-              <div style="display:flex; gap:0.4rem; flex-wrap:wrap; margin-bottom:0.45rem;">
-                <select id="manageClassSelect" style="flex:1; min-width:150px; padding:0.45rem; font-size:0.83rem;"></select>
-                <button type="button" class="btn btn-outline btn-sm" style="color:var(--danger); border-color:#fca5a5;" onclick="deleteSelectedClassFromInstitution()">수업 삭제</button>
+
+              <!-- Col 2: Level under Institution -->
+              <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:0.55rem;">
+                <div style="font-size:0.74rem; font-weight:800; color:#475569; margin-bottom:0.3rem;">② 해당 기관의 [급] 선택/추가</div>
+                <div style="display:flex; gap:0.3rem; margin-bottom:0.4rem;">
+                  <select id="manageLevelSelect" style="flex:1; padding:0.42rem; font-size:0.83rem;" onchange="onManageLevelSelectChange()"></select>
+                  <button type="button" class="btn btn-outline btn-sm" style="color:var(--danger); border-color:#fca5a5; padding:0.3rem 0.5rem; font-size:0.75rem;" onclick="deleteSelectedLevelFromInstitution()">급 삭제</button>
+                </div>
+                <div style="display:flex; gap:0.3rem;">
+                  <input type="text" id="newLevelUnderInstInput" placeholder="예: 1급, 2급, 3급, 4급" class="typing-input" style="flex:1; padding:0.38rem 0.55rem; font-size:0.82rem; margin-bottom:0; text-align:left;" />
+                  <button type="button" class="btn btn-primary btn-sm" style="padding:0.35rem 0.6rem; font-size:0.76rem;" onclick="addCustomLevelToInstitution()">+ 급 추가</button>
+                </div>
               </div>
-              <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
-                <input type="text" id="newClassUnderInstInput" placeholder="새 수업명 (예: 1급 오전반, TOPIK 3급)" class="typing-input" style="flex:1; min-width:130px; padding:0.45rem 0.65rem; font-size:0.84rem; margin-bottom:0; text-align:left;" />
-                <button type="button" class="btn btn-success btn-sm" onclick="addCustomClassToInstitution()">+ 수업 추가</button>
+
+              <!-- Col 3: Sub-classes under Level -->
+              <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:0.55rem;">
+                <div style="font-size:0.74rem; font-weight:800; color:#475569; margin-bottom:0.3rem;">③ 선택한 [급]의 하위 [반] 추가/삭제</div>
+                <div style="display:flex; gap:0.3rem; margin-bottom:0.4rem;">
+                  <select id="manageClassSelect" style="flex:1; padding:0.42rem; font-size:0.83rem;"></select>
+                  <button type="button" class="btn btn-outline btn-sm" style="color:var(--danger); border-color:#fca5a5; padding:0.3rem 0.5rem; font-size:0.75rem;" onclick="deleteSelectedClassFromInstitution()">반 삭제</button>
+                </div>
+                <div style="display:flex; gap:0.3rem;">
+                  <input type="text" id="newClassUnderInstInput" placeholder="예: 3A, 3B, 3C" class="typing-input" style="flex:1; padding:0.38rem 0.55rem; font-size:0.82rem; margin-bottom:0; text-align:left;" />
+                  <button type="button" class="btn btn-success btn-sm" style="padding:0.35rem 0.6rem; font-size:0.76rem;" onclick="addCustomClassToInstitution()">+ 반 추가</button>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Teacher Assignment Box (Multi-Institution & Multi-Class Support) -->
+        <!-- Teacher Assignment Box (Multi-Institution, Level & Sub-Class Tree Support) -->
         <div style="background:#f8fafc; border:1px solid var(--border); border-radius:12px; padding:1rem; margin-bottom:1rem;">
-          <h3 style="font-size:1rem; font-weight:800; color:var(--primary); margin-bottom:0.3rem;">➕ 담당 선생님 등록 및 다중 기관·급수·수업 배정</h3>
+          <h3 style="font-size:1rem; font-weight:800; color:var(--primary); margin-bottom:0.3rem;">➕ 담당 선생님 등록 및 다중 기관·급·반 배정</h3>
           <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:0.75rem;">
-            한 선생님에게 <strong>여러 기관과 여러 급수·수업</strong>을 동시에 체크하여 배정할 수 있습니다. (이미 등록된 이메일을 다시 등록하면 배정 목록이 업데이트됩니다)
+            <strong>[급] 전체</strong>(예: 3급)를 체크하면 하위 반(3A, 3B, 3C 및 추후 추가되는 3급 반)이 모두 자동 포함됩니다. 특정 반(예: 3A)만 체크할 수도 있습니다.
           </p>
           <div style="display:flex; flex-wrap:wrap; gap:0.6rem; align-items:center; margin-bottom:0.65rem;">
             <input type="email" id="newTeacherEmail" placeholder="선생님 구글 이메일 (예: teacher@gmail.com)" class="typing-input" style="flex:1; min-width:240px; padding:0.52rem 0.85rem; font-size:0.88rem; margin-bottom:0; text-align:left;" />
@@ -2101,13 +2147,13 @@
           </div>
           <div style="background:white; border:1px solid #dbeafe; border-radius:10px; padding:0.65rem;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
-              <span style="font-size:0.78rem; font-weight:800; color:var(--primary);">🏫 배정할 기관 및 급수·수업 선택 (복수 선택 가능)</span>
+              <span style="font-size:0.78rem; font-weight:800; color:var(--primary);">🏫 배정할 기관 · 급 · 반 선택 (복수 선택 가능)</span>
               <div style="display:flex; gap:0.35rem;">
                 <button type="button" class="btn btn-outline btn-sm" style="padding:0.15rem 0.45rem; font-size:0.72rem;" onclick="toggleAllNewTeacherClasses(true)">전체 선택</button>
                 <button type="button" class="btn btn-outline btn-sm" style="padding:0.15rem 0.45rem; font-size:0.72rem;" onclick="toggleAllNewTeacherClasses(false)">전체 해제</button>
               </div>
             </div>
-            <div id="newTeacherMultiScopeBox" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:0.5rem; max-height:170px; overflow-y:auto;"></div>
+            <div id="newTeacherMultiScopeBox" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap:0.55rem; max-height:200px; overflow-y:auto;"></div>
           </div>
         </div>
 
@@ -2611,8 +2657,27 @@
     let currentAdminUser = null;
     let currentUserRole = null;
     let assignedTeacherClass = 'ALL';
-    let assignedTeacherClasses = []; // ['ALL'] or ['용인대 3급', '중앙대 2급', ...]
+    let assignedTeacherClasses = []; // ['ALL'] or ['level:용인대학교 한국어학당:3급', '3A', ...]
     let assignedTeacherInstitutions = [];
+    let lockedStudentInstitution = null; // Set when opened via ?org=...
+
+    function expandTeacherScopeToClassNames(scopeTokens) {
+      const hierarchy = getInstitutionHierarchy();
+      const result = new Set();
+      (scopeTokens || []).forEach(tok => {
+        if (!tok || tok === 'ALL') return;
+        if (tok.startsWith('level:')) {
+          const parts = tok.split(':');
+          const orgName = parts[1] || '';
+          const lvlName = parts.slice(2).join(':');
+          const clsList = hierarchy[orgName]?.levels?.[lvlName] || [];
+          clsList.forEach(c => result.add(c));
+        } else {
+          result.add(tok);
+        }
+      });
+      return Array.from(result);
+    }
 
     function isTeacherAllScope() {
       return currentUserRole === 'MAIN_ADMIN' || assignedTeacherClass === 'ALL' || assignedTeacherClasses.includes('ALL');
@@ -2622,7 +2687,8 @@
       if (isTeacherAllScope()) return true;
       const c = (clsName || '').trim();
       if (!c) return false;
-      return assignedTeacherClasses.includes(c);
+      const expanded = expandTeacherScopeToClassNames(assignedTeacherClasses);
+      return expanded.includes(c) || assignedTeacherClasses.includes(c);
     }
     let currentTeacherPermissions = { canExportCSV: true, canDeleteRecord: false };
     let adminRecordsCache = [];
@@ -2634,6 +2700,7 @@
     ========================================================================== */
     window.addEventListener('DOMContentLoaded', async () => {
       initTTSCheck();
+      detectLockedInstitutionFromUrl();
       loadUserProfile();
       await loadBooksAndInitialVocab();
       bindEvents();
@@ -2831,7 +2898,9 @@
       const box = document.getElementById('recentProfilesBox');
       const listEl = document.getElementById('recentProfilesList');
       if (!box || !listEl) return;
-      const list = getRecentProfiles();
+      const list = lockedStudentInstitution
+        ? getRecentProfiles().filter(p => p.institution === lockedStudentInstitution)
+        : getRecentProfiles();
       if (list.length === 0) {
         box.style.display = 'none';
         return;
@@ -2846,10 +2915,12 @@
     }
 
     function quickSwitchRecentProfile(idx) {
-      const list = getRecentProfiles();
+      const list = lockedStudentInstitution
+        ? getRecentProfiles().filter(p => p.institution === lockedStudentInstitution)
+        : getRecentProfiles();
       const p = list[idx];
       if (!p) return;
-      userInstitution = p.institution || '용인대학교 한국어학당';
+      userInstitution = lockedStudentInstitution || p.institution || '용인대학교 한국어학당';
       userSemester = p.semester || '26-1';
       userClass = p.userClass || '용인대 4급';
       userName = p.name;
@@ -2878,12 +2949,12 @@
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEYS.USER_PROFILE) || 'null');
       renderInstitutionAndClassDropdowns();
       renderRecentProfilesUI();
-      if (!saved || !saved.name) {
-        document.getElementById('nameModal').classList.add('show');
+      if (!saved || !saved.name || (lockedStudentInstitution && saved.institution !== lockedStudentInstitution)) {
+        openNameModal();
       } else {
-        userInstitution = saved.institution || '용인대학교 한국어학당';
+        userInstitution = lockedStudentInstitution || saved.institution || '용인대학교 한국어학당';
         userSemester = saved.semester || '26-1';
-        userClass = saved.userClass || '용인대 4급';
+        userClass = saved.userClass || '4A';
         userName = saved.name;
         addRecentProfile({ institution: userInstitution, semester: userSemester, userClass, name: userName });
         upsertStudentRosterToCloud();
@@ -2914,10 +2985,14 @@
     }
 
     function saveUserProfileModal() {
-      const selectedInst = document.getElementById('userInstSelect')?.value || '용인대학교 한국어학당';
+      const selectedInst = lockedStudentInstitution || document.getElementById('userInstSelect')?.value || '용인대학교 한국어학당';
       const selectedSem = document.getElementById('userSemesterSelect')?.value || '26-1';
-      const selectedCls = document.getElementById('userClassSelect').value;
+      const selectedCls = document.getElementById('userClassSelect')?.value;
       const inputName = document.getElementById('userNameInput').value.trim();
+      if (!selectedCls) {
+        alert('급과 반을 선택해 주세요.');
+        return;
+      }
       if (!inputName) {
         alert('이름을 입력해 주세요.');
         return;
@@ -2941,14 +3016,25 @@
     function openNameModal() {
       renderInstitutionAndClassDropdowns();
       renderRecentProfilesUI();
+      const targetInst = lockedStudentInstitution || userInstitution;
       const instSel = document.getElementById('userInstSelect');
-      if (instSel && Array.from(instSel.options).some(o => o.value === userInstitution)) {
-        instSel.value = userInstitution;
-        onStudentInstSelectChange();
+      if (instSel && Array.from(instSel.options).some(o => o.value === targetInst)) {
+        instSel.value = targetInst;
       }
+      onStudentInstSelectChange();
+
       const semSel = document.getElementById('userSemesterSelect');
       if (semSel && Array.from(semSel.options).some(o => o.value === userSemester)) {
         semSel.value = userSemester;
+      }
+      // Match level containing userClass
+      const hierarchy = getInstitutionHierarchy();
+      const levelsObj = hierarchy[targetInst]?.levels || {};
+      const foundLevel = Object.keys(levelsObj).find(lv => (levelsObj[lv] || []).includes(userClass));
+      const lvlSel = document.getElementById('userLevelSelect');
+      if (lvlSel && foundLevel) {
+        lvlSel.value = foundLevel;
+        onStudentLevelSelectChange();
       }
       const clsSel = document.getElementById('userClassSelect');
       if (clsSel && Array.from(clsSel.options).some(o => o.value === userClass)) {
@@ -4054,10 +4140,10 @@
         roleBadge.textContent = '👥 담당 선생님';
         roleBadge.style.background = '#ecfdf5';
         roleBadge.style.color = '#065f46';
-        const scopeList = Array.isArray(assignedClass) ? assignedClass : [assignedClass];
+        const expandedCls = expandTeacherScopeToClassNames(assignedTeacherClasses);
         classBadge.textContent = isTeacherAllScope()
           ? '전체 기관 · 전체 급수'
-          : `담당 (${scopeList.length}개): ${scopeList.join(', ')}`;
+          : `담당 (${expandedCls.length}개 반): ${expandedCls.join(', ')}`;
         tabTeachersBtn.style.display = 'none';
         tabBuilderBtn.style.display = 'none';
         tabWorkbookBtn.style.display = 'none';
@@ -4070,8 +4156,9 @@
         delColHeader.style.display = currentTeacherPermissions.canDeleteRecord ? 'table-cell' : 'none';
         if (btnBulkDelRec) btnBulkDelRec.style.display = currentTeacherPermissions.canDeleteRecord ? 'inline-flex' : 'none';
 
-        if (!isTeacherAllScope() && scopeList.length === 1) {
-          classFilterSelect.value = scopeList[0];
+        const expandedList = expandTeacherScopeToClassNames(assignedTeacherClasses);
+        if (!isTeacherAllScope() && expandedList.length === 1) {
+          classFilterSelect.value = expandedList[0];
           classFilterSelect.disabled = true;
         } else {
           classFilterSelect.disabled = false;
@@ -5965,8 +6052,9 @@
     function initPrintSheetControls() {
       const sheetClassSel = document.getElementById('sheetClassSelect');
       if (currentUserRole === 'TEACHER' && !isTeacherAllScope()) {
-        sheetClassSel.innerHTML = assignedTeacherClasses.map(c => `<option value="${c}">${c}</option>`).join('');
-        sheetClassSel.disabled = assignedTeacherClasses.length <= 1;
+        const expanded = expandTeacherScopeToClassNames(assignedTeacherClasses);
+        sheetClassSel.innerHTML = expanded.map(c => `<option value="${c}">${c}</option>`).join('');
+        sheetClassSel.disabled = expanded.length <= 1;
       } else {
         populateAllClassesIntoSelect(sheetClassSel, null);
         sheetClassSel.disabled = false;
@@ -6832,29 +6920,262 @@ ${JSON.stringify(rawLines)}`;
     /* ==========================================================================
        15. TEACHER REGISTRATION & CUSTOM INSTITUTION / CLASS MANAGEMENT
     ========================================================================== */
-    const STORAGE_KEY_CUSTOM_ORGS = 'YONGIN_CUSTOM_ORGS_V2';
+    const STORAGE_KEY_CUSTOM_ORGS = 'YONGIN_CUSTOM_ORGS_V3';
     const STORAGE_KEY_SEMESTERS = 'YONGIN_CUSTOM_SEMESTERS_V2';
 
-    const DEFAULT_ORGS_MAP = {
-      '용인대학교 한국어학당': ['용인대 1급', '용인대 2급', '용인대 3급', '용인대 4급'],
-      '온라인 세종학당': ['세종 초급1', '세종 초급2', '세종 중급1', '세종 중급2'],
-      '02100 KOREAN': ['TOPIK I 집중반', 'TOPIK II 실전반']
+    const DEFAULT_INST_HIERARCHY = {
+      '용인대학교 한국어학당': {
+        slug: 'yongin',
+        levels: {
+          '1급': ['1A', '1B'],
+          '2급': ['2A', '2B'],
+          '3급': ['3A', '3B', '3C'],
+          '4급': ['4A', '4B']
+        }
+      },
+      '중앙대학교 한국어학당': {
+        slug: 'cau',
+        levels: {
+          '1급': ['1A', '1B'],
+          '2급': ['2A', '2B'],
+          '3급': ['3A', '3B'],
+          '4급': ['4A', '4B']
+        }
+      }
     };
     const DEFAULT_SEMESTERS = ['26-1', '26-2', '26-3', '26-4'];
 
-    let cachedOrgsMap = null;
+    let cachedInstHierarchy = null;
     let cachedSemestersList = null;
 
-    function getOrganizationsMap() {
-      if (cachedOrgsMap && Object.keys(cachedOrgsMap).length > 0) return cachedOrgsMap;
+    function generateOrgSlug(orgName, existingSlugs) {
+      const presets = [
+        ['용인', 'yongin'],
+        ['중앙', 'cau'],
+        ['경희', 'khu'],
+        ['서울', 'snu'],
+        ['연세', 'yonsei'],
+        ['고려', 'korea'],
+        ['세종', 'sejong'],
+        ['02100', '02100']
+      ];
+      let base = '';
+      for (const [kw, code] of presets) {
+        if (orgName.includes(kw)) { base = code; break; }
+      }
+      if (!base) {
+        const ascii = orgName.toLowerCase().replace(/[^a-z0-9]+/g, '');
+        base = ascii || ('org' + Math.abs(Array.from(orgName).reduce((h, c) => ((h << 5) - h) + c.charCodeAt(0), 0)).toString(36).slice(0, 5));
+      }
+      let slug = base;
+      let n = 2;
+      while (existingSlugs.has(slug)) {
+        slug = `${base}${n++}`;
+      }
+      existingSlugs.add(slug);
+      return slug;
+    }
+
+    function normalizeToHierarchy(rawObj) {
+      if (!rawObj || typeof rawObj !== 'object' || Object.keys(rawObj).length === 0) {
+        return JSON.parse(JSON.stringify(DEFAULT_INST_HIERARCHY));
+      }
+      const usedSlugs = new Set();
+      const out = {};
+      Object.entries(rawObj).forEach(([orgName, val]) => {
+        if (val && typeof val === 'object' && !Array.isArray(val) && val.levels) {
+          const slug = val.slug && !usedSlugs.has(val.slug) ? val.slug : generateOrgSlug(orgName, usedSlugs);
+          usedSlugs.add(slug);
+          const cleanLevels = {};
+          Object.entries(val.levels).forEach(([lv, clsArr]) => {
+            cleanLevels[lv] = Array.isArray(clsArr) ? [...clsArr] : [];
+          });
+          out[orgName] = { slug, levels: cleanLevels };
+        } else if (Array.isArray(val)) {
+          // Legacy v2 array format migration -> group into levels
+          const slug = generateOrgSlug(orgName, usedSlugs);
+          const levels = {};
+          val.forEach(cls => {
+            const m = String(cls).match(/(\d+급|초급\d*|중급\d*|고급\d*|TOPIK\s*[I12]+)/i);
+            const lvName = m ? m[1] : '기본 과정';
+            if (!levels[lvName]) levels[lvName] = [];
+            if (!levels[lvName].includes(cls)) levels[lvName].push(cls);
+          });
+          if (Object.keys(levels).length === 0) levels['1급'] = ['1A'];
+          out[orgName] = { slug, levels };
+        }
+      });
+      return Object.keys(out).length > 0 ? out : JSON.parse(JSON.stringify(DEFAULT_INST_HIERARCHY));
+    }
+
+    function getInstitutionHierarchy() {
+      if (cachedInstHierarchy && Object.keys(cachedInstHierarchy).length > 0) return cachedInstHierarchy;
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEY_CUSTOM_ORGS) || 'null');
       if (saved && typeof saved === 'object' && Object.keys(saved).length > 0) {
-        cachedOrgsMap = saved;
-        return cachedOrgsMap;
+        cachedInstHierarchy = normalizeToHierarchy(saved);
+        return cachedInstHierarchy;
       }
-      cachedOrgsMap = { ...DEFAULT_ORGS_MAP };
-      localStorage.setItem(STORAGE_KEY_CUSTOM_ORGS, JSON.stringify(cachedOrgsMap));
-      return cachedOrgsMap;
+      cachedInstHierarchy = JSON.parse(JSON.stringify(DEFAULT_INST_HIERARCHY));
+      localStorage.setItem(STORAGE_KEY_CUSTOM_ORGS, JSON.stringify(cachedInstHierarchy));
+      return cachedInstHierarchy;
+    }
+
+    // Compatibility helper: returns { orgName: [allClasses...] }
+    function getOrganizationsMap() {
+      const h = getInstitutionHierarchy();
+      const map = {};
+      Object.entries(h).forEach(([orgName, info]) => {
+        const list = [];
+        Object.values(info.levels || {}).forEach(arr => {
+          (arr || []).forEach(c => { if (!list.includes(c)) list.push(c); });
+        });
+        map[orgName] = list;
+      });
+      return map;
+    }
+
+    function getStudentLinkForInstitution(orgName) {
+      const h = getInstitutionHierarchy();
+      const slug = h[orgName]?.slug || encodeURIComponent(orgName);
+      const url = new URL(window.location.href);
+      url.search = '';
+      url.hash = '';
+      url.searchParams.set('org', slug);
+      return url.toString();
+    }
+
+    function detectLockedInstitutionFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+      const orgParam = (params.get('org') || '').trim();
+      if (!orgParam) {
+        lockedStudentInstitution = null;
+        return;
+      }
+      const h = getInstitutionHierarchy();
+      const matchedOrg = Object.keys(h).find(name =>
+        h[name].slug === orgParam || name === orgParam
+      );
+      if (matchedOrg) {
+        lockedStudentInstitution = matchedOrg;
+        userInstitution = matchedOrg;
+      } else {
+        // Store raw slug temporarily until cloud hierarchy finishes loading
+        lockedStudentInstitution = orgParam;
+      }
+    }
+
+    function copyInstitutionStudentLink(orgName) {
+      const link = getStudentLinkForInstitution(orgName);
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(link).then(() => {
+          alert(`[${orgName}] 학생 전용 접속 링크가 복사되었습니다.
+
+${link}`);
+        }).catch(() => {
+          prompt(`아래 [${orgName}] 학생 전용 접속 링크를 복사해 주세요:`, link);
+        });
+      } else {
+        prompt(`아래 [${orgName}] 학생 전용 접속 링크를 복사해 주세요:`, link);
+      }
+    }
+
+    function openOrgQrModal(orgName) {
+      const link = getStudentLinkForInstitution(orgName);
+      const overlay = document.getElementById('orgQrOverlayModal');
+      const titleEl = document.getElementById('orgQrModalTitle');
+      const qrBox = document.getElementById('orgQrCanvasContainer');
+      const urlEl = document.getElementById('orgQrUrlText');
+      const copyBtn = document.getElementById('orgQrCopyBtn');
+
+      if (!overlay || !qrBox) return;
+      titleEl.textContent = orgName;
+      urlEl.textContent = link;
+      qrBox.innerHTML = '';
+
+      if (typeof QRCode !== 'undefined') {
+        new QRCode(qrBox, {
+          text: link,
+          width: 230,
+          height: 230,
+          colorDark: '#0f172a',
+          colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.M
+        });
+      } else {
+        const img = document.createElement('img');
+        img.src = `https://api.qrserver.com/v1/create-qr-code/?size=230x230&data=${encodeURIComponent(link)}`;
+        img.alt = orgName + ' QR';
+        img.style.width = '230px';
+        img.style.height = '230px';
+        qrBox.appendChild(img);
+      }
+
+      copyBtn.onclick = () => copyInstitutionStudentLink(orgName);
+      overlay.style.display = 'flex';
+    }
+
+    function closeOrgQrModal() {
+      const overlay = document.getElementById('orgQrOverlayModal');
+      if (overlay) overlay.style.display = 'none';
+    }
+
+    function renderAdminOrgShareBar() {
+      const bar = document.getElementById('adminOrgShareBar');
+      const btnWrap = document.getElementById('adminOrgShareButtons');
+      if (!bar || !btnWrap) return;
+
+      const h = getInstitutionHierarchy();
+      const allOrgs = Object.keys(h);
+      let targetOrgs = [];
+
+      if (isTeacherAllScope()) {
+        targetOrgs = allOrgs;
+      } else {
+        const instSet = new Set(assignedTeacherInstitutions || []);
+        const expandedCls = expandTeacherScopeToClassNames(assignedTeacherClasses);
+        allOrgs.forEach(org => {
+          const orgCls = Object.values(h[org]?.levels || {}).flat();
+          if (orgCls.some(c => expandedCls.includes(c))) instSet.add(org);
+        });
+        targetOrgs = allOrgs.filter(o => instSet.has(o));
+      }
+
+      if (targetOrgs.length === 0) {
+        bar.style.display = 'none';
+        return;
+      }
+
+      bar.style.display = 'block';
+      btnWrap.innerHTML = targetOrgs.map(org => `
+        <div style="display:inline-flex; align-items:center; gap:0.3rem; background:white; border:1px solid #86efac; border-radius:8px; padding:0.25rem 0.45rem;">
+          <span style="font-size:0.78rem; font-weight:800; color:#14532d;">🏫 ${org}</span>
+          <button type="button" class="btn btn-outline btn-sm" style="padding:0.18rem 0.45rem; font-size:0.73rem;" onclick="copyInstitutionStudentLink('${org.replace(/'/g, "\'")}')">🔗 링크 복사</button>
+          <button type="button" class="btn btn-primary btn-sm" style="padding:0.18rem 0.45rem; font-size:0.73rem;" onclick="openOrgQrModal('${org.replace(/'/g, "\'")}')">📱 QR 띄우기</button>
+        </div>
+      `).join('');
+    }
+
+    function renderAdminInstLinksList() {
+      const box = document.getElementById('adminInstLinksList');
+      if (!box) return;
+      const h = getInstitutionHierarchy();
+      const orgNames = Object.keys(h);
+      box.innerHTML = orgNames.map(org => {
+        const link = getStudentLinkForInstitution(org);
+        const safeOrg = org.replace(/'/g, "\'");
+        return `
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.4rem; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:0.4rem 0.6rem;">
+            <div style="display:flex; flex-direction:column; gap:0.1rem;">
+              <strong style="font-size:0.82rem; color:var(--primary);">🏫 ${org}</strong>
+              <span style="font-size:0.72rem; color:var(--text-muted);">${link}</span>
+            </div>
+            <div style="display:flex; gap:0.35rem;">
+              <button type="button" class="btn btn-outline btn-sm" style="padding:0.25rem 0.55rem; font-size:0.76rem;" onclick="copyInstitutionStudentLink('${safeOrg}')">🔗 학생 전용 링크 복사</button>
+              <button type="button" class="btn btn-primary btn-sm" style="padding:0.25rem 0.55rem; font-size:0.76rem;" onclick="openOrgQrModal('${safeOrg}')">📱 QR 띄우기</button>
+            </div>
+          </div>
+        `;
+      }).join('');
     }
 
     function getSemestersList() {
@@ -6875,9 +7196,12 @@ ${JSON.stringify(rawLines)}`;
         const docSnap = await db.collection("app_settings").doc("organizations").get();
         if (docSnap.exists) {
           const data = docSnap.data();
-          if (data.orgMap && Object.keys(data.orgMap).length > 0) {
-            cachedOrgsMap = data.orgMap;
-            localStorage.setItem(STORAGE_KEY_CUSTOM_ORGS, JSON.stringify(cachedOrgsMap));
+          if (data.hierarchy && Object.keys(data.hierarchy).length > 0) {
+            cachedInstHierarchy = normalizeToHierarchy(data.hierarchy);
+            localStorage.setItem(STORAGE_KEY_CUSTOM_ORGS, JSON.stringify(cachedInstHierarchy));
+          } else if (data.orgMap && Object.keys(data.orgMap).length > 0) {
+            cachedInstHierarchy = normalizeToHierarchy(data.orgMap);
+            localStorage.setItem(STORAGE_KEY_CUSTOM_ORGS, JSON.stringify(cachedInstHierarchy));
           }
           if (Array.isArray(data.semesters) && data.semesters.length > 0) {
             cachedSemestersList = data.semesters;
@@ -6896,6 +7220,7 @@ ${JSON.stringify(rawLines)}`;
             if (yEl) yEl.value = matrixThresholds.yellow;
             if (oEl) oEl.value = matrixThresholds.orange;
           }
+          detectLockedInstitutionFromUrl();
           renderInstitutionAndClassDropdowns();
         }
       } catch (err) {
@@ -6903,17 +7228,19 @@ ${JSON.stringify(rawLines)}`;
       }
     }
 
-    async function saveOrganizationsMap(mapObj, semestersArr) {
-      cachedOrgsMap = mapObj;
+    async function saveInstitutionHierarchy(hierarchyObj, semestersArr) {
+      const normalized = normalizeToHierarchy(hierarchyObj);
+      cachedInstHierarchy = normalized;
       const sems = semestersArr || getSemestersList();
       cachedSemestersList = sems;
-      localStorage.setItem(STORAGE_KEY_CUSTOM_ORGS, JSON.stringify(mapObj));
+      localStorage.setItem(STORAGE_KEY_CUSTOM_ORGS, JSON.stringify(normalized));
       localStorage.setItem(STORAGE_KEY_SEMESTERS, JSON.stringify(sems));
       renderInstitutionAndClassDropdowns();
       if (db && currentUserRole === 'MAIN_ADMIN') {
         try {
           await db.collection("app_settings").doc("organizations").set({
-            orgMap: mapObj,
+            hierarchy: normalized,
+            orgMap: getOrganizationsMap(),
             semesters: sems,
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
           }, { merge: true });
@@ -6933,7 +7260,7 @@ ${JSON.stringify(rawLines)}`;
       const list = [...getSemestersList()];
       if (!list.includes(val)) {
         list.push(val);
-        await saveOrganizationsMap(getOrganizationsMap(), list);
+        await saveInstitutionHierarchy(getInstitutionHierarchy(), list);
       }
       document.getElementById('manageSemesterSelect').value = val;
       input.value = '';
@@ -6951,7 +7278,7 @@ ${JSON.stringify(rawLines)}`;
       }
       if (!confirm(`[${val}] 학기를 삭제하시겠습니까?`)) return;
       const nextList = list.filter(s => s !== val);
-      await saveOrganizationsMap(getOrganizationsMap(), nextList);
+      await saveInstitutionHierarchy(getInstitutionHierarchy(), nextList);
       alert(`[${val}] 학기가 삭제되었습니다.`);
     }
 
@@ -6961,19 +7288,56 @@ ${JSON.stringify(rawLines)}`;
     }
 
     function onStudentInstSelectChange() {
-      const orgMap = getOrganizationsMap();
+      const h = getInstitutionHierarchy();
       const instSel = document.getElementById('userInstSelect');
+      const lockedBadge = document.getElementById('userInstLockedBadge');
+      const lvlSel = document.getElementById('userLevelSelect');
+      if (!lvlSel) return;
+
+      const activeOrg = (lockedStudentInstitution && h[lockedStudentInstitution])
+        ? lockedStudentInstitution
+        : (instSel?.value || Object.keys(h)[0]);
+
+      if (lockedStudentInstitution && h[lockedStudentInstitution]) {
+        if (instSel) {
+          instSel.value = lockedStudentInstitution;
+          instSel.style.display = 'none';
+        }
+        if (lockedBadge) {
+          lockedBadge.style.display = 'block';
+          lockedBadge.textContent = `🏫 ${lockedStudentInstitution}`;
+        }
+      } else {
+        if (instSel) instSel.style.display = 'block';
+        if (lockedBadge) lockedBadge.style.display = 'none';
+      }
+
+      const levels = Object.keys(h[activeOrg]?.levels || {});
+      const prevLvl = lvlSel.value;
+      lvlSel.innerHTML = levels.map(lv => `<option value="${lv}">${lv}</option>`).join('');
+      if (prevLvl && levels.includes(prevLvl)) lvlSel.value = prevLvl;
+      onStudentLevelSelectChange();
+    }
+
+    function onStudentLevelSelectChange() {
+      const h = getInstitutionHierarchy();
+      const instSel = document.getElementById('userInstSelect');
+      const lvlSel = document.getElementById('userLevelSelect');
       const clsSel = document.getElementById('userClassSelect');
-      if (!instSel || !clsSel) return;
-      const classes = orgMap[instSel.value] || [];
-      const prev = clsSel.value;
+      if (!lvlSel || !clsSel) return;
+
+      const activeOrg = (lockedStudentInstitution && h[lockedStudentInstitution])
+        ? lockedStudentInstitution
+        : (instSel?.value || Object.keys(h)[0]);
+      const classes = h[activeOrg]?.levels?.[lvlSel.value] || [];
+      const prevCls = clsSel.value;
       clsSel.innerHTML = classes.map(c => `<option value="${c}">${c}</option>`).join('');
-      if (prev && classes.includes(prev)) clsSel.value = prev;
+      if (prevCls && classes.includes(prevCls)) clsSel.value = prevCls;
     }
 
     function renderInstitutionAndClassDropdowns() {
-      const orgMap = getOrganizationsMap();
-      const orgNames = Object.keys(orgMap);
+      const h = getInstitutionHierarchy();
+      const orgNames = Object.keys(h);
       const sems = getSemestersList();
 
       ['userSemesterSelect', 'manageSemesterSelect'].forEach(selId => {
@@ -7000,18 +7364,22 @@ ${JSON.stringify(rawLines)}`;
       });
 
       onManageInstSelectChange();
+      renderAdminInstLinksList();
+      renderAdminOrgShareBar();
       renderNewTeacherMultiScopeBox();
       onStudentInstSelectChange();
 
       const allClasses = [];
       orgNames.forEach(org => {
-        (orgMap[org] || []).forEach(cls => {
-          if (!allClasses.includes(cls)) allClasses.push(cls);
+        Object.values(h[org]?.levels || {}).forEach(arr => {
+          (arr || []).forEach(cls => {
+            if (!allClasses.includes(cls)) allClasses.push(cls);
+          });
         });
       });
 
       const visibleClassesForUser = (currentUserRole === 'TEACHER' && !isTeacherAllScope())
-        ? assignedTeacherClasses
+        ? expandTeacherScopeToClassNames(assignedTeacherClasses)
         : allClasses;
 
       const adminFilterCls = document.getElementById('adminFilterClass');
@@ -7075,14 +7443,29 @@ ${JSON.stringify(rawLines)}`;
     }
 
     function onManageInstSelectChange() {
-      const orgMap = getOrganizationsMap();
+      const h = getInstitutionHierarchy();
       const instSel = document.getElementById('manageInstSelect');
+      const lvlSel = document.getElementById('manageLevelSelect');
+      if (!instSel || !lvlSel) return;
+      const levels = Object.keys(h[instSel.value]?.levels || {});
+      const prev = lvlSel.value;
+      lvlSel.innerHTML = levels.length > 0
+        ? levels.map(lv => `<option value="${lv}">${lv}</option>`).join('')
+        : `<option value="">(등록된 급 없음)</option>`;
+      if (prev && levels.includes(prev)) lvlSel.value = prev;
+      onManageLevelSelectChange();
+    }
+
+    function onManageLevelSelectChange() {
+      const h = getInstitutionHierarchy();
+      const instSel = document.getElementById('manageInstSelect');
+      const lvlSel = document.getElementById('manageLevelSelect');
       const clsSel = document.getElementById('manageClassSelect');
-      if (!instSel || !clsSel) return;
-      const classes = orgMap[instSel.value] || [];
+      if (!instSel || !lvlSel || !clsSel) return;
+      const classes = h[instSel.value]?.levels?.[lvlSel.value] || [];
       clsSel.innerHTML = classes.length > 0
         ? classes.map(c => `<option value="${c}">${c}</option>`).join('')
-        : `<option value="">(등록된 수업 없음)</option>`;
+        : `<option value="">(등록된 하위 반 없음)</option>`;
     }
 
     function populateAllClassesIntoSelect(selectEl, lockedClass) {
@@ -7097,38 +7480,54 @@ ${JSON.stringify(rawLines)}`;
     let teacherRecordsCacheMap = new Map();
     let editingTeacherScopeEmail = '';
 
-    function buildMultiScopeCheckboxesHtml(containerPrefix, selectedClassesSet) {
-      const orgMap = getOrganizationsMap();
-      const orgNames = Object.keys(orgMap);
-      const isAllChecked = selectedClassesSet && selectedClassesSet.has('ALL');
+    function buildMultiScopeCheckboxesHtml(containerPrefix, selectedTokensSet) {
+      const h = getInstitutionHierarchy();
+      const orgNames = Object.keys(h);
+      const isAllChecked = selectedTokensSet && selectedTokensSet.has('ALL');
 
       const allCardHtml = `
         <div style="background:#fef3c7; border:1px solid #fcd34d; border-radius:8px; padding:0.45rem 0.6rem; grid-column: 1 / -1;">
           <label style="display:flex; align-items:center; gap:0.4rem; font-size:0.8rem; font-weight:800; color:#92400e; cursor:pointer;">
             <input type="checkbox" class="${containerPrefix}-all-cb" value="ALL" ${isAllChecked ? 'checked' : ''} onchange="onTeacherAllScopeToggle('${containerPrefix}', this.checked)" />
-            🌐 전체 기관 · 전체 급수/수업 모두 허용
+            🌐 전체 기관 · 전체 급 · 전체 반 모두 허용
           </label>
         </div>
       `;
 
       const orgCardsHtml = orgNames.map((org, oIdx) => {
-        const classes = orgMap[org] || [];
+        const levelsObj = h[org]?.levels || {};
+        const levelNames = Object.keys(levelsObj);
         return `
-          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:0.45rem 0.6rem;">
-            <label style="display:flex; align-items:center; gap:0.35rem; font-size:0.8rem; font-weight:800; color:var(--primary); cursor:pointer; margin-bottom:0.3rem;">
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:0.5rem 0.65rem;">
+            <label style="display:flex; align-items:center; gap:0.35rem; font-size:0.82rem; font-weight:800; color:var(--primary); cursor:pointer; margin-bottom:0.35rem; border-bottom:1px solid #e2e8f0; padding-bottom:0.25rem;">
               <input type="checkbox" class="${containerPrefix}-inst-cb" data-org-idx="${oIdx}" data-org="${org}" onchange="onTeacherInstGroupToggle('${containerPrefix}', ${oIdx}, this.checked)" />
-              <span>🏫 ${org}</span>
+              <span>🏫 ${org} (기관 전체)</span>
             </label>
-            <div style="padding-left:1.1rem; display:flex; flex-direction:column; gap:0.2rem;">
-              ${classes.length > 0 ? classes.map(cls => {
-                const checked = isAllChecked || (selectedClassesSet && selectedClassesSet.has(cls));
+            <div style="padding-left:0.55rem; display:flex; flex-direction:column; gap:0.35rem;">
+              ${levelNames.length > 0 ? levelNames.map((lv, lIdx) => {
+                const levelToken = `level:${org}:${lv}`;
+                const levelChecked = isAllChecked || (selectedTokensSet && selectedTokensSet.has(levelToken));
+                const subClasses = levelsObj[lv] || [];
                 return `
-                  <label style="display:flex; align-items:center; gap:0.35rem; font-size:0.77rem; color:var(--text-main); cursor:pointer;">
-                    <input type="checkbox" class="${containerPrefix}-cls-cb" data-org-idx="${oIdx}" data-org="${org}" value="${cls}" ${checked ? 'checked' : ''} onchange="syncTeacherScopeParentCheckboxes('${containerPrefix}')" />
-                    <span>${cls}</span>
-                  </label>
+                  <div style="background:white; border:1px solid #e2e8f0; border-radius:6px; padding:0.3rem 0.45rem;">
+                    <label style="display:flex; align-items:center; gap:0.35rem; font-size:0.78rem; font-weight:800; color:#1e40af; cursor:pointer; margin-bottom:0.2rem;">
+                      <input type="checkbox" class="${containerPrefix}-lvl-cb" data-org-idx="${oIdx}" data-lvl-idx="${lIdx}" data-org="${org}" data-level="${lv}" value="${levelToken}" ${levelChecked ? 'checked' : ''} onchange="onTeacherLevelGroupToggle('${containerPrefix}', ${oIdx}, ${lIdx}, this.checked)" />
+                      <span>📘 ${lv} 전체 (${subClasses.length}개 반)</span>
+                    </label>
+                    <div style="padding-left:1.1rem; display:flex; flex-wrap:wrap; gap:0.35rem 0.65rem;">
+                      ${subClasses.length > 0 ? subClasses.map(cls => {
+                        const clsChecked = levelChecked || (selectedTokensSet && selectedTokensSet.has(cls));
+                        return `
+                          <label style="display:inline-flex; align-items:center; gap:0.25rem; font-size:0.76rem; color:var(--text-main); cursor:pointer;">
+                            <input type="checkbox" class="${containerPrefix}-cls-cb" data-org-idx="${oIdx}" data-lvl-idx="${lIdx}" data-org="${org}" data-level="${lv}" value="${cls}" ${clsChecked ? 'checked' : ''} onchange="syncTeacherScopeParentCheckboxes('${containerPrefix}')" />
+                            <span>${cls}</span>
+                          </label>
+                        `;
+                      }).join('') : '<span style="font-size:0.72rem; color:var(--text-muted);">(하위 반 없음)</span>'}
+                    </div>
+                  </div>
                 `;
-              }).join('') : '<span style="font-size:0.74rem; color:var(--text-muted);">(등록된 수업 없음)</span>'}
+              }).join('') : '<span style="font-size:0.74rem; color:var(--text-muted);">(등록된 급 없음)</span>'}
             </div>
           </div>
         `;
@@ -7139,69 +7538,101 @@ ${JSON.stringify(rawLines)}`;
 
     function onTeacherAllScopeToggle(prefix, checked) {
       document.querySelectorAll(`.${prefix}-cls-cb`).forEach(cb => { cb.checked = checked; });
+      document.querySelectorAll(`.${prefix}-lvl-cb`).forEach(cb => { cb.checked = checked; });
       document.querySelectorAll(`.${prefix}-inst-cb`).forEach(cb => { cb.checked = checked; });
     }
 
     function onTeacherInstGroupToggle(prefix, orgIdx, checked) {
-      document.querySelectorAll(`.${prefix}-cls-cb[data-org-idx="${orgIdx}"]`).forEach(cb => {
+      document.querySelectorAll(`.${prefix}-lvl-cb[data-org-idx="${orgIdx}"]`).forEach(cb => { cb.checked = checked; });
+      document.querySelectorAll(`.${prefix}-cls-cb[data-org-idx="${orgIdx}"]`).forEach(cb => { cb.checked = checked; });
+      syncTeacherScopeParentCheckboxes(prefix);
+    }
+
+    function onTeacherLevelGroupToggle(prefix, orgIdx, lvlIdx, checked) {
+      document.querySelectorAll(`.${prefix}-cls-cb[data-org-idx="${orgIdx}"][data-lvl-idx="${lvlIdx}"]`).forEach(cb => {
         cb.checked = checked;
       });
       syncTeacherScopeParentCheckboxes(prefix);
     }
 
     function syncTeacherScopeParentCheckboxes(prefix) {
-      const allClsCbs = Array.from(document.querySelectorAll(`.${prefix}-cls-cb`));
-      const allChecked = allClsCbs.length > 0 && allClsCbs.every(cb => cb.checked);
-      const allCb = document.querySelector(`.${prefix}-all-cb`);
-      if (allCb) allCb.checked = allChecked;
+      document.querySelectorAll(`.${prefix}-lvl-cb`).forEach(lvlCb => {
+        const oIdx = lvlCb.dataset.orgIdx;
+        const lIdx = lvlCb.dataset.lvlIdx;
+        const subCbs = Array.from(document.querySelectorAll(`.${prefix}-cls-cb[data-org-idx="${oIdx}"][data-lvl-idx="${lIdx}"]`));
+        if (subCbs.length > 0) {
+          lvlCb.checked = subCbs.every(cb => cb.checked);
+        }
+      });
 
       document.querySelectorAll(`.${prefix}-inst-cb`).forEach(instCb => {
-        const idx = instCb.dataset.orgIdx;
-        const groupCbs = Array.from(document.querySelectorAll(`.${prefix}-cls-cb[data-org-idx="${idx}"]`));
-        instCb.checked = groupCbs.length > 0 && groupCbs.every(cb => cb.checked);
+        const oIdx = instCb.dataset.orgIdx;
+        const lvlCbs = Array.from(document.querySelectorAll(`.${prefix}-lvl-cb[data-org-idx="${oIdx}"]`));
+        instCb.checked = lvlCbs.length > 0 && lvlCbs.every(cb => cb.checked);
       });
+
+      const allInstCbs = Array.from(document.querySelectorAll(`.${prefix}-inst-cb`));
+      const allCb = document.querySelector(`.${prefix}-all-cb`);
+      if (allCb) allCb.checked = allInstCbs.length > 0 && allInstCbs.every(cb => cb.checked);
     }
 
     function collectSelectedTeacherScope(prefix) {
       const allCb = document.querySelector(`.${prefix}-all-cb`);
-      const checkedClsCbs = Array.from(document.querySelectorAll(`.${prefix}-cls-cb:checked`));
       if (allCb && allCb.checked) {
         return {
-          assignedInstitutions: Object.keys(getOrganizationsMap()),
+          assignedInstitutions: Object.keys(getInstitutionHierarchy()),
           assignedClasses: ['ALL'],
           assignedInstitution: '전체 기관',
           assignedClass: 'ALL'
         };
       }
+
       const instSet = new Set();
-      const clsList = [];
-      checkedClsCbs.forEach(cb => {
-        if (cb.dataset.org) instSet.add(cb.dataset.org);
-        if (cb.value && !clsList.includes(cb.value)) clsList.push(cb.value);
+      const tokens = [];
+      const coveredLvlKeys = new Set();
+
+      // 1. Checked full levels (e.g., level:용인대학교 한국어학당:3급 -> auto-includes future sub-classes!)
+      document.querySelectorAll(`.${prefix}-lvl-cb:checked`).forEach(lvlCb => {
+        const org = lvlCb.dataset.org;
+        const lv = lvlCb.dataset.level;
+        if (org) instSet.add(org);
+        tokens.push(`level:${org}:${lv}`);
+        coveredLvlKeys.add(`${org}::${lv}`);
       });
+
+      // 2. Checked individual sub-classes whose parent level is NOT fully checked
+      document.querySelectorAll(`.${prefix}-cls-cb:checked`).forEach(clsCb => {
+        const org = clsCb.dataset.org;
+        const lv = clsCb.dataset.level;
+        if (org) instSet.add(org);
+        if (!coveredLvlKeys.has(`${org}::${lv}`)) {
+          if (clsCb.value && !tokens.includes(clsCb.value)) tokens.push(clsCb.value);
+        }
+      });
+
       const instList = Array.from(instSet);
+      const expanded = expandTeacherScopeToClassNames(tokens);
       return {
         assignedInstitutions: instList,
-        assignedClasses: clsList,
+        assignedClasses: tokens,
         assignedInstitution: instList.join(', ') || '용인대학교 한국어학당',
-        assignedClass: clsList[0] || ''
+        assignedClass: expanded[0] || tokens[0] || ''
       };
     }
 
     function renderNewTeacherMultiScopeBox() {
       const box = document.getElementById('newTeacherMultiScopeBox');
       if (!box) return;
-      const prevChecked = new Set(Array.from(document.querySelectorAll('.new-t-scope-cls-cb:checked')).map(c => c.value));
-      box.innerHTML = buildMultiScopeCheckboxesHtml('new-t-scope', prevChecked);
+      const prevTokens = new Set([
+        ...Array.from(document.querySelectorAll('.new-t-scope-lvl-cb:checked')).map(c => c.value),
+        ...Array.from(document.querySelectorAll('.new-t-scope-cls-cb:checked')).map(c => c.value)
+      ]);
+      box.innerHTML = buildMultiScopeCheckboxesHtml('new-t-scope', prevTokens);
       syncTeacherScopeParentCheckboxes('new-t-scope');
     }
 
     function toggleAllNewTeacherClasses(checked) {
       onTeacherAllScopeToggle('new-t-scope', checked);
-    }
-
-    function onTeacherInstSelectChange() {
-      renderNewTeacherMultiScopeBox();
     }
 
     async function addCustomInstitution() {
@@ -7211,65 +7642,119 @@ ${JSON.stringify(rawLines)}`;
         alert("추가할 기관명을 입력해 주세요.");
         return;
       }
-      const orgMap = { ...getOrganizationsMap() };
-      if (!orgMap[name]) {
-        orgMap[name] = [`${name} 1반`];
-        await saveOrganizationsMap(orgMap);
+      const h = JSON.parse(JSON.stringify(getInstitutionHierarchy()));
+      if (!h[name]) {
+        const existingSlugs = new Set(Object.values(h).map(v => v.slug));
+        h[name] = {
+          slug: generateOrgSlug(name, existingSlugs),
+          levels: { '1급': ['1A', '1B'] }
+        };
+        await saveInstitutionHierarchy(h);
       }
       document.getElementById('manageInstSelect').value = name;
       onManageInstSelectChange();
-      renderNewTeacherMultiScopeBox();
       input.value = '';
-      alert(`[${name}] 기관이 추가 및 클라우드에 저장되었습니다.`);
+      alert(`[${name}] 기관이 추가되었으며 전용 학생 링크·QR 코드가 생성되었습니다.`);
     }
 
     async function deleteSelectedInstitution() {
-      const instSel = document.getElementById('manageInstSelect');
-      const instName = instSel?.value;
+      const instName = document.getElementById('manageInstSelect')?.value;
       if (!instName) return;
-      const orgMap = { ...getOrganizationsMap() };
-      if (Object.keys(orgMap).length <= 1) {
+      const h = JSON.parse(JSON.stringify(getInstitutionHierarchy()));
+      if (Object.keys(h).length <= 1) {
         alert("최소 1개 이상의 기관은 유지되어야 합니다.");
         return;
       }
-      if (!confirm(`[${instName}] 기관과 하위 수업 목록을 삭제하시겠습니까?`)) return;
-      delete orgMap[instName];
-      await saveOrganizationsMap(orgMap);
+      if (!confirm(`[${instName}] 기관과 모든 급·반 목록을 삭제하시겠습니까?`)) return;
+      delete h[instName];
+      await saveInstitutionHierarchy(h);
       alert(`[${instName}] 기관이 삭제되었습니다.`);
     }
 
-    async function addCustomClassToInstitution() {
-      const instName = document.getElementById('manageInstSelect').value;
-      const clsInput = document.getElementById('newClassUnderInstInput');
-      const clsName = clsInput.value.trim();
-      if (!instName || !clsName) {
-        alert("기관을 선택하고 추가할 급수/수업명을 입력해 주세요.");
+    async function addCustomLevelToInstitution() {
+      const instName = document.getElementById('manageInstSelect')?.value;
+      const lvlInput = document.getElementById('newLevelUnderInstInput');
+      const lvlName = lvlInput?.value.trim();
+      if (!instName || !lvlName) {
+        alert("기관을 선택하고 추가할 [급] 이름을 입력해 주세요. (예: 3급)");
         return;
       }
-      const orgMap = { ...getOrganizationsMap() };
-      if (!orgMap[instName]) orgMap[instName] = [];
-      if (!orgMap[instName].includes(clsName)) {
-        orgMap[instName] = [...orgMap[instName], clsName];
-        await saveOrganizationsMap(orgMap);
+      const h = JSON.parse(JSON.stringify(getInstitutionHierarchy()));
+      if (!h[instName].levels) h[instName].levels = {};
+      if (!h[instName].levels[lvlName]) {
+        const numMatch = lvlName.match(/^(\d+)/);
+        const defaultSub = numMatch ? `${numMatch[1]}A` : `${lvlName} A반`;
+        h[instName].levels[lvlName] = [defaultSub];
+        await saveInstitutionHierarchy(h);
       }
-      onManageInstSelectChange();
-      renderNewTeacherMultiScopeBox();
+      document.getElementById('manageLevelSelect').value = lvlName;
+      onManageLevelSelectChange();
+      lvlInput.value = '';
+      alert(`[${instName}]에 [${lvlName}]이 추가되었습니다.`);
+    }
+
+    async function deleteSelectedLevelFromInstitution() {
+      const instName = document.getElementById('manageInstSelect')?.value;
+      const lvlName = document.getElementById('manageLevelSelect')?.value;
+      if (!instName || !lvlName) {
+        alert("삭제할 [급]을 선택해 주세요.");
+        return;
+      }
+      if (!confirm(`[${instName}]의 [${lvlName}]과 하위 반 목록을 모두 삭제하시겠습니까?`)) return;
+      const h = JSON.parse(JSON.stringify(getInstitutionHierarchy()));
+      delete h[instName].levels[lvlName];
+      await saveInstitutionHierarchy(h);
+      alert(`[${lvlName}]이 삭제되었습니다.`);
+    }
+
+    async function addCustomClassToInstitution() {
+      const instName = document.getElementById('manageInstSelect')?.value;
+      const lvlName = document.getElementById('manageLevelSelect')?.value;
+      const clsInput = document.getElementById('newClassUnderInstInput');
+      const clsName = clsInput?.value.trim();
+      if (!instName || !lvlName || !clsName) {
+        alert("기관과 [급]을 먼저 선택한 뒤 추가할 [반] 이름을 입력해 주세요. (예: 3A)");
+        return;
+      }
+      const h = JSON.parse(JSON.stringify(getInstitutionHierarchy()));
+      if (!h[instName].levels[lvlName]) h[instName].levels[lvlName] = [];
+      if (!h[instName].levels[lvlName].includes(clsName)) {
+        h[instName].levels[lvlName].push(clsName);
+        await saveInstitutionHierarchy(h);
+      }
+      document.getElementById('manageLevelSelect').value = lvlName;
+      onManageLevelSelectChange();
+      document.getElementById('manageClassSelect').value = clsName;
       clsInput.value = '';
-      alert(`[${instName}]에 [${clsName}] 수업이 추가되었습니다.`);
+      alert(`[${instName} > ${lvlName}] 하위에 [${clsName}] 반이 추가되었습니다.`);
     }
 
     async function deleteSelectedClassFromInstitution() {
       const instName = document.getElementById('manageInstSelect')?.value;
+      const lvlName = document.getElementById('manageLevelSelect')?.value;
       const clsName = document.getElementById('manageClassSelect')?.value;
-      if (!instName || !clsName) {
-        alert("삭제할 수업을 선택해 주세요.");
+      if (!instName || !lvlName || !clsName) {
+        alert("삭제할 [반]을 선택해 주세요.");
         return;
       }
-      if (!confirm(`[${instName}]의 [${clsName}] 수업을 삭제하시겠습니까?`)) return;
-      const orgMap = { ...getOrganizationsMap() };
-      orgMap[instName] = (orgMap[instName] || []).filter(c => c !== clsName);
-      await saveOrganizationsMap(orgMap);
-      alert(`[${clsName}] 수업이 삭제되었습니다.`);
+      if (!confirm(`[${instName} > ${lvlName}]의 [${clsName}] 반을 삭제하시겠습니까?`)) return;
+      const h = JSON.parse(JSON.stringify(getInstitutionHierarchy()));
+      h[instName].levels[lvlName] = (h[instName].levels[lvlName] || []).filter(c => c !== clsName);
+      await saveInstitutionHierarchy(h);
+      alert(`[${clsName}] 반이 삭제되었습니다.`);
+    }
+
+    function formatTeacherScopeDisplayTokens(tokens) {
+      if (!Array.isArray(tokens) || tokens.length === 0) return [];
+      return tokens.map(tok => {
+        if (tok === 'ALL') return '전체 급·반';
+        if (tok.startsWith('level:')) {
+          const parts = tok.split(':');
+          const lv = parts.slice(2).join(':');
+          return `📘 ${lv} 전체`;
+        }
+        return tok;
+      });
     }
 
     async function registerNewTeacher() {
@@ -7280,7 +7765,7 @@ ${JSON.stringify(rawLines)}`;
       }
       const scope = collectSelectedTeacherScope('new-t-scope');
       if (scope.assignedClasses.length === 0) {
-        alert('담당할 기관의 급수·수업을 최소 1개 이상 선택해 주세요.');
+        alert('담당할 기관의 급 또는 반을 최소 1개 이상 선택해 주세요.');
         return;
       }
 
@@ -7296,10 +7781,8 @@ ${JSON.stringify(rawLines)}`;
           createdAt: firebase.firestore.FieldValue.serverTimestamp(),
           registeredDate: new Date().toLocaleString('ko-KR')
         });
-        const label = scope.assignedClasses.includes('ALL')
-          ? '전체 기관 · 전체 급수'
-          : `${scope.assignedInstitutions.join(', ')} (${scope.assignedClasses.join(', ')})`;
-        alert(`${email} 선생님이 [${label}] 담당으로 등록되었습니다.`);
+        const prettyTokens = formatTeacherScopeDisplayTokens(scope.assignedClasses);
+        alert(`${email} 선생님이 [${scope.assignedInstitutions.join(', ')} · ${prettyTokens.join(', ')}] 담당으로 등록되었습니다.`);
         document.getElementById('newTeacherEmail').value = '';
         toggleAllNewTeacherClasses(false);
         loadTeacherList();
@@ -7313,11 +7796,11 @@ ${JSON.stringify(rawLines)}`;
       if (!t) return;
       editingTeacherScopeEmail = email;
       document.getElementById('editTeacherScopeEmailDisplay').textContent = email;
-      const existingClasses = Array.isArray(t.assignedClasses) && t.assignedClasses.length > 0
+      const existingTokens = Array.isArray(t.assignedClasses) && t.assignedClasses.length > 0
         ? t.assignedClasses
         : (t.assignedClass ? [t.assignedClass] : []);
       const box = document.getElementById('editTeacherMultiScopeBox');
-      box.innerHTML = buildMultiScopeCheckboxesHtml('edit-t-scope', new Set(existingClasses));
+      box.innerHTML = buildMultiScopeCheckboxesHtml('edit-t-scope', new Set(existingTokens));
       syncTeacherScopeParentCheckboxes('edit-t-scope');
       document.getElementById('editTeacherScopeModal').classList.add('show');
     }
@@ -7334,7 +7817,7 @@ ${JSON.stringify(rawLines)}`;
       if (!editingTeacherScopeEmail || !db) return;
       const scope = collectSelectedTeacherScope('edit-t-scope');
       if (scope.assignedClasses.length === 0) {
-        alert('담당할 기관의 급수·수업을 최소 1개 이상 선택해 주세요.');
+        alert('담당할 기관의 급 또는 반을 최소 1개 이상 선택해 주세요.');
         return;
       }
       try {
@@ -7346,7 +7829,7 @@ ${JSON.stringify(rawLines)}`;
         });
         closeEditTeacherScopeModal();
         loadTeacherList();
-        alert(`${editingTeacherScopeEmail} 선생님의 담당 기관·급수가 수정되었습니다.`);
+        alert(`${editingTeacherScopeEmail} 선생님의 담당 기관·급·반이 수정되었습니다.`);
       } catch (err) {
         alert("수정 실패: " + err.message);
       }
@@ -7371,17 +7854,18 @@ ${JSON.stringify(rawLines)}`;
           const instList = Array.isArray(t.assignedInstitutions) && t.assignedInstitutions.length > 0
             ? t.assignedInstitutions
             : (t.assignedInstitution ? [t.assignedInstitution] : ['용인대학교 한국어학당']);
-          const clsList = Array.isArray(t.assignedClasses) && t.assignedClasses.length > 0
+          const tokens = Array.isArray(t.assignedClasses) && t.assignedClasses.length > 0
             ? t.assignedClasses
             : (t.assignedClass ? [t.assignedClass] : []);
-          const isAll = clsList.includes('ALL');
+          const isAll = tokens.includes('ALL');
+          const prettyLabels = formatTeacherScopeDisplayTokens(tokens);
 
           const scopeBadgesHtml = isAll
-            ? `<span style="background:#fef3c7; color:#92400e; padding:2px 8px; border-radius:6px; font-weight:800; font-size:0.76rem;">🌐 전체 기관 · 전체 급수</span>`
-            : `<div style="display:flex; flex-direction:column; gap:0.25rem; white-space:normal; max-width:340px;">
+            ? `<span style="background:#fef3c7; color:#92400e; padding:2px 8px; border-radius:6px; font-weight:800; font-size:0.76rem;">🌐 전체 기관 · 전체 급·반</span>`
+            : `<div style="display:flex; flex-direction:column; gap:0.25rem; white-space:normal; max-width:350px;">
                 <div style="font-size:0.74rem; font-weight:800; color:#475569;">🏫 ${instList.join(' · ')}</div>
                 <div style="display:flex; flex-wrap:wrap; gap:0.25rem;">
-                  ${clsList.map(c => `<span style="background:#eff6ff; color:#1e3a8a; border:1px solid #bfdbfe; padding:1px 6px; border-radius:5px; font-size:0.74rem; font-weight:700;">${c}</span>`).join('')}
+                  ${prettyLabels.map(lbl => `<span style="background:#eff6ff; color:#1e3a8a; border:1px solid #bfdbfe; padding:1px 6px; border-radius:5px; font-size:0.74rem; font-weight:700;">${lbl}</span>`).join('')}
                 </div>
               </div>`;
 
@@ -7448,5 +7932,17 @@ ${JSON.stringify(rawLines)}`;
       }
     }
   </script>
+
+  <!-- Fullscreen Clean QR Code Overlay (Completely hides teacher admin screen behind opaque light backdrop) -->
+  <div id="orgQrOverlayModal" style="display:none; position:fixed; inset:0; background:#f8fafc; z-index:99999; align-items:center; justify-content:center; padding:1.5rem;">
+    <div style="position:relative; background:#ffffff; border:2px solid #e2e8f0; border-radius:24px; padding:2.2rem 2.5rem; box-shadow:0 20px 45px rgba(15,23,42,0.12); text-align:center; max-width:440px; width:100%;">
+      <button type="button" onclick="closeOrgQrModal()" title="닫기" aria-label="QR 코드 닫기" style="position:absolute; top:14px; right:14px; width:38px; height:38px; border-radius:50%; border:1.5px solid #cbd5e1; background:#ffffff; color:#334155; font-size:1.15rem; font-weight:900; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 6px rgba(0,0,0,0.06);">✕</button>
+      <div style="font-size:0.82rem; font-weight:800; color:#2563eb; letter-spacing:0.5px; margin-bottom:0.35rem;">학생 전용 접속 QR 코드</div>
+      <h3 id="orgQrModalTitle" style="font-size:1.35rem; font-weight:900; color:#0f172a; margin-bottom:1.25rem; word-break:keep-all;"></h3>
+      <div id="orgQrCanvasContainer" style="display:inline-flex; align-items:center; justify-content:center; padding:1rem; background:#ffffff; border:1.5px solid #e2e8f0; border-radius:16px; margin-bottom:1rem;"></div>
+      <div id="orgQrUrlText" style="font-size:0.75rem; color:#64748b; word-break:break-all; background:#f1f5f9; padding:0.5rem 0.75rem; border-radius:8px; margin-bottom:0.9rem;"></div>
+      <button type="button" id="orgQrCopyBtn" class="btn btn-primary btn-sm" style="width:100%; padding:0.65rem; font-size:0.88rem;">🔗 학생 접속 링크 복사하기</button>
+    </div>
+  </div>
 </body>
 </html>
