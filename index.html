@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>다국어 한국어 어휘 학습 & 실전 퀴즈 플랫폼 v3.13</title>
+  <title>다국어 한국어 어휘 학습 & 실전 퀴즈 플랫폼 v3.17</title>
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
   <!-- Google Fonts & Libraries -->
@@ -1536,6 +1536,63 @@
     .review-box { background: #fff; border: 1px solid #bfdbfe; border-radius: 10px; padding: 0.6rem 0.7rem; margin: 0.5rem 0; }
     .review-head { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem; margin-bottom: 0.4rem; font-size: 0.82rem; font-weight: 800; color: var(--primary); }
     .review-head .btn { margin-left: auto; }
+
+    /* v3.14 */
+    .result-hint { font-size: 0.8rem; color: var(--text-muted); background: #f1f5f9; border-radius: 8px; padding: 0.5rem 0.7rem; margin-top: 0.5rem; }
+    .result-modal { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.55); z-index: 9000; align-items: center; justify-content: center; padding: 0.75rem; }
+    .result-modal.show { display: flex; }
+    .result-box { background: #fff; border-radius: 14px; width: min(1250px, 98vw); max-height: 94vh; display: flex; flex-direction: column; padding: 0.9rem 1rem; gap: 0.5rem; }
+    .result-head { display: flex; justify-content: space-between; align-items: center; font-size: 1.05rem; color: #0f172a; }
+    .result-sub { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; margin-left: 0.4rem; }
+    .result-actions { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; }
+    .result-msg { font-size: 0.8rem; font-weight: 700; color: var(--primary); }
+    .result-scroll { overflow: auto; border: 1px solid #e2e8f0; border-radius: 8px; flex: 1; min-height: 160px; }
+    .result-table th { position: sticky; top: 0; z-index: 1; }
+    .result-table td.rv-fixed { background: #fef9c3; font-weight: 700; }
+    .result-table td.rv-empty { background: #fee2e2; }
+    .result-head, .result-actions, .result-diff { flex-shrink: 0; }
+    .result-diff { border: 1px solid #bfdbfe; background: #f8fbff; border-radius: 10px; padding: 0.5rem 0.6rem; max-height: 34vh; overflow: auto; }
+    .lang-engine { display: grid; grid-template-columns: auto 1fr; gap: 0.3rem 0.6rem; align-items: center; margin: 0.4rem 0; }
+    .lang-engine .le-row { display: contents; }
+    .lang-engine input { width: 100%; }
+    @media print {
+      body.printing-result > *:not(#resultModal) { display: none !important; }
+      body.printing-result #resultModal { display: block !important; position: static; background: #fff; padding: 0; }
+      body.printing-result .result-box { width: 100%; max-height: none; padding: 0; }
+      body.printing-result .result-scroll { overflow: visible; border: none; }
+      body.printing-result .result-table { font-size: 9pt; }
+      body.printing-result .result-table th { position: static; }
+      body.printing-result .no-print { display: none !important; }
+    }
+    /* v3.16: 입장 안내 · 체험 */
+    .modal-box.rel { position: relative; }
+    .modal-x { position:absolute; top:0.6rem; right:0.6rem; width:34px; height:34px; border-radius:50%; border:1px solid var(--border); background:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--text-muted); }
+    .modal-x:hover { background:#f1f5f9; color:var(--text-main, #111827); }
+    .ap-box { max-width:520px; text-align:left; }
+    .ap-box h2 { font-size:1.2rem; font-weight:800; color:var(--primary); margin-bottom:0.5rem; }
+    .ap-box p { font-size:0.88rem; line-height:1.6; margin-bottom:0.45rem; }
+    .ap-box .en { color:var(--text-muted); font-size:0.82rem; }
+    .ap-btns { display:grid; grid-template-columns:1fr 1fr; gap:0.55rem; margin-top:0.8rem; }
+    .ap-code-row { display:flex; gap:0.5rem; margin-top:0.8rem; }
+    .ap-code-row input { flex:1; margin-bottom:0; text-transform:uppercase; letter-spacing:0.08em; }
+    .ap-msg { min-height:1.2rem; font-size:0.82rem; font-weight:700; color:#b91c1c; margin-top:0.35rem; }
+    #trialBadge { position:fixed; top:8px; left:50%; transform:translateX(-50%); z-index:1500; background:#fef3c7; color:#92400e; border:1.5px solid #f59e0b; padding:0.3rem 0.85rem; border-radius:999px; font-size:0.82rem; font-weight:800; display:none; box-shadow:0 2px 8px rgba(0,0,0,.15); }
+    #trialExpiredModal, #approvalModal { z-index:2000; }
+    .trial-row-code { font-family:monospace; font-weight:800; letter-spacing:0.06em; }
+
+    /* v3.17: 반 입장 설정 */
+    .ca-panel { background:#f0fdf4; border:1px solid #bbf7d0; border-radius:12px; padding:0.85rem; margin-bottom:0.75rem; }
+    .ca-panel h3 { font-size:0.96rem; font-weight:800; color:#166534; margin-bottom:0.4rem; }
+    .ca-row { display:flex; flex-wrap:wrap; gap:0.45rem; align-items:center; margin-bottom:0.5rem; }
+    .ca-row select, .ca-row input[type=text] { padding:0.42rem 0.6rem; font-size:0.82rem; margin-bottom:0; }
+    .ca-status { font-size:0.8rem; font-weight:700; color:#166534; background:#dcfce7; border-radius:6px; padding:2px 8px; }
+    .ca-warn { font-size:0.78rem; color:#92400e; background:#fffbeb; border:1px solid #fde68a; border-radius:8px; padding:0.4rem 0.6rem; margin-bottom:0.5rem; }
+    #caRosterText { width:100%; min-height:120px; padding:0.55rem; font-size:0.85rem; border:1px solid var(--border); border-radius:8px; font-family:inherit; resize:vertical; }
+    .entry-pin-box { background:#fffbeb; border:1px solid #fde68a; border-radius:10px; padding:0.6rem 0.7rem; margin-bottom:0.75rem; text-align:left; }
+    .entry-pin-row { display:flex; gap:0.5rem; }
+    .entry-pin-row input { flex:1; margin-bottom:0; letter-spacing:0.25em; text-align:center; }
+    .entry-note { font-size:0.78rem; color:var(--text-muted); margin-top:0.3rem; }
+
   </style>
 </head>
 <body>
@@ -1560,7 +1617,8 @@
 
   <!-- 1. Student Institution, Semester, Class & Name Entry Modal -->
   <div id="nameModal" class="modal-overlay">
-    <div class="modal-box" style="max-width:500px;">
+    <div class="modal-box rel" style="max-width:500px;">
+      <button type="button" class="modal-x" id="nameModalX" aria-label="닫기 / Close" onclick="closeNameModalByX()"><svg class="i"><use href="#i-x"/></svg></button>
       <div style="font-size: 2.5rem; margin-bottom: 0.35rem;">👋</div>
       <h2 style="font-size: 1.35rem; font-weight: 800; margin-bottom: 0.35rem; color: var(--primary);">환영합니다!</h2>
       <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem; line-height: 1.5;">
@@ -1594,18 +1652,61 @@
         </div>
         <div>
           <label style="font-size:0.78rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.25rem;">반 선택</label>
-          <select id="userClassSelect" style="width:100%; padding:0.68rem; font-size:0.93rem;"></select>
+          <select id="userClassSelect" style="width:100%; padding:0.68rem; font-size:0.93rem;" onchange="refreshEntryAccess()"></select>
         </div>
       </div>
 
-      <div style="text-align:left; margin-bottom:1.1rem;">
+      <div id="entryPinBox" class="entry-pin-box" style="display:none;">
+        <label style="font-size:0.78rem; font-weight:800; color:#92400e; display:block; margin-bottom:0.3rem;">반 PIN / Class PIN</label>
+        <div class="entry-pin-row">
+          <input type="password" id="userPinInput" class="typing-input" inputmode="numeric" maxlength="8" placeholder="••••" autocomplete="off" onkeydown="if(event.key==='Enter')verifyEntryPin()" />
+          <button type="button" class="btn btn-primary btn-sm" onclick="verifyEntryPin()">확인 / OK</button>
+        </div>
+        <div class="entry-note" id="entryPinMsg">선생님께 받은 PIN을 입력하세요. / Enter the PIN from your teacher.</div>
+      </div>
+      <div id="entryNameBox" style="text-align:left; margin-bottom:1.1rem;">
         <label style="font-size:0.78rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.25rem;">학생 이름</label>
         <input type="text" id="userNameInput" class="typing-input" placeholder="예: 홍길동" style="margin-bottom:0; font-size:1.02rem; padding:0.75rem;" />
+        <select id="userNameSelect" style="display:none; width:100%; padding:0.75rem; font-size:1.02rem;"></select>
+        <div class="entry-note" id="entryNameNote" style="display:none;"></div>
       </div>
 
       <button class="btn btn-primary" style="width: 100%; padding: 0.85rem;" onclick="saveUserProfileModal()">학습 시작하기</button>
     </div>
   </div>
+
+
+  <!-- v3.16: 승인 안내 / 코드 입력 / 체험 -->
+  <div id="approvalModal" class="modal-overlay">
+    <div class="modal-box ap-box">
+      <h2>승인된 학생만 사용할 수 있어요 <span class="en" style="font-weight:600;">/ For approved students only</span></h2>
+      <p>이 사이트는 수업용으로 만든 사이트예요. 선생님이나 관리자에게 승인된 학생만 사용할 수 있어요.</p>
+      <p class="en">This site is made for classes. Only students approved by a teacher or administrator can use it.</p>
+      <p>코드를 입력하세요. 코드가 없으면 선생님/관리자에게 문의하세요. 코드를 입력하면 정해진 기간 동안 체험해 볼 수 있어요. 체험 중 학습 기록은 화면에서만 볼 수 있고, 저장되지 않아요.</p>
+      <p class="en">Enter your code. If you do not have one, please ask your teacher or administrator. A code lets you try the site for a limited time. Records during the trial are not saved.</p>
+      <div class="ap-code-row">
+        <input type="text" id="trialCodeInput" class="typing-input" placeholder="코드 / Code" maxlength="20" autocomplete="off" onkeydown="if(event.key==='Enter')submitTrialCode()" />
+        <button type="button" class="btn btn-primary" onclick="submitTrialCode()">코드 입력 / Enter</button>
+      </div>
+      <div class="ap-msg" id="trialCodeMsg"></div>
+      <div class="ap-btns">
+        <button type="button" class="btn btn-outline" onclick="backToEntryForm()">돌아가기 / Go back</button>
+        <button type="button" class="btn btn-accent" id="btnFreeTrial" onclick="startFreeTrial()">체험하기 (3분) / Try 3 min</button>
+      </div>
+    </div>
+  </div>
+  <div id="trialExpiredModal" class="modal-overlay">
+    <div class="modal-box ap-box">
+      <h2>기간 만료 <span class="en" style="font-weight:600;">/ Trial expired</span></h2>
+      <p>체험 기간이 끝났어요. 계속 사용하려면 수업을 신청하거나 선생님/관리자에게 문의하세요. 코드가 있으면 코드를 입력하세요.</p>
+      <p class="en">Your trial has ended. To keep using the site, please sign up for a class or ask your teacher or administrator. If you have a code, enter it.</p>
+      <div class="ap-btns">
+        <button type="button" class="btn btn-primary" onclick="expiredToCode()">코드 입력 / Enter code</button>
+        <button type="button" class="btn btn-outline" onclick="expiredToEntry()">입장 화면 / Entry</button>
+      </div>
+    </div>
+  </div>
+  <div id="trialBadge"></div>
 
   <!-- 2. Admin Google Auth Modal -->
   <div id="adminPwModal" class="modal-overlay">
@@ -1856,6 +1957,39 @@
             </select>
             <input type="text" id="rosterSearchInput" placeholder="학생 이름 검색" class="typing-input" style="padding:0.42rem 0.65rem; font-size:0.82rem; margin-bottom:0; text-align:left;" oninput="filterStudentRosterTable()" />
           </div>
+        </div>
+
+                <!-- v3.17: 반 입장 설정 (PIN · 학생 명단) -->
+        <div class="ca-panel" id="classAccessPanel">
+          <h3>반 입장 설정 <span class="ca-status" id="caStatus">반을 고르세요</span></h3>
+          <p class="manage-note" style="margin-bottom:0.5rem;">반마다 PIN이나 학생 명단을 정해 두면, 학생이 입장할 때 PIN을 입력하고 명단에서 자기 이름을 골라요. 아무것도 정하지 않은 반은 지금처럼 이름을 직접 입력해요. 이미 이름이 저장된 기기에는 바로 적용되지 않고, 이름을 바꾸거나 새로 들어올 때부터 적용돼요.</p>
+          <div class="ca-row">
+            <select id="caInst" onchange="renderClassAccessControls(true)"></select>
+            <select id="caSem" onchange="renderClassAccessControls(true)"></select>
+            <select id="caCls" onchange="loadClassAccessPanel()"></select>
+            <button type="button" class="btn btn-outline btn-sm" onclick="copyClassLink()">반 전용 링크 복사</button>
+          </div>
+          <div class="ca-row">
+            <strong style="font-size:0.82rem;">PIN</strong>
+            <input type="text" id="caPinInput" class="typing-input" inputmode="numeric" maxlength="8" placeholder="숫자 4~8자리" style="width:150px;" />
+            <button type="button" class="btn btn-outline btn-sm" onclick="makeRandomPin()">자동 만들기</button>
+            <button type="button" class="btn btn-primary btn-sm" onclick="saveClassPin()">PIN 저장</button>
+            <button type="button" class="btn btn-outline btn-sm" style="color:var(--danger); border-color:#fca5a5;" onclick="clearClassPin()">PIN 해제</button>
+          </div>
+          <div class="ca-row">
+            <strong style="font-size:0.82rem;">명단</strong>
+            <button type="button" class="btn btn-outline btn-sm" onclick="fillRosterFromStudents()">이미 들어온 학생으로 채우기</button>
+            <select id="caPrevSem"></select>
+            <button type="button" class="btn btn-outline btn-sm" onclick="copyRosterFromPrevSemester()">지난 학기에서 복사</button>
+            <span class="ca-status" id="caRosterCount">0명</span>
+          </div>
+          <textarea id="caRosterText" placeholder="학생 이름을 한 줄에 한 명씩 붙여 넣으세요. (엑셀에서 복사해도 돼요)" oninput="updateRosterCount()"></textarea>
+          <div class="ca-row" style="margin-top:0.5rem;">
+            <button type="button" class="btn btn-primary btn-sm" onclick="saveClassRoster()">명단 저장</button>
+            <button type="button" class="btn btn-outline btn-sm" style="color:var(--danger); border-color:#fca5a5;" onclick="clearClassRoster()">명단 지우기</button>
+            <span id="caMsg" style="font-size:0.8rem; font-weight:700; color:#166534;"></span>
+          </div>
+          <div class="ca-warn">PIN 없이 명단만 저장하면, 그 반의 이름이 입장 화면에서 누구에게나 보여요. 가능하면 PIN과 함께 쓰세요. PIN과 명단은 브라우저에서 확인하는 방식이라 완전한 보안은 아니고, 승인되지 않은 학생이 마음대로 쓰는 것을 줄이는 용도예요.</div>
         </div>
 
         <div class="admin-table-container" style="max-height:420px;">
@@ -2256,6 +2390,11 @@
               <label class="ai-check"><input type="checkbox" id="aiReviewCheck" onchange="localStorage.setItem('YONGIN_AI_REVIEW', this.checked ? '1' : '0')" /> 번역 후 검수</label>
               <label>검수 엔진 <select id="aiReviewEngineSelect" onchange="localStorage.setItem('YONGIN_AI_REVIEW_ENGINE', this.value)"><option value="claude">Claude</option><option value="gemini">Gemini</option><option value="gpt">GPT</option></select></label>
             </div>
+            <details id="langEngineBox" ontoggle="if (this.open) renderLangEngineTable()">
+              <summary>언어별 검수 엔진 (선택)</summary>
+              <div id="langEngineTable" class="lang-engine"></div>
+              <p class="manage-note">비워 두면(기본) 위의 "검수 엔진"을 써요. 비교해 본 뒤 언어마다 잘 맞는 엔진을 고르고, 메모에 적어 두세요.</p>
+            </details>
             <p class="manage-note">키와 모델 이름은 이 브라우저에만 저장돼요. 모델 이름은 각 회사에서 쓰는 이름으로 바꿀 수 있어요. 검수는 번역된 칸을 다시 보고 고칠 것만 고쳐요.</p>
           </div>
 
@@ -2311,6 +2450,8 @@
             <button class="btn btn-outline btn-sm" onclick="showInputCheck()">① 입력 확인</button>
             <button id="btnTrialTranslate" class="btn btn-primary btn-sm" onclick="runAiMultilingualTranslation(20)">② 20개 시험 번역</button>
             <button id="btnRunAiTranslate" class="btn btn-primary btn-sm" onclick="runAiMultilingualTranslation()">③ 전체 번역</button>
+            <button id="btnReviewOnly" class="btn btn-outline btn-sm" onclick="runReviewOnly()">④ 검수만 실행</button>
+            <button class="btn btn-outline btn-sm" onclick="openResultPopup()">결과 보기</button>
             <button class="btn btn-outline btn-sm" onclick="enrichStopFlag = true">중지</button>
             <button class="btn btn-outline btn-sm" onclick="downloadBuiltJson()">JSON 저장</button>
             <span id="builderStatusText" style="font-size:0.82rem; font-weight:700; color:var(--primary);"></span>
@@ -2365,7 +2506,8 @@
           <p class="manage-note">번역 결과 등록: 위에서 번역한 단어를 이 교재에 추가해요(같은 소단원·같은 단어는 새 것으로 바꿔요). JSON 파일 올리기: 교재 전체를 파일 내용으로 바꿔요.</p>
         </div>
 
-        <div class="admin-table-container" style="max-height:260px;">
+        <div class="result-hint">번역·검수 결과는 <b>결과 보기</b> 팝업에서 확인해요 (엑셀 받기 · 인쇄/PDF · 수정한 엑셀 올리기 · 검수 요청 문구 복사).</div>
+        <div class="admin-table-container" style="max-height:260px; display:none;">
           <table class="admin-table">
             <thead id="builderPreviewHead">
               <tr>
@@ -2385,6 +2527,27 @@
 
       <!-- SUB-TAB 6: Teacher Account & Custom Institution / Level / Class Management (Main Admin Only) -->
       <div id="adminViewTeachers" class="no-print" style="display:none;">
+        <!-- v3.16: 체험 코드 (최종 관리자 전용) -->
+        <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:12px; padding:0.95rem; margin-bottom:0.95rem;">
+          <h3 style="font-size:0.96rem; font-weight:800; color:#92400e; margin-bottom:0.45rem;">체험 코드</h3>
+          <p class="manage-note" style="margin-bottom:0.6rem;">승인되지 않은 학생이 일정 기간 체험하거나, 베타 테스터에게 줄 코드를 만들어요. 체험 중에는 학습 기록이 저장되지 않아요. 사용 횟수를 정하면 그 횟수가 끝난 코드는 쓸 수 없어요.</p>
+          <div style="display:flex; flex-wrap:wrap; gap:0.5rem; align-items:center; margin-bottom:0.6rem;">
+            <input type="text" id="tcCode" class="typing-input" placeholder="코드 (비우면 자동 생성)" maxlength="20" style="width:190px; padding:0.45rem 0.65rem; font-size:0.85rem; margin-bottom:0; text-transform:uppercase;" />
+            <select id="tcMinutes" style="padding:0.45rem; font-size:0.85rem;">
+              <option value="3">3분</option><option value="30">30분</option><option value="60">1시간</option><option value="1440">24시간</option><option value="10080">7일</option>
+            </select>
+            <input type="number" id="tcMax" min="0" value="0" title="0 = 제한 없음" style="width:110px; padding:0.45rem; font-size:0.85rem;" placeholder="최대 횟수" />
+            <span class="manage-note" style="margin:0;">최대 횟수 0 = 제한 없음</span>
+            <input type="text" id="tcMemo" class="typing-input" placeholder="메모 (예: 베타 테스터)" maxlength="40" style="width:190px; padding:0.45rem 0.65rem; font-size:0.85rem; margin-bottom:0;" />
+            <button type="button" class="btn btn-primary btn-sm" onclick="createTrialCode()">코드 만들기</button>
+          </div>
+          <div class="admin-table-container" style="max-height:230px;">
+            <table class="admin-table">
+              <thead><tr><th>코드</th><th>기간</th><th>사용 / 최대</th><th>메모</th><th>관리</th></tr></thead>
+              <tbody id="trialCodeBody"><tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:1rem;">코드를 불러오는 중입니다...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
         <!-- v3.7: 기관 → 학기 → 급 → 반 관리 (급·반은 학기마다 따로) -->
         <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:12px; padding:0.95rem; margin-bottom:0.95rem;">
           <h3 style="font-size:0.96rem; font-weight:800; color:var(--primary); margin-bottom:0.55rem;">기관 · 학기 · 급 · 반</h3>
@@ -2448,6 +2611,15 @@
             <label style="display:inline-flex; align-items:center; gap:0.35rem; cursor:pointer; font-size:0.82rem; font-weight:700;">
               <input type="checkbox" id="permDeleteRecord" /> 삭제 허용
             </label>
+            <label style="display:inline-flex; align-items:center; gap:0.35rem; cursor:pointer; font-size:0.82rem; font-weight:700;">
+              <input type="checkbox" id="permWorkbook" /> 단어 자료 허용
+            </label>
+            <label style="display:inline-flex; align-items:center; gap:0.35rem; cursor:pointer; font-size:0.82rem; font-weight:700;">
+              <input type="checkbox" id="permPpt" /> PPT 허용
+            </label>
+            <label style="display:inline-flex; align-items:center; gap:0.35rem; cursor:pointer; font-size:0.82rem; font-weight:700;">
+              <input type="checkbox" id="permTest" /> 테스트 허용
+            </label>
             <button type="button" class="btn btn-primary btn-sm" onclick="registerNewTeacher()">등록 저장</button>
           </div>
           <div style="background:white; border:1px solid #dbeafe; border-radius:10px; padding:0.6rem;">
@@ -2463,12 +2635,15 @@
                 <th>담당 범위</th>
                 <th>엑셀 허용</th>
                 <th>삭제 허용</th>
+                <th>PPT</th>
+                <th>테스트</th>
+                <th>단어 자료</th>
                 <th>등록일</th>
                 <th>관리</th>
               </tr>
             </thead>
             <tbody id="teacherTableBody">
-              <tr><td colspan="6" style="text-align:center; padding:1.5rem; color:var(--text-muted);">선생님 목록을 불러오는 중...</td></tr>
+              <tr><td colspan="9" style="text-align:center; padding:1.5rem; color:var(--text-muted);">선생님 목록을 불러오는 중...</td></tr>
             </tbody>
           </table>
         </div>
@@ -2907,6 +3082,518 @@
       BUILDER_API_KEY: 'YONGIN_GEMINI_BUILDER_KEY'
     };
 
+
+    /* ==========================================================================
+       v3.16: 입장 안내 · 체험 코드 (승인 안 된 학생이 마음대로 계속 쓰는 것을 줄이기 위한 장치)
+       - 체험 중에는 학습 기록을 저장하지 않음 (메모리에서만 유지, 기간 끝나면 사라짐)
+       - 서버가 아니라 브라우저에서 확인하는 방식이라 완전한 차단은 아니고 '억제' 용도
+    ========================================================================== */
+    const TRIAL_KEY = 'YONGIN_KOREAN_TRIAL_V1';
+    const FREE_TRIAL_CODE = 'FREE';
+    const FREE_TRIAL_MINUTES = 3;
+    let trialState = null;       // 체험 중이면 { code, until }
+    let trialTimer = null;
+    const trialMem = new Map();
+
+    (function patchStorageForTrial() {
+      const _get = Storage.prototype.getItem, _set = Storage.prototype.setItem, _rm = Storage.prototype.removeItem;
+      Storage.prototype.setItem = function (k, v) {
+        if (trialState && this === window.localStorage && k !== TRIAL_KEY) { trialMem.set(k, String(v)); return; }
+        return _set.call(this, k, v);
+      };
+      Storage.prototype.getItem = function (k) {
+        if (trialState && this === window.localStorage && trialMem.has(k)) return trialMem.get(k);
+        return _get.call(this, k);
+      };
+      Storage.prototype.removeItem = function (k) {
+        if (trialState && this === window.localStorage && k !== TRIAL_KEY) { trialMem.delete(k); return; }
+        return _rm.call(this, k);
+      };
+    })();
+
+    function readTrialStore() {
+      try { return JSON.parse(localStorage.getItem(TRIAL_KEY) || 'null'); } catch (e) { return null; }
+    }
+    function writeTrialStore(obj) { localStorage.setItem(TRIAL_KEY, JSON.stringify(obj)); }
+
+    function hasSavedProfile() {
+      try { const p = JSON.parse(localStorage.getItem(STORAGE_KEYS.USER_PROFILE) || 'null'); return !!(p && p.name); } catch (e) { return false; }
+    }
+
+    function closeNameModalByX() {
+      document.getElementById('nameModal').classList.remove('show');
+      if (hasSavedProfile() || (userName && userName !== '학습자')) return;   // 이미 이름이 있으면 그냥 닫기
+      openApprovalModal();
+    }
+    function openApprovalModal() {
+      document.getElementById('trialCodeInput').value = '';
+      document.getElementById('trialCodeMsg').textContent = '';
+      document.getElementById('approvalModal').classList.add('show');
+    }
+    function backToEntryForm() {
+      document.getElementById('approvalModal').classList.remove('show');
+      openNameModal();
+    }
+    function expiredToCode() {
+      document.getElementById('trialExpiredModal').classList.remove('show');
+      openApprovalModal();
+    }
+    function expiredToEntry() {
+      document.getElementById('trialExpiredModal').classList.remove('show');
+      openNameModal();
+    }
+    function showTrialMsg(ko, en) {
+      document.getElementById('trialCodeMsg').textContent = ko + ' / ' + en;
+    }
+
+    function startFreeTrial() {
+      const st = readTrialStore();
+      if (st && st.code === FREE_TRIAL_CODE) {      // 이 기기에서 이미 체험함
+        document.getElementById('approvalModal').classList.remove('show');
+        if (st.until > Date.now()) { location.reload(); return; }
+        document.getElementById('trialExpiredModal').classList.add('show');
+        return;
+      }
+      writeTrialStore({ code: FREE_TRIAL_CODE, until: Date.now() + FREE_TRIAL_MINUTES * 60000 });
+      location.reload();
+    }
+
+    async function submitTrialCode() {
+      const code = (document.getElementById('trialCodeInput').value || '').trim().toUpperCase();
+      if (!/^[A-Z0-9]{3,20}$/.test(code)) { showTrialMsg('코드는 영어와 숫자 3~20자예요.', 'Use 3-20 letters or numbers.'); return; }
+      const st = readTrialStore();
+      if (st && st.code === code) {                 // 같은 기기에서 같은 코드: 남은 시간만 이어서 (시간이 다시 시작되지 않음)
+        document.getElementById('approvalModal').classList.remove('show');
+        if (st.until > Date.now()) { location.reload(); return; }
+        document.getElementById('trialExpiredModal').classList.add('show');
+        return;
+      }
+      if (!db) { showTrialMsg('지금은 코드를 확인할 수 없어요. 인터넷을 확인해 주세요.', 'Cannot check the code now. Please check your internet.'); return; }
+      showTrialMsg('확인하는 중...', 'Checking...');
+      try {
+        const ref = db.collection('trial_codes').doc(code);
+        const result = await db.runTransaction(async tx => {
+          const snap = await tx.get(ref);
+          if (!snap.exists) return { error: 'none' };
+          const d = snap.data();
+          const used = d.usedCount || 0;
+          if (d.maxUses > 0 && used >= d.maxUses) return { error: 'limit' };
+          tx.update(ref, { usedCount: used + 1 });
+          return { minutes: d.minutes || FREE_TRIAL_MINUTES };
+        });
+        if (result.error === 'none') { showTrialMsg('없는 코드예요. 다시 확인해 주세요.', 'Code not found.'); return; }
+        if (result.error === 'limit') { showTrialMsg('사용 횟수가 끝난 코드예요.', 'This code has reached its limit.'); return; }
+        writeTrialStore({ code, until: Date.now() + result.minutes * 60000 });
+        location.reload();
+      } catch (err) {
+        showTrialMsg('확인하지 못했어요. 잠시 뒤에 다시 해 주세요.', 'Could not check. Please try again.');
+      }
+    }
+
+    function formatTrialRemain(ms) {
+      const t = Math.max(0, Math.ceil(ms / 1000));
+      const d = Math.floor(t / 86400), h = Math.floor((t % 86400) / 3600), m = Math.floor((t % 3600) / 60), sec = t % 60;
+      const mm = String(m).padStart(2, '0'), ss = String(sec).padStart(2, '0');
+      if (d > 0) return `${d}일 ${h}시간`;
+      if (h > 0) return `${h}:${mm}:${ss}`;
+      return `${mm}:${ss}`;
+    }
+
+    function startTrialSession(st) {
+      trialState = { code: st.code, until: st.until };
+      userName = '체험(Guest)';
+      updateHeaderUserUI();
+      document.getElementById('nameModal').classList.remove('show');
+      document.getElementById('approvalModal').classList.remove('show');
+      const badge = document.getElementById('trialBadge');
+      badge.style.display = 'block';
+      const tick = () => {
+        const left = trialState ? trialState.until - Date.now() : 0;
+        if (left <= 0) { endTrialSession(); return; }
+        badge.textContent = `체험 중 / Trial · ${formatTrialRemain(left)} · 기록은 저장되지 않아요`;
+      };
+      tick();
+      clearInterval(trialTimer);
+      trialTimer = setInterval(tick, 1000);
+      if (booksConfig) {
+        populateBookDropdownForClass();
+        selectBookById(document.getElementById('bookSelect').value);
+      }
+    }
+
+    function endTrialSession() {
+      clearInterval(trialTimer);
+      trialState = null;
+      trialMem.clear();
+      document.getElementById('trialBadge').style.display = 'none';
+      document.getElementById('trialExpiredModal').classList.add('show');
+    }
+
+    // 시작할 때: 프로필이 없으면 체험 상태를 확인. true 를 돌려주면 이름 입력창을 열지 않음
+    function handleTrialOnStartup() {
+      const st = readTrialStore();
+      if (!st) return false;
+      if (st.until > Date.now()) { startTrialSession(st); return true; }
+      document.getElementById('trialExpiredModal').classList.add('show');
+      return true;
+    }
+
+    /* ----- 관리자: 체험 코드 관리 ----- */
+    function randomTrialCode() {
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      return Array.from({ length: 6 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+    }
+    function trialMinutesLabel(m) {
+      if (m >= 1440 && m % 1440 === 0) return (m / 1440) + '일';
+      if (m >= 60 && m % 60 === 0) return (m / 60) + '시간';
+      return m + '분';
+    }
+    async function createTrialCode() {
+      if (currentUserRole !== 'MAIN_ADMIN' || !db) { alert('최종 관리자만 만들 수 있어요.'); return; }
+      let code = (document.getElementById('tcCode').value || '').trim().toUpperCase();
+      if (!code) code = randomTrialCode();
+      if (!/^[A-Z0-9]{3,20}$/.test(code)) { alert('코드는 영어와 숫자 3~20자로 만들어 주세요.'); return; }
+      if (code === FREE_TRIAL_CODE) { alert('FREE는 무료 체험용으로 쓰는 이름이라 만들 수 없어요.'); return; }
+      const minutes = parseInt(document.getElementById('tcMinutes').value, 10) || 3;
+      const maxUses = Math.max(0, parseInt(document.getElementById('tcMax').value, 10) || 0);
+      try {
+        const ref = db.collection('trial_codes').doc(code);
+        const ex = await ref.get();
+        if (ex.exists) { alert('이미 있는 코드예요. 다른 코드를 써 주세요.'); return; }
+        await ref.set({ code, minutes, maxUses, usedCount: 0, memo: (document.getElementById('tcMemo').value || '').trim(), createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+        document.getElementById('tcCode').value = '';
+        document.getElementById('tcMemo').value = '';
+        loadTrialCodes();
+      } catch (err) { alert('코드를 만들지 못했어요: ' + err.message); }
+    }
+    async function loadTrialCodes() {
+      const tb = document.getElementById('trialCodeBody');
+      if (!tb || currentUserRole !== 'MAIN_ADMIN' || !db) return;
+      try {
+        const snap = await db.collection('trial_codes').get();
+        const rows = [];
+        snap.forEach(d => rows.push(d.data()));
+        if (!rows.length) { tb.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:1rem;">만든 코드가 없어요.</td></tr>'; return; }
+        rows.sort((a, b) => String(a.code).localeCompare(String(b.code)));
+        const esc = t => String(t == null ? '' : t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+        tb.innerHTML = rows.map(r => `<tr>
+          <td><span class="trial-row-code">${esc(r.code)}</span> <button type="button" class="btn btn-outline btn-sm" style="padding:0.1rem 0.45rem; font-size:0.72rem;" onclick="copyTrialCode('${esc(r.code)}')">복사</button></td>
+          <td>${trialMinutesLabel(r.minutes || 3)}</td>
+          <td>${r.usedCount || 0} / ${r.maxUses > 0 ? r.maxUses : '제한 없음'}</td>
+          <td>${esc(r.memo)}</td>
+          <td><button type="button" class="btn btn-danger btn-sm" style="padding:0.2rem 0.55rem; font-size:0.75rem;" onclick="deleteTrialCode('${esc(r.code)}')">삭제</button></td>
+        </tr>`).join('');
+      } catch (err) {
+        tb.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--danger); padding:1rem;">코드 목록을 불러오지 못했어요: ${err.message}</td></tr>`;
+      }
+    }
+    function copyTrialCode(code) {
+      if (navigator.clipboard) navigator.clipboard.writeText(code).catch(() => {});
+    }
+    async function deleteTrialCode(code) {
+      if (currentUserRole !== 'MAIN_ADMIN' || !db) return;
+      if (!confirm(`코드 ${code} 를 삭제할까요?\n삭제하면 더 이상 쓸 수 없어요. (이미 체험 중인 사람은 남은 시간까지 쓸 수 있어요)`)) return;
+      try { await db.collection('trial_codes').doc(code).delete(); loadTrialCodes(); }
+      catch (err) { alert('삭제하지 못했어요: ' + err.message); }
+    }
+
+
+    /* ==========================================================================
+       v3.17: 반별 입장 설정 (PIN · 학생 명단)
+       - class_access/{기관__학기__반}      : { pinHash, hasPin, roster[] }  (누구나 읽기)
+       - class_pin_private/{기관__학기__반} : { pin }                         (선생님만 읽기, PIN 다시 보기용)
+       - 학생 화면에서 브라우저가 확인하는 방식 → 완전한 보안이 아니라 '억제' 용도
+    ========================================================================== */
+    const PIN_OK_KEY = 'YONGIN_KOREAN_PINOK_V1';
+    const classAccessCache = new Map();
+    let entryAccess = { id: '', cfg: null, pinOk: true, loading: false };
+    let lockedLinkSem = '', lockedLinkCls = '';
+
+    function classAccessId(inst, sem, cls) { return `${inst}__${sem}__${cls}`.replace(/[\/\.#\$\[\]]/g, '_'); }
+    async function sha256Hex(t) {
+      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t));
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+    async function classPinHash(id, pin) { return sha256Hex(id + '|' + String(pin).trim()); }
+    function cfgHasPin(cfg) { return !!(cfg && cfg.pinHash); }
+    function cfgHasRoster(cfg) { return !!(cfg && Array.isArray(cfg.roster) && cfg.roster.length > 0); }
+
+    async function fetchClassAccess(inst, sem, cls, fresh) {
+      const id = classAccessId(inst, sem, cls);
+      if (!fresh && classAccessCache.has(id)) return classAccessCache.get(id);
+      if (!db) return null;
+      try {
+        const snap = await db.collection('class_access').doc(id).get();
+        const cfg = snap.exists ? snap.data() : null;
+        classAccessCache.set(id, cfg);
+        return cfg;
+      } catch (e) { return null; }
+    }
+    function readPinOkMap() { try { return JSON.parse(localStorage.getItem(PIN_OK_KEY) || '{}') || {}; } catch (e) { return {}; } }
+    function isPinVerified(id, cfg) { return !!(cfg && cfg.pinHash && readPinOkMap()[id] === cfg.pinHash); }
+    function setPinVerified(id, hash) { const m = readPinOkMap(); m[id] = hash; localStorage.setItem(PIN_OK_KEY, JSON.stringify(m)); }
+
+    function currentEntrySelection() {
+      return {
+        inst: lockedStudentInstitution || document.getElementById('userInstSelect')?.value || '',
+        sem: document.getElementById('userSemesterSelect')?.value || '',
+        cls: document.getElementById('userClassSelect')?.value || ''
+      };
+    }
+
+    let entryAccessToken = 0;
+    async function refreshEntryAccess() {
+      const token = ++entryAccessToken;
+      const { inst, sem, cls } = currentEntrySelection();
+      const pinBox = document.getElementById('entryPinBox');
+      const nameBox = document.getElementById('entryNameBox');
+      const txt = document.getElementById('userNameInput');
+      const sel = document.getElementById('userNameSelect');
+      const note = document.getElementById('entryNameNote');
+      if (!pinBox || !nameBox) return;
+      if (!cls) { entryAccess = { id: '', cfg: null, pinOk: true, loading: false }; pinBox.style.display = 'none'; nameBox.style.display = 'block'; txt.style.display = 'block'; sel.style.display = 'none'; note.style.display = 'none'; return; }
+      entryAccess = { id: classAccessId(inst, sem, cls), cfg: null, pinOk: false, loading: true };
+      const cfg = await fetchClassAccess(inst, sem, cls);
+      if (token !== entryAccessToken) return;       // 그 사이 다른 반을 골랐으면 무시
+      const id = classAccessId(inst, sem, cls);
+      const pinOk = !cfgHasPin(cfg) || isPinVerified(id, cfg);
+      entryAccess = { id, cfg, pinOk, loading: false };
+      pinBox.style.display = (cfgHasPin(cfg) && !pinOk) ? 'block' : 'none';
+      nameBox.style.display = pinOk ? 'block' : 'none';
+      if (cfgHasRoster(cfg) && pinOk) {
+        const names = [...cfg.roster].sort((a, b) => String(a).localeCompare(String(b), 'ko'));
+        const prev = (userName && names.includes(userName)) ? userName : '';
+        sel.innerHTML = `<option value="">이름을 고르세요 / Choose your name</option>` + names.map(n => `<option value="${String(n).replace(/"/g, '&quot;')}">${String(n).replace(/</g, '&lt;')}</option>`).join('');
+        sel.value = prev;
+        sel.style.display = 'block'; txt.style.display = 'none';
+        note.style.display = 'block'; note.textContent = '목록에 내 이름이 없으면 선생님께 말씀하세요. / If your name is not here, tell your teacher.';
+      } else {
+        sel.style.display = 'none'; txt.style.display = 'block';
+        note.style.display = 'none';
+      }
+    }
+
+    async function verifyEntryPin() {
+      const msg = document.getElementById('entryPinMsg');
+      const pin = (document.getElementById('userPinInput').value || '').trim();
+      if (!entryAccess.cfg || !cfgHasPin(entryAccess.cfg)) { await refreshEntryAccess(); return; }
+      if (!pin) { msg.textContent = 'PIN을 입력하세요. / Enter the PIN.'; return; }
+      const h = await classPinHash(entryAccess.id, pin);
+      if (h === entryAccess.cfg.pinHash) {
+        setPinVerified(entryAccess.id, h);
+        document.getElementById('userPinInput').value = '';
+        msg.textContent = '선생님께 받은 PIN을 입력하세요. / Enter the PIN from your teacher.';
+        refreshEntryAccess();
+      } else {
+        msg.textContent = 'PIN이 맞지 않아요. / Wrong PIN.';
+      }
+    }
+
+    function getEntryNameValue() {
+      const sel = document.getElementById('userNameSelect');
+      if (sel && sel.style.display !== 'none') return sel.value.trim();
+      return document.getElementById('userNameInput').value.trim();
+    }
+
+    // 입장 전 확인. 통과하면 '' , 막히면 안내 문구를 돌려줌
+    function checkEntryAllowed(name) {
+      if (entryAccess.loading) return '확인하는 중이에요. 잠시 뒤에 다시 눌러 주세요. / Checking. Please try again in a moment.';
+      const cfg = entryAccess.cfg;
+      if (cfgHasPin(cfg) && !entryAccess.pinOk) return '먼저 PIN을 확인해 주세요. / Please check the PIN first.';
+      if (cfgHasRoster(cfg) && !cfg.roster.includes(name)) return '명단에서 내 이름을 골라 주세요. / Please choose your name from the list.';
+      return '';
+    }
+
+    /* ----- 반 전용 링크 (?org=..&sem=..&cls=..) ----- */
+    function applyClassLinkParams() {
+      const params = new URLSearchParams(window.location.search);
+      lockedLinkSem = (params.get('sem') || '').trim();
+      lockedLinkCls = (params.get('cls') || '').trim();
+    }
+    function applyClassLinkLock() {
+      if (!lockedLinkSem && !lockedLinkCls) return;
+      const semSel = document.getElementById('userSemesterSelect');
+      const lvlSel = document.getElementById('userLevelSelect');
+      const clsSel = document.getElementById('userClassSelect');
+      if (lockedLinkSem && semSel && Array.from(semSel.options).some(o => o.value === lockedLinkSem)) {
+        semSel.value = lockedLinkSem; onStudentInstSelectChange(); semSel.disabled = true;
+      }
+      if (lockedLinkCls) {
+        const inst = lockedStudentInstitution || document.getElementById('userInstSelect')?.value;
+        const levels = getLevelsFor(inst, semSel?.value || lockedLinkSem);
+        const lv = Object.keys(levels).find(k => (levels[k] || []).includes(lockedLinkCls));
+        if (lv && lvlSel && clsSel) {
+          lvlSel.value = lv; onStudentLevelSelectChange(); clsSel.value = lockedLinkCls;
+          lvlSel.disabled = true; clsSel.disabled = true;
+        }
+      }
+    }
+    function copyClassLink() {
+      const inst = document.getElementById('caInst').value, sem = document.getElementById('caSem').value, cls = document.getElementById('caCls').value;
+      if (!inst || !sem || !cls) { alert('기관·학기·반을 먼저 골라 주세요.'); return; }
+      let link = getStudentLinkForInstitution(inst);
+      link += (link.includes('?') ? '&' : '?') + 'sem=' + encodeURIComponent(sem) + '&cls=' + encodeURIComponent(cls);
+      if (navigator.clipboard) navigator.clipboard.writeText(link).catch(() => {});
+      setCaMsg('반 전용 링크를 복사했어요: ' + link);
+    }
+
+    /* ----- 선생님·관리자 화면 ----- */
+    let caCurrent = { id: '', inst: '', sem: '', cls: '', cfg: null };
+    function setCaMsg(t, bad) {
+      const el = document.getElementById('caMsg'); if (!el) return;
+      el.textContent = t; el.style.color = bad ? '#b91c1c' : '#166534';
+    }
+    function caAllowedClasses(org, sem) {
+      const all = Array.from(new Set(Object.values(getLevelsFor(org, sem)).flat()));
+      return (currentUserRole === 'MAIN_ADMIN' || isTeacherAllScope()) ? all : all.filter(c => isClassAllowedForTeacher(c, sem, org));
+    }
+    function renderClassAccessControls(keep) {
+      const instSel = document.getElementById('caInst'), semSel = document.getElementById('caSem'), clsSel = document.getElementById('caCls'), prevSel = document.getElementById('caPrevSem');
+      if (!instSel || !semSel || !clsSel) return;
+      const h = getInstitutionHierarchy(); const orgs = Object.keys(h); const sems = getSemestersList();
+      const pi = instSel.value, ps = semSel.value, pc = clsSel.value;
+      instSel.innerHTML = orgs.map(o => `<option value="${o}">${o}</option>`).join('');
+      if (pi && orgs.includes(pi)) instSel.value = pi;
+      semSel.innerHTML = sems.map(x => `<option value="${x}">${x}</option>`).join('');
+      if (ps && sems.includes(ps)) semSel.value = ps;
+      const classes = caAllowedClasses(instSel.value, semSel.value);
+      clsSel.innerHTML = classes.length ? classes.map(c => `<option value="${c}">${c}</option>`).join('') : '<option value="">(맡은 반 없음)</option>';
+      if (pc && classes.includes(pc)) clsSel.value = pc;
+      if (prevSel) {
+        const others = sems.filter(x => x !== semSel.value);
+        const pp = prevSel.value;
+        prevSel.innerHTML = others.map(x => `<option value="${x}">${x}에서</option>`).join('');
+        if (pp && others.includes(pp)) prevSel.value = pp;
+      }
+      loadClassAccessPanel();
+    }
+    function parseRosterText(t) {
+      const out = [];
+      String(t || '').split(/[\n\r\t,;]+/).map(x => x.trim()).filter(Boolean).forEach(n => { if (!out.includes(n)) out.push(n); });
+      return out;
+    }
+    function updateRosterCount() {
+      const n = parseRosterText(document.getElementById('caRosterText').value).length;
+      document.getElementById('caRosterCount').textContent = n + '명';
+    }
+    async function loadClassAccessPanel(keepMsg) {
+      const inst = document.getElementById('caInst')?.value, sem = document.getElementById('caSem')?.value, cls = document.getElementById('caCls')?.value;
+      const statusEl = document.getElementById('caStatus');
+      if (!statusEl) return;
+      if (!inst || !sem || !cls) { statusEl.textContent = '반을 고르세요'; document.getElementById('caRosterText').value = ''; updateRosterCount(); return; }
+      const id = classAccessId(inst, sem, cls);
+      caCurrent = { id, inst, sem, cls, cfg: null };
+      document.getElementById('caPinInput').value = ''; document.getElementById('caRosterText').value = '';
+      if (!keepMsg) setCaMsg('');
+      if (!db) { statusEl.textContent = '서버에 연결되지 않았어요'; return; }
+      statusEl.textContent = '불러오는 중...';
+      try {
+        const cfg = await fetchClassAccess(inst, sem, cls, true);
+        if (caCurrent.id !== id) return;
+        caCurrent.cfg = cfg;
+        document.getElementById('caRosterText').value = cfgHasRoster(cfg) ? cfg.roster.join('\n') : '';
+        updateRosterCount();
+        try {
+          const ps = await db.collection('class_pin_private').doc(id).get();
+          if (caCurrent.id === id && ps.exists && cfgHasPin(cfg)) document.getElementById('caPinInput').value = ps.data().pin || '';
+        } catch (e) { /* 선생님만 읽을 수 있음 */ }
+        statusEl.textContent = `PIN ${cfgHasPin(cfg) ? '있음' : '없음'} · 명단 ${cfgHasRoster(cfg) ? cfg.roster.length + '명' : '없음'}`;
+      } catch (e) { statusEl.textContent = '불러오지 못했어요'; }
+    }
+    function makeRandomPin() {
+      document.getElementById('caPinInput').value = String(Math.floor(1000 + Math.random() * 9000));
+    }
+    async function writeClassAccess(fields) {
+      const { id, inst, sem, cls } = caCurrent;
+      await db.collection('class_access').doc(id).set({
+        institution: inst, semester: sem, studentClass: cls, ...fields,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+      classAccessCache.delete(id);
+    }
+    function caReady() {
+      if (!db || !caCurrent.id || !caCurrent.cls) { setCaMsg('반을 먼저 골라 주세요.', true); return false; }
+      if (currentUserRole === 'TEACHER' && !isTeacherAllScope() && !isClassAllowedForTeacher(caCurrent.cls, caCurrent.sem, caCurrent.inst)) { setCaMsg('맡은 반이 아니에요.', true); return false; }
+      return true;
+    }
+    async function saveClassPin() {
+      if (!caReady()) return;
+      const pin = document.getElementById('caPinInput').value.trim();
+      if (!/^\d{4,8}$/.test(pin)) { setCaMsg('PIN은 숫자 4~8자리로 해 주세요. (없애려면 PIN 해제)', true); return; }
+      try {
+        const h = await classPinHash(caCurrent.id, pin);
+        await writeClassAccess({ pinHash: h, hasPin: true });
+        await db.collection('class_pin_private').doc(caCurrent.id).set({ pin, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+        setCaMsg('PIN을 저장했어요. 학생에게 알려 주세요: ' + pin);
+        loadClassAccessPanel(true);
+      } catch (e) { setCaMsg('저장하지 못했어요: ' + e.message, true); }
+    }
+    async function clearClassPin() {
+      if (!caReady()) return;
+      if (!confirm('이 반의 PIN을 없앨까요? 없애면 PIN 없이 들어올 수 있어요.')) return;
+      try {
+        await writeClassAccess({ pinHash: '', hasPin: false });
+        try { await db.collection('class_pin_private').doc(caCurrent.id).delete(); } catch (e) { /* 없어도 됨 */ }
+        setCaMsg('PIN을 없앴어요.');
+        loadClassAccessPanel(true);
+      } catch (e) { setCaMsg('저장하지 못했어요: ' + e.message, true); }
+    }
+    async function saveClassRoster() {
+      if (!caReady()) return;
+      const roster = parseRosterText(document.getElementById('caRosterText').value);
+      if (!roster.length) { setCaMsg('이름이 없어요. 명단을 없애려면 [명단 지우기]를 누르세요.', true); return; }
+      try {
+        await writeClassAccess({ roster });
+        const hasPin = cfgHasPin(caCurrent.cfg);
+        setCaMsg(`명단 ${roster.length}명을 저장했어요.` + (hasPin ? '' : ' (PIN이 없어서 이름이 누구에게나 보여요)'), !hasPin);
+        loadClassAccessPanel(true);
+      } catch (e) { setCaMsg('저장하지 못했어요: ' + e.message, true); }
+    }
+    async function clearClassRoster() {
+      if (!caReady()) return;
+      if (!confirm('이 반의 명단을 지울까요? 지우면 학생이 이름을 직접 입력해요.')) return;
+      try {
+        await writeClassAccess({ roster: [] });
+        setCaMsg('명단을 지웠어요.');
+        loadClassAccessPanel(true);
+      } catch (e) { setCaMsg('저장하지 못했어요: ' + e.message, true); }
+    }
+    function mergeIntoRosterText(names) {
+      const cur = parseRosterText(document.getElementById('caRosterText').value);
+      let added = 0;
+      names.forEach(n => { if (n && !cur.includes(n)) { cur.push(n); added++; } });
+      document.getElementById('caRosterText').value = cur.join('\n');
+      updateRosterCount();
+      return added;
+    }
+    async function studentsOfClass(inst, sem, cls) {
+      const names = [];
+      const snap = await db.collection('students').get();
+      snap.forEach(d => { const x = d.data(); if (x.institution === inst && x.semester === sem && x.studentClass === cls && x.studentName) names.push(x.studentName); });
+      return names;
+    }
+    async function fillRosterFromStudents() {
+      if (!caReady()) return;
+      try {
+        const names = await studentsOfClass(caCurrent.inst, caCurrent.sem, caCurrent.cls);
+        const added = mergeIntoRosterText(names);
+        setCaMsg(names.length ? `이미 들어온 학생 ${added}명을 목록에 넣었어요. 확인하고 [명단 저장]을 누르세요.` : '이 반으로 들어온 학생이 아직 없어요.', !names.length);
+      } catch (e) { setCaMsg('불러오지 못했어요: ' + e.message, true); }
+    }
+    async function copyRosterFromPrevSemester() {
+      if (!caReady()) return;
+      const prev = document.getElementById('caPrevSem').value;
+      if (!prev) { setCaMsg('복사할 학기를 골라 주세요.', true); return; }
+      try {
+        let names = [];
+        const cfg = await fetchClassAccess(caCurrent.inst, prev, caCurrent.cls, true);
+        if (cfgHasRoster(cfg)) names = cfg.roster;
+        else names = await studentsOfClass(caCurrent.inst, prev, caCurrent.cls);
+        const added = mergeIntoRosterText(names);
+        setCaMsg(names.length ? `${prev}의 ${caCurrent.cls}에서 ${added}명을 가져왔어요. 확인하고 [명단 저장]을 누르세요.` : `${prev}의 ${caCurrent.cls}에는 가져올 이름이 없어요.`, !names.length);
+      } catch (e) { setCaMsg('불러오지 못했어요: ' + e.message, true); }
+    }
+
     let booksConfig = null;
     let currentBook = null;
     let RAW_VOCAB = [];
@@ -2994,7 +3681,7 @@
       const expanded = expandTeacherScopeToClassNames(assignedTeacherClasses);
       return expanded.includes(c) || assignedTeacherClasses.includes(c);
     }
-    let currentTeacherPermissions = { canExportCSV: true, canDeleteRecord: false };
+    let currentTeacherPermissions = { canExportCSV: true, canDeleteRecord: false, canWorkbook: true, canPpt: true, canTest: true };
     let adminRecordsCache = [];
     let adminFilteredRecords = [];
     let builtJsonData = [];
@@ -3224,12 +3911,26 @@
       `).join('');
     }
 
-    function quickSwitchRecentProfile(idx) {
+    async function quickSwitchRecentProfile(idx) {
       const list = lockedStudentInstitution
         ? getRecentProfiles().filter(p => p.institution === lockedStudentInstitution)
         : getRecentProfiles();
       const p = list[idx];
       if (!p) return;
+      {   // v3.17: 그 반에 PIN·명단이 있으면 입장 확인을 거침
+        const inst0 = lockedStudentInstitution || p.institution || '용인대학교 한국어학당';
+        const cfg0 = await fetchClassAccess(inst0, p.semester || '26-1', p.userClass || '용인대 4급');
+        if (cfgHasPin(cfg0) || cfgHasRoster(cfg0)) {
+          const id0 = classAccessId(inst0, p.semester || '26-1', p.userClass || '용인대 4급');
+          const pinOk0 = !cfgHasPin(cfg0) || isPinVerified(id0, cfg0);
+          const rosterOk0 = !cfgHasRoster(cfg0) || cfg0.roster.includes(p.name);
+          if (!pinOk0 || !rosterOk0) {
+            userInstitution = inst0; userSemester = p.semester || '26-1'; userClass = p.userClass || '용인대 4급'; userName = p.name;
+            openNameModal();
+            return;
+          }
+        }
+      }
       userInstitution = lockedStudentInstitution || p.institution || '용인대학교 한국어학당';
       userSemester = p.semester || '26-1';
       userClass = p.userClass || '용인대 4급';
@@ -3260,7 +3961,7 @@
       renderInstitutionAndClassDropdowns();
       renderRecentProfilesUI();
       if (!saved || !saved.name || (lockedStudentInstitution && saved.institution !== lockedStudentInstitution)) {
-        openNameModal();
+        if (!handleTrialOnStartup()) openNameModal();
       } else {
         userInstitution = lockedStudentInstitution || saved.institution || '용인대학교 한국어학당';
         userSemester = saved.semester || '26-1';
@@ -3298,15 +3999,17 @@
       const selectedInst = lockedStudentInstitution || document.getElementById('userInstSelect')?.value || '용인대학교 한국어학당';
       const selectedSem = document.getElementById('userSemesterSelect')?.value || '26-1';
       const selectedCls = document.getElementById('userClassSelect')?.value;
-      const inputName = document.getElementById('userNameInput').value.trim();
+      const inputName = getEntryNameValue();
       if (!selectedCls) {
         alert('급과 반을 선택해 주세요.');
         return;
       }
       if (!inputName) {
-        alert('이름을 입력해 주세요.');
+        alert(document.getElementById('userNameSelect').style.display !== 'none' ? '명단에서 이름을 골라 주세요. / Please choose your name.' : '이름을 입력해 주세요.');
         return;
       }
+      const blockMsg = checkEntryAllowed(inputName);
+      if (blockMsg) { alert(blockMsg); return; }
       userInstitution = selectedInst;
       userSemester = selectedSem;
       userClass = selectedCls;
@@ -3351,7 +4054,9 @@
         clsSel.value = userClass;
       }
       document.getElementById('userNameInput').value = userName === '학습자' ? '' : userName;
+      applyClassLinkLock();
       document.getElementById('nameModal').classList.add('show');
+      refreshEntryAccess();
     }
 
     function buildStudentDocId(inst, sem, cls, name) {
@@ -3359,6 +4064,7 @@
     }
 
     function upsertStudentRosterToCloud() {
+      if (trialState) return;
       if (!db || !userName || userName === '학습자') return;
       const docId = buildStudentDocId(userInstitution, userSemester, userClass, userName);
       db.collection("students").doc(docId).set({
@@ -4259,7 +4965,7 @@
     }
 
     function sendRecordToFirestore(recordData) {
-      if (!db) return;
+      if (!db || trialState) return;   // v3.16: 체험 중에는 기록을 서버에 저장하지 않음
       const scopeName = getScopeSummaryName();
       const testedUnits = Array.from(new Set((recordData.testedWords || []).map(w => w.unit).filter(Boolean)));
       const testedSections = Array.from(new Set((recordData.testedWords || []).map(w => w.section).filter(Boolean)));
@@ -4346,7 +5052,7 @@
         currentUserRole = 'MAIN_ADMIN';
         assignedTeacherScopes = null;
         assignedTeacherClass = 'ALL';
-        currentTeacherPermissions = { canExportCSV: true, canDeleteRecord: true };
+        currentTeacherPermissions = { canExportCSV: true, canDeleteRecord: true, canWorkbook: true, canPpt: true, canTest: true };
         setupAdminDashboardUI(true, email, 'ALL');
         closeAdminAuthModal();
         document.getElementById('adminModal').classList.add('show');
@@ -4391,7 +5097,10 @@
           assignedTeacherClass = assignedTeacherScopes ? '' : (assignedTeacherClasses.includes('ALL') ? 'ALL' : (assignedTeacherClasses[0] || 'ALL'));
           currentTeacherPermissions = {
             canExportCSV: data.canExportCSV !== false,
-            canDeleteRecord: data.canDeleteRecord === true
+            canDeleteRecord: data.canDeleteRecord === true,
+            canWorkbook: data.canWorkbook !== false,
+            canPpt: data.canPpt !== false,
+            canTest: data.canTest !== false
           };
           setupAdminDashboardUI(false, email, assignedTeacherClasses);
           closeAdminAuthModal();
@@ -4418,6 +5127,24 @@
     let selectedStudentDocIds = new Set();
     let matrixThresholds = { green: 90, yellow: 70, orange: 50 };
 
+    // v3.15: 메뉴별 접근 범위 (관리자 전용 / 선생님 포함)
+    const ADMIN_ONLY_TABS = ['builder', 'teachers'];
+    function canAccessAdminTab(tab) {
+      if (currentUserRole === 'MAIN_ADMIN') return true;
+      if (ADMIN_ONLY_TABS.includes(tab)) return false;
+      if (currentUserRole !== 'TEACHER') return false;
+      if (tab === 'workbook') return currentTeacherPermissions.canWorkbook !== false;
+      if (tab === 'pptStudio') return currentTeacherPermissions.canPpt !== false;
+      if (tab === 'printSheet') return currentTeacherPermissions.canTest !== false;
+      return true; // 성적(records)·명단(students)은 선생님 기본 권한
+    }
+    function canUseWorkbook() { return canAccessAdminTab('workbook'); }
+    function canUsePpt() { return canAccessAdminTab('pptStudio'); }
+    function canUseTest() { return canAccessAdminTab('printSheet'); }
+    // 관리자 센터 밖(역할 없음)에서는 막지 않고, 권한 없는 선생님이 직접 부르는 경우만 막음
+    function canUsePptOrStudent() { return currentUserRole === null || canUsePpt(); }
+    function canUseTestOrStudent() { return currentUserRole === null || canUseTest(); }
+
     function setupAdminDashboardUI(isMainAdmin, email, assignedClass) {
       document.getElementById('currentAdminEmailDisplay').textContent = email;
       const roleBadge = document.getElementById('adminRoleBadge');
@@ -4442,6 +5169,8 @@
         tabTeachersBtn.style.display = 'inline-flex';
         tabBuilderBtn.style.display = 'inline-flex';
         tabWorkbookBtn.style.display = 'inline-flex';
+        document.getElementById('tabBtnPptStudio').style.display = 'inline-flex';
+        document.getElementById('tabBtnPrintSheet').style.display = 'inline-flex';
         if (btnSaveThresh) btnSaveThresh.style.display = 'inline-flex';
         ['threshGreenInput', 'threshYellowInput', 'threshOrangeInput'].forEach(id => {
           const el = document.getElementById(id);
@@ -4464,7 +5193,10 @@
           : Array.isArray(assignedTeacherScopes) ? `담당: ${formatScopeLabels(assignedTeacherScopes).join(' / ')}` : `담당 (${expandedCls.length}개 반): ${expandedCls.join(', ')}`;
         tabTeachersBtn.style.display = 'none';
         tabBuilderBtn.style.display = 'none';
-        tabWorkbookBtn.style.display = 'none';
+        tabWorkbookBtn.style.display = canUseWorkbook() ? 'inline-flex' : 'none';
+        document.getElementById('tabBtnPptStudio').style.display = canUsePpt() ? 'inline-flex' : 'none';
+        document.getElementById('tabBtnPrintSheet').style.display = canUseTest() ? 'inline-flex' : 'none';
+        if (canUseWorkbook()) initWorkbookControls();
         if (btnSaveThresh) btnSaveThresh.style.display = 'none';
         ['threshGreenInput', 'threshYellowInput', 'threshOrangeInput'].forEach(id => {
           const el = document.getElementById(id);
@@ -4478,6 +5210,7 @@
     }
 
     function switchAdminSubTab(tab) {
+      if (!canAccessAdminTab(tab)) tab = 'records';
       if (tab === 'builder') setTimeout(renderCloudBookSelect, 0);
       const tabs = {
         records: ['tabBtnRecords', 'adminViewRecords'],
@@ -4494,8 +5227,8 @@
         if (btn) btn.className = key === tab ? 'btn btn-primary btn-sm' : 'btn btn-outline btn-sm';
         if (view) view.style.display = key === tab ? 'block' : 'none';
       });
-      if (tab === 'students') loadStudentRoster();
-      if (tab === 'teachers') loadTeacherList();
+      if (tab === 'students') { loadStudentRoster(); renderClassAccessControls(); }
+      if (tab === 'teachers') { loadTeacherList(); loadTrialCodes(); }
       if (tab === 'printSheet') initPrintSheetControls();
       if (tab === 'pptStudio') initPptStudioControls();
       if (tab === 'workbook') initWorkbookControls();
@@ -5451,6 +6184,18 @@
       }
     };
 
+    // v3.15: PPT 파일은 받는 사람 컴퓨터에 기본으로 있는 글꼴만 사용 (PDF 화면은 기존 웹 글꼴 유지)
+    const PPT_KR_FONT = 'Malgun Gothic';
+    const PPT_LANG_FONTS = {
+      default: { face: 'Arial', lang: 'en-US' },
+      en: { face: 'Arial', lang: 'en-US' }, es: { face: 'Arial', lang: 'es-ES' },
+      vi: { face: 'Arial', lang: 'vi-VN' }, id: { face: 'Arial', lang: 'id-ID' },
+      uz: { face: 'Arial', lang: 'uz-Latn-UZ' }, ru: { face: 'Arial', lang: 'ru-RU' },
+      mn: { face: 'Arial', lang: 'mn-MN' }, ar: { face: 'Arial', lang: 'ar-SA' },
+      zh: { face: 'Microsoft YaHei', lang: 'zh-CN' }, ja: { face: 'Yu Gothic', lang: 'ja-JP' },
+      th: { face: 'Tahoma', lang: 'th-TH' }
+    };
+
     const LANG_BADGE_META = {
       en: { code: 'EN', label: '영어', pillBg: '#E07A5F', fontFace: 'Noto Sans' },
       vi: { code: 'VI', label: '베트남어', pillBg: '#3D8C95', fontFace: 'Noto Sans' },
@@ -5946,6 +6691,7 @@
 
     /* --- EXPORT ACTUAL .PPTX FILE (UNIFIED TEXT-IN-SHAPE BOXES + PROPER PREVIOUS SLIDE NAVIGATION) --- */
     async function exportActualPptxFile() {
+      if (!canUsePptOrStudent()) return;
       if (pptDeckSlides.length === 0) {
         alert("먼저 출제할 단원 또는 소단원을 1개 이상 선택해 주세요.");
         return;
@@ -5970,7 +6716,8 @@
           code: meta.code,
           pillBg: hexClean(meta.pillBg),
           text: item[lCode] || item.en || '',
-          fontFace: lCode === 'zh' ? 'Noto Sans SC' : 'Noto Sans KR'
+          fontFace: (PPT_LANG_FONTS[lCode] || PPT_LANG_FONTS.default).face,
+          lang: (PPT_LANG_FONTS[lCode] || PPT_LANG_FONTS.default).lang
         };
       });
 
@@ -6024,7 +6771,7 @@
                 shape: pptx.ShapeType.rect,
                 x: 0, y: 0, w: 10, h: 3.4,
                 fill: { color: hexClean(cfg.bg) },
-                fontSize: 72, bold: true, color: hexClean(cfg.krColor), align: 'center', valign: 'middle', fontFace: 'Noto Sans KR'
+                fontSize: 72, bold: true, color: hexClean(cfg.krColor), align: 'center', valign: 'middle', fontFace: PPT_KR_FONT, lang: 'ko-KR'
               });
               staticShapes += 1;
             } else {
@@ -6038,8 +6785,8 @@
                   staticShapes += 1;
                 }
                 slide.addText([
-                  { text: c.code + '\n', options: { fontSize: 15, bold: true, color: 'FFD6D3', fontFace: 'Noto Sans KR' } },
-                  { text: c.text, options: { fontSize: 29, bold: true, color: 'FFFFFF', fontFace: c.fontFace } }
+                  { text: c.code + '\n', options: { fontSize: 15, bold: true, color: 'FFD6D3', fontFace: PPT_KR_FONT, lang: 'ko-KR' } },
+                  { text: c.text, options: { fontSize: 29, bold: true, color: 'FFFFFF', fontFace: c.fontFace, lang: c.lang } }
                 ], { x: cx + 0.08, y: 0.55, w: colW - 0.16, h: 3.1, align: 'center', valign: 'middle' });
                 staticShapes += 1;
               });
@@ -6050,7 +6797,7 @@
                 shape: pptx.ShapeType.rect,
                 x: 0, y: 0, w: 4.84, h: 7.5,
                 fill: { color: hexClean(cfg.bg) },
-                fontSize: 62, bold: true, color: hexClean(cfg.krColor), align: 'center', valign: 'middle', fontFace: 'Noto Sans KR'
+                fontSize: 62, bold: true, color: hexClean(cfg.krColor), align: 'center', valign: 'middle', fontFace: PPT_KR_FONT, lang: 'ko-KR'
               });
               staticShapes += 1;
             } else {
@@ -6060,8 +6807,8 @@
               cards.forEach((c, i) => {
                 const ry = 0.55 + i * rowH;
                 slide.addText([
-                  { text: c.code + '\n', options: { fontSize: 15, bold: true, color: 'FFD6D3', fontFace: 'Noto Sans KR' } },
-                  { text: c.text, options: { fontSize: 30, bold: true, color: 'FFFFFF', fontFace: c.fontFace } }
+                  { text: c.code + '\n', options: { fontSize: 15, bold: true, color: 'FFD6D3', fontFace: PPT_KR_FONT, lang: 'ko-KR' } },
+                  { text: c.text, options: { fontSize: 30, bold: true, color: 'FFFFFF', fontFace: c.fontFace, lang: c.lang } }
                 ], { x: 0.4, y: ry, w: 4.9, h: rowH - 0.1, align: 'left', valign: 'middle' });
                 staticShapes += 1;
               });
@@ -6072,7 +6819,7 @@
           const cardLine = (tKey === 'chalkboard') ? { color: 'B9CFC4', width: 1 } : undefined;
 
           if (isKrFirst) {
-            slide.addText(item.kr, { x: 0.4, y: 0.4, w: 9.2, h: 2.75, fontSize: 72, bold: true, color: hexClean(cfg.krColor), align: 'center', valign: 'middle', fontFace: 'Noto Sans KR' });
+            slide.addText(item.kr, { x: 0.4, y: 0.4, w: 9.2, h: 2.75, fontSize: 72, bold: true, color: hexClean(cfg.krColor), align: 'center', valign: 'middle', fontFace: PPT_KR_FONT, lang: 'ko-KR' });
             staticShapes += 1;
           } else {
             if (isHoriz) {
@@ -6085,8 +6832,8 @@
                 const cx = 0.5 + i * (colW + gap);
                 const cClr = tKey === 'sage_flashcard' ? c.pillBg : (tKey === 'midnight_navy' ? 'CADCFC' : (tKey === 'chalkboard' ? hexClean(cfg.boxColor) : '8A94A6'));
                 slide.addText([
-                  { text: c.code + '\n', options: { fontSize: 15, bold: true, color: cClr, fontFace: 'Noto Sans KR' } },
-                  { text: c.text, options: { fontSize: 29, bold: true, color: topTxtColor, fontFace: c.fontFace } }
+                  { text: c.code + '\n', options: { fontSize: 15, bold: true, color: cClr, fontFace: PPT_KR_FONT, lang: 'ko-KR' } },
+                  { text: c.text, options: { fontSize: 29, bold: true, color: topTxtColor, fontFace: c.fontFace, lang: c.lang } }
                 ], {
                   shape: pptx.ShapeType.roundRect,
                   x: cx, y: 0.5, w: colW, h: 3.4, rectRadius: 0.06,
@@ -6102,8 +6849,8 @@
                 const ry = 0.45 + i * rowH;
                 const cClr = tKey === 'sage_flashcard' ? c.pillBg : (tKey === 'chalkboard' ? hexClean(cfg.boxColor) : '8A94A6');
                 slide.addText([
-                  { text: `[${c.code}]  `, options: { fontSize: 16, bold: true, color: cClr, fontFace: 'Noto Sans KR' } },
-                  { text: c.text, options: { fontSize: 34, bold: true, color: topTxtColor, fontFace: c.fontFace } }
+                  { text: `[${c.code}]  `, options: { fontSize: 16, bold: true, color: cClr, fontFace: PPT_KR_FONT, lang: 'ko-KR' } },
+                  { text: c.text, options: { fontSize: 34, bold: true, color: topTxtColor, fontFace: c.fontFace, lang: c.lang } }
                 ], { x: 0.75, y: ry, w: 8.6, h: rowH, align: 'left', valign: 'middle' });
                 staticShapes += 1;
               });
@@ -6120,8 +6867,8 @@
                 cards.forEach((c, i) => {
                   const cx = 0.5 + i * colW;
                   slide.addText([
-                    { text: c.code + '\n', options: { fontSize: 15, bold: true, color: hexClean(cfg.bg), fontFace: 'Noto Sans KR' } },
-                    { text: c.text, options: { fontSize: 29, bold: true, color: hexClean(cfg.multiColor), fontFace: c.fontFace } }
+                    { text: c.code + '\n', options: { fontSize: 15, bold: true, color: hexClean(cfg.bg), fontFace: PPT_KR_FONT, lang: 'ko-KR' } },
+                    { text: c.text, options: { fontSize: 29, bold: true, color: hexClean(cfg.multiColor), fontFace: c.fontFace, lang: c.lang } }
                   ], {
                     shape: pptx.ShapeType.rect,
                     x: cx + 0.06, y: 3.7, w: colW - 0.12, h: 2.95,
@@ -6135,7 +6882,7 @@
                   shape: pptx.ShapeType.roundRect,
                   x: 1.2, y: 4.35, w: 7.6, h: 2.4, rectRadius: 0.08,
                   fill: { color: hexClean(cfg.boxColor) },
-                  fontSize: 62, bold: true, color: hexClean(cfg.multiColor), align: 'center', valign: 'middle', fontFace: 'Noto Sans KR'
+                  fontSize: 62, bold: true, color: hexClean(cfg.multiColor), align: 'center', valign: 'middle', fontFace: PPT_KR_FONT, lang: 'ko-KR'
                 });
               }
             } else {
@@ -6144,8 +6891,8 @@
                 cards.forEach((c, i) => {
                   const ry = 0.55 + i * rowH;
                   slide.addText([
-                    { text: c.code + '\n', options: { fontSize: 15, bold: true, color: hexClean(cfg.bg), fontFace: 'Noto Sans KR' } },
-                    { text: c.text, options: { fontSize: 30, bold: true, color: hexClean(cfg.multiColor), fontFace: c.fontFace } }
+                    { text: c.code + '\n', options: { fontSize: 15, bold: true, color: hexClean(cfg.bg), fontFace: PPT_KR_FONT, lang: 'ko-KR' } },
+                    { text: c.text, options: { fontSize: 30, bold: true, color: hexClean(cfg.multiColor), fontFace: c.fontFace, lang: c.lang } }
                   ], {
                     shape: pptx.ShapeType.rect,
                     x: 5.15, y: ry, w: 4.45, h: rowH - 0.1,
@@ -6158,7 +6905,7 @@
                   shape: pptx.ShapeType.roundRect,
                   x: 5.9, y: 1.0, w: 3.8, h: 5.4, rectRadius: 0.08,
                   fill: { color: hexClean(cfg.boxColor) },
-                  fontSize: 50, bold: true, color: hexClean(cfg.multiColor), align: 'center', valign: 'middle', fontFace: 'Noto Sans KR'
+                  fontSize: 50, bold: true, color: hexClean(cfg.multiColor), align: 'center', valign: 'middle', fontFace: PPT_KR_FONT, lang: 'ko-KR'
                 });
               }
             }
@@ -6177,8 +6924,8 @@
                   const cx = 0.5 + i * (colW + gap);
                   const cClr = tKey === 'sage_flashcard' ? c.pillBg : (tKey === 'chalkboard' ? hexClean(cfg.boxColor) : '8A94A6');
                   slide.addText([
-                    { text: c.code + '\n', options: { fontSize: 15, bold: true, color: cClr, fontFace: 'Noto Sans KR' } },
-                    { text: c.text, options: { fontSize: 29, bold: true, color: hexClean(cfg.multiColor), fontFace: c.fontFace } }
+                    { text: c.code + '\n', options: { fontSize: 15, bold: true, color: cClr, fontFace: PPT_KR_FONT, lang: 'ko-KR' } },
+                    { text: c.text, options: { fontSize: 29, bold: true, color: hexClean(cfg.multiColor), fontFace: c.fontFace, lang: c.lang } }
                   ], {
                     shape: pptx.ShapeType.roundRect,
                     x: cx, y: 3.4, w: colW, h: 3.25, rectRadius: 0.06,
@@ -6191,8 +6938,8 @@
                 const textRuns = [];
                 cards.forEach((c, i) => {
                   const cClr = tKey === 'sage_flashcard' ? c.pillBg : (tKey === 'chalkboard' ? hexClean(cfg.boxColor) : '8A94A6');
-                  textRuns.push({ text: `[${c.code}]  `, options: { fontSize: 16, bold: true, color: cClr, fontFace: 'Noto Sans KR' } });
-                  textRuns.push({ text: c.text + (i < cards.length - 1 ? '\n' : ''), options: { fontSize: 32, bold: true, color: hexClean(cfg.multiColor), fontFace: c.fontFace } });
+                  textRuns.push({ text: `[${c.code}]  `, options: { fontSize: 16, bold: true, color: cClr, fontFace: PPT_KR_FONT, lang: 'ko-KR' } });
+                  textRuns.push({ text: c.text + (i < cards.length - 1 ? '\n' : ''), options: { fontSize: 32, bold: true, color: hexClean(cfg.multiColor), fontFace: c.fontFace, lang: c.lang } });
                 });
                 slide.addText(textRuns, {
                   shape: pptx.ShapeType.roundRect,
@@ -6206,7 +6953,7 @@
                 shape: pptx.ShapeType.roundRect,
                 x: 1.2, y: 4.2, w: 7.6, h: 2.45, rectRadius: 0.08,
                 fill: { color: krBoxBg }, line: krBoxLine,
-                fontSize: 62, bold: true, color: krBoxTxt, align: 'center', valign: 'middle', fontFace: 'Noto Sans KR'
+                fontSize: 62, bold: true, color: krBoxTxt, align: 'center', valign: 'middle', fontFace: PPT_KR_FONT, lang: 'ko-KR'
               });
             }
           }
@@ -6214,9 +6961,9 @@
 
         // 4. Bottom Center Slide Number & Bottom Right Institution Footer (Static)
         const footerClr = tKey === 'coral_split' ? '64748B' : hexClean(cfg.krColor);
-        slide.addText(`${pageIdx + 1}`, { x: 4.5, y: 7.05, w: 1.0, h: 0.32, fontSize: 11, bold: true, color: footerClr, align: 'center', fontFace: 'Noto Sans KR' });
+        slide.addText(`${pageIdx + 1}`, { x: 4.5, y: 7.05, w: 1.0, h: 0.32, fontSize: 11, bold: true, color: footerClr, align: 'center', fontFace: PPT_KR_FONT, lang: 'ko-KR' });
         if (cfg.footerText) {
-          slide.addText(cfg.footerText, { x: 6.2, y: 7.05, w: 3.45, h: 0.32, fontSize: 9.5, bold: true, color: footerClr, align: 'right', fontFace: 'Noto Sans KR' });
+          slide.addText(cfg.footerText, { x: 6.2, y: 7.05, w: 3.45, h: 0.32, fontSize: 9.5, bold: true, color: footerClr, align: 'right', fontFace: PPT_KR_FONT, lang: 'ko-KR' });
         }
 
         staticShapeCountsPerSlide.push(staticShapes);
@@ -6331,6 +7078,7 @@
     }
 
     function exportPptAsPdf() {
+      if (!canUsePptOrStudent()) return;
       if (pptDeckSlides.length === 0) {
         alert("먼저 출제할 단원 또는 소단원을 1개 이상 선택해 주세요.");
         return;
@@ -6407,6 +7155,7 @@
     }
 
     function printQuizSheetNow(mode) {
+      if (!canUseTestOrStudent()) return;
       const previewEl = document.getElementById('printSheetPreview');
       if (!previewEl.querySelector('.sheet-student-section')) {
         alert("먼저 [시험지 및 교사용 정답지 생성] 버튼을 눌러 시험지를 만들어 주세요.");
@@ -6434,6 +7183,7 @@
     }
 
     function generatePrintableSheet() {
+      if (!canUseTestOrStudent()) return;
       const selectedSecs = getSelectedTreeSections('sheet');
       if (selectedSecs.size === 0) {
         alert("시험지에 출제할 단원(또는 소단원)을 1개 이상 선택해 주세요.");
@@ -6648,7 +7398,7 @@
     let wbVocabData = [];
 
     async function initWorkbookControls() {
-      if (currentUserRole !== 'MAIN_ADMIN') return;
+      if (!canUseWorkbook()) return;
       const bookSel = document.getElementById('wbBookSelect');
       if (bookSel && booksConfig && Array.isArray(booksConfig.books)) {
         const prevBookId = bookSel.value || currentBook?.id || booksConfig.defaultBookId;
@@ -7053,7 +7803,7 @@
     }
 
     function renderWorkbookPreview() {
-      if (currentUserRole !== 'MAIN_ADMIN') return;
+      if (!canUseWorkbook()) return;
       const { pages, isTwoCol } = buildWorkbookPagesHtml();
       const layoutTxt = isTwoCol ? '2단 배열' : '1단 배열';
       document.getElementById('wbPageSummaryBadge').textContent = `총 ${pages.length}페이지 (${layoutTxt})`;
@@ -7061,7 +7811,7 @@
     }
 
     function printWorkbookLandscapeA4() {
-      if (currentUserRole !== 'MAIN_ADMIN') return;
+      if (!canUseWorkbook()) return;
       const { pages, bodyPageCount } = buildWorkbookPagesHtml();
       if (bodyPageCount <= 0) {
         alert("인쇄할 단원을 1개 이상 선택해 주세요.");
@@ -7125,7 +7875,7 @@
 
     /* v3.10: 번역·검수 엔진 선택 (Gemini / Claude / GPT) */
     const AI_ENGINES = {
-      gemini: { name: 'Gemini', model: 'gemini-2.5-flash', keyStore: () => STORAGE_KEYS.BUILDER_API_KEY, keyEl: 'geminiApiKeyInput' },
+      gemini: { name: 'Gemini', model: 'gemini-3.5-flash-lite', keyStore: () => STORAGE_KEYS.BUILDER_API_KEY, keyEl: 'geminiApiKeyInput' },
       claude: { name: 'Claude', model: 'claude-sonnet-5-5', keyStore: () => 'YONGIN_AI_KEY_claude', keyEl: 'aiKey_claude' },
       gpt:    { name: 'GPT',    model: 'gpt-4.1-mini',      keyStore: () => 'YONGIN_AI_KEY_gpt',    keyEl: 'aiKey_gpt' }
     };
@@ -7186,10 +7936,19 @@
         headers['Authorization'] = 'Bearer ' + cfg.key;
         body = { model: cfg.model, response_format: { type: 'json_object' }, messages: [{ role: 'user', content: prompt + '\n\nWrap the array as {"items": [...]}.' }] };
       }
-      const response = await fetch(url, { method: 'POST', headers, body: JSON.stringify(body) });
+      let response;
+      try {
+        response = await fetch(url, { method: 'POST', headers, body: JSON.stringify(body) });
+      } catch (netErr) {
+        const err = new Error(`인터넷 연결 오류 (${cfg.name})`);
+        err.retry = true; err.status = 0;
+        throw err;
+      }
       const data = await response.json().catch(() => ({}));
       if (!response.ok) {
-        const err = new Error(data.error?.message || data.message || `${cfg.name} 호출 오류 (${response.status})`);
+        const raw = String(data.error?.message || data.message || '').replace(/\s+/g, ' ').slice(0, 90);
+        const err = new Error(`${cfg.name} 오류 ${response.status}${raw ? ': ' + raw : ''}`);
+        err.status = response.status;
         err.retry = response.status === 429 || response.status >= 500 || response.status === 529;
         throw err;
       }
@@ -7213,7 +7972,8 @@
           const wait = 15 * (attempt + 1);
           for (let t = wait; t > 0 && !enrichStopFlag; t--) {
             const el = document.getElementById(statusId);
-            if (el) el.textContent = `한도에 걸려 ${t}초 뒤 다시 시도해요...`;
+            const why = e.status === 429 ? '요청이 많거나 한도에 걸림(429)' : e.status >= 500 ? '서버가 바쁨(' + e.status + ')' : e.status === 0 ? '인터넷 연결 확인' : '응답 형식 오류';
+            if (el) el.textContent = `${why} · ${t}초 뒤 다시 시도해요 (${attempt + 1}/3)...`;
             await new Promise(r => setTimeout(r, 1000));
           }
           if (enrichStopFlag) break;
@@ -7255,31 +8015,11 @@ ${JSON.stringify(norm)}`;
 
     // 검수: words(번역된 칸 포함)를 25개씩 보내 고칠 것만 받아 적용. 고친 칸 수를 돌려줌
     async function aiReviewWords(words, langs, statusId) {
-      const rcfg = getAiConfig(document.getElementById('aiReviewEngineSelect').value);
-      if (!rcfg.key) { alert(`${rcfg.name} API 키가 없어 검수를 건너뛰어요.`); return 0; }
-      const codes = langs.map(l => l.code);
-      let fixed = 0;
-      for (let i = 0; i < words.length; i += 25) {
-        if (enrichStopFlag) break;
-        const part = words.slice(i, i + 25);
-        const el = document.getElementById(statusId);
-        if (el) el.textContent = `${rcfg.name} 검수 중... ${Math.min(i + 25, words.length)} / ${words.length}`;
-        const payload = part.map((w, k) => { const o = { i: k, kr: w.kr }; codes.forEach(c => { o[c] = w[c] || ''; }); return o; });
-        const prompt = `You are a careful reviewer of Korean-to-foreign-language textbook vocabulary translations. Check each item's translations (${langs.map(l => `${l.name} (${l.code})`).join(', ')}) for accuracy, natural dictionary phrasing and consistency with the Korean word.
-Return ONLY a JSON array containing ONLY the items that need correction, each as {"i": <same i>, "fix": {"<langcode>": "<corrected text>"}} with only the changed language codes. If everything is fine return []. No markdown fences.
-
-Items:
-${JSON.stringify(payload)}`;
-        const res = await aiCallWithRetry(rcfg, prompt, statusId);
-        res.forEach(r => {
-          const w = part[r && r.i];
-          if (!w || !r.fix) return;
-          Object.entries(r.fix).forEach(([c, v]) => {
-            if (codes.includes(c) && v && String(v).trim() && String(v) !== w[c]) { w[c] = String(v); fixed++; }
-          });
-        });
-      }
-      return fixed;
+      const out = await aiReviewCollect(words, langs, statusId);
+      if (!out) return 0;
+      out.changes.forEach(c => { c.w[c.code] = c.to; logReview(c); });
+      if (out.error) throw new Error(out.error);
+      return out.changes.length;
     }
 
     /* v3.11: 힌트 입력 · 엑셀 올리기 · 이어서 번역 */
@@ -7319,6 +8059,7 @@ ${JSON.stringify(payload)}`;
         const t = cellText(raw);
         if (!t) return;
         const low = t.toLowerCase();
+        if (/^(번호|no\.?|#|id)$/.test(low)) return;
         if (/한국어|korean/.test(low) && cols.kr < 0 && !/\[/.test(t.replace(/\(.*?\)/g, ''))) cols.kr = i;
         else if (/소단원|section|sub.?unit|소주제/.test(low)) { if (cols.section < 0) cols.section = i; }
         else if (/대단원|unit|단원|chapter|lesson|과$/.test(low)) { if (cols.unit < 0) cols.unit = i; else if (cols.section < 0) cols.section = i; }
@@ -7536,38 +8277,58 @@ ${JSON.stringify(payload)}`;
       } catch (e) { /* 목록 없이 전체만 사용 */ }
     }
 
-    // 고칠 것만 모아서 돌려줌 (words 자체는 바꾸지 않음)
+    // 언어별 검수 엔진 설정 (v3.14)
+    function getLangEnginePrefs() {
+      try { return JSON.parse(localStorage.getItem('YONGIN_AI_REVIEW_LANG') || '{}') || {}; } catch (e) { return {}; }
+    }
+    function reviewEngineFor(code) {
+      const pref = getLangEnginePrefs()[code];
+      if (pref && pref.engine && AI_ENGINES[pref.engine]) return pref.engine;
+      return document.getElementById('aiReviewEngineSelect').value;
+    }
+
+    // 고칠 것만 모아서 돌려줌 (words 자체는 바꾸지 않음). 검수 엔진은 언어별 설정을 따름
     async function aiReviewCollect(words, langs, statusId, onProgress) {
-      const rcfg = getAiConfig(document.getElementById('aiReviewEngineSelect').value);
-      if (!rcfg.key) { alert(`${rcfg.name} API 키를 입력하고 저장해 주세요.`); return null; }
+      const groups = {};
+      langs.forEach(l => { (groups[reviewEngineFor(l.code)] = groups[reviewEngineFor(l.code)] || []).push(l); });
+      const usable = [], missing = [];
+      Object.entries(groups).forEach(([eid, ls]) => {
+        const cfg = getAiConfig(eid);
+        if (cfg.key) usable.push({ cfg, ls }); else missing.push(cfg.name);
+      });
+      if (usable.length === 0) { alert(`${missing.join(', ')} API 키가 없어 검수할 수 없어요. 키를 입력하고 저장해 주세요.`); return null; }
+      if (missing.length) alert(`${missing.join(', ')} API 키가 없어 그 엔진으로 정한 언어는 검수에서 빼요.`);
       const changes = [];
       let error = '';
-      for (let i = 0; i < words.length && !enrichStopFlag; i += 25) {
-        const part = words.slice(i, i + 25);
-        const payload = part.map((w, k) => {
-          const o = { i: k, kr: w.kr };
-          langs.forEach(l => { if (String(w[l.code] || '').trim()) o[l.code] = w[l.code]; });
-          return o;
-        }).filter(o => Object.keys(o).length > 2);
-        if (payload.length === 0) { if (onProgress) onProgress(Math.min(i + 25, words.length)); continue; }
-        const prompt = `You are a careful reviewer of Korean-to-foreign-language textbook vocabulary translations. Check each item's translations (${langs.map(l => `${l.name} (${l.code})`).join(', ')}) for accuracy, natural dictionary phrasing and consistency with the Korean word. Only flag real errors or clearly unnatural wording; do not change style preferences.
-Return ONLY a JSON array containing ONLY the items that need correction, each as {"i": <same i>, "fix": {"<langcode>": "<corrected text>"}, "note": "<very short reason in Korean>"} with only the changed language codes. If everything is fine return []. No markdown fences.
+      const stEl = () => document.getElementById(statusId);
+      for (const { cfg, ls } of usable) {
+        for (let i = 0; i < words.length && !enrichStopFlag && !error; i += 25) {
+          const part = words.slice(i, i + 25);
+          if (stEl()) stEl().textContent = `${cfg.name} 검수 중 (${ls.map(l => l.name).join('·')})... ${Math.min(i + 25, words.length)} / ${words.length}`;
+          const payload = part.map((w, k) => {
+            const o = { i: k, kr: w.kr };
+            ls.forEach(l => { if (String(w[l.code] || '').trim()) o[l.code] = w[l.code]; });
+            return o;
+          }).filter(o => Object.keys(o).length > 2);
+          if (payload.length === 0) continue;
+          const prompt = `You are a careful reviewer of Korean-to-foreign-language textbook vocabulary translations. Check each item's translations (${ls.map(l => `${l.name} (${l.code})`).join(', ')}) for accuracy, natural dictionary phrasing and consistency with the Korean word. Only flag real errors or clearly unnatural wording; do not change style preferences.
+Return ONLY a JSON array containing ONLY the items that need correction, each as {"i": <same i>, "fix": {"<langcode>": "<corrected text>"}, "level": "필수" or "권장", "note": "<one short reason in Korean>"} with only the changed language codes. Use "필수" only when the translation is wrong in meaning, ungrammatical or misleading; use "권장" for a more natural or accurate wording. If everything is fine return []. No markdown fences.
 
 Items:
 ${JSON.stringify(payload)}`;
-        try {
-          const res = await aiCallWithRetry(rcfg, prompt, statusId);
-          res.forEach(r => {
-            const w = part[r && r.i];
-            if (!w || !r.fix) return;
-            Object.entries(r.fix).forEach(([c, v]) => {
-              if (langs.some(l => l.code === c) && v && String(v).trim() && String(v) !== w[c] && String(w[c] || '').trim()) {
-                changes.push({ w, code: c, from: w[c], to: String(v), note: r.note || '' });
-              }
+          try {
+            const res = await aiCallWithRetry(cfg, prompt, statusId);
+            res.forEach(r => {
+              const w = part[r && r.i];
+              if (!w || !r.fix) return;
+              Object.entries(r.fix).forEach(([c, v]) => {
+                if (ls.some(l => l.code === c) && v && String(v).trim() && String(v) !== w[c] && String(w[c] || '').trim()) {
+                  changes.push({ w, code: c, from: w[c], to: String(v), note: r.note || '', level: /필수|must|required/i.test(String(r.level || '')) ? '필수' : '권장' });
+                }
+              });
             });
-          });
-        } catch (e) { error = e.message; break; }
-        if (onProgress) onProgress(Math.min(i + 25, words.length));
+          } catch (e) { error = e.message; }
+        }
       }
       return { changes, error };
     }
@@ -7787,6 +8548,293 @@ ${JSON.stringify(payload)}`;
       renderReviewResult();
     }
 
+    /* ==========================================================================
+       v3.14: 결과 보기 팝업 · 엑셀 · 인쇄 · 검수 문구 · 검수만 실행 · 언어별 검수 엔진
+       ========================================================================== */
+    let reviewLog = [];      // [{kr, code, level, from, to, note}]
+    let popupDiff = null;    // { title, changes:[{w,code,from,to,note,level}], info }
+    let resultView = { langs: [], idx: null };
+    const PLAIN_FIELDS = ['unit', 'section', 'kr', 'page'];
+
+    function setResultView(langs, idx) { resultView = { langs, idx }; }
+
+    function logReview(c) {
+      const hit = reviewLog.find(x => x.kr === c.w.kr && x.code === c.code);
+      if (hit) { hit.to = c.to; hit.note = c.note || hit.note; hit.level = c.level || hit.level; }
+      else reviewLog.push({ kr: c.w.kr, code: c.code, level: c.level || '권장', from: c.from, to: c.to, note: c.note || '' });
+    }
+
+    function syncJobFromBuilt() {
+      if (!translateJob || !translateJob.rows || translateJob.rows.length !== builtJsonData.length) return;
+      builtJsonData.forEach((w, i) => {
+        const r = translateJob.rows[i];
+        Object.keys(w).forEach(k => { if (k !== 'id' && !PLAIN_FIELDS.includes(k)) r.langs[k] = w[k]; });
+        ['unit', 'section', 'page'].forEach(k => { r[k] = w[k]; });
+      });
+    }
+
+    function resultLangs() {
+      const known = resultView.langs && resultView.langs.length ? resultView.langs : [];
+      if (known.length) return known;
+      const first = builtJsonData[0] || {};
+      return Object.keys(first).filter(k => k !== 'id' && !PLAIN_FIELDS.includes(k)).map(c => ({ code: c, name: langNameOf(c) }));
+    }
+    function resultIndexes() {
+      return resultView.idx && resultView.idx.length ? resultView.idx : builtJsonData.map((_, i) => i);
+    }
+
+    function openResultPopup() {
+      if (!builtJsonData || builtJsonData.length === 0) { alert('아직 보여 줄 결과가 없어요. 번역이나 입력 확인을 먼저 해 주세요.'); return; }
+      renderResultPopup();
+      document.getElementById('resultModal').classList.add('show');
+    }
+    function closeResultPopup() { document.getElementById('resultModal').classList.remove('show'); }
+
+    function renderResultPopup() {
+      const e = cascadeEsc, langs = resultLangs(), idx = resultIndexes();
+      const fixedMap = new Map(reviewLog.map(x => [x.kr + '\t' + x.code, x]));
+      document.getElementById('resultTitle').textContent = '번역 결과';
+      const empty = builtJsonData.filter(w => langs.some(l => !String(w[l.code] || '').trim())).length;
+      document.getElementById('resultSub').textContent = `전체 ${builtJsonData.length}개 중 ${idx.length}개 표시 · 번역 안 된 칸이 있는 단어 ${empty}개 · 검수로 고친 칸 ${reviewLog.length}개 (노란색)`;
+      document.getElementById('resultHead').innerHTML = `<tr><th>번호</th><th>대단원</th><th>소단원</th><th>한국어</th>${langs.map(l => `<th>${e(l.name)}</th>`).join('')}<th>페이지</th></tr>`;
+      document.getElementById('resultBody').innerHTML = idx.map(i => {
+        const w = builtJsonData[i];
+        return `<tr><td>${i + 1}</td><td>${e(w.unit)}</td><td>${e(w.section)}</td><td><b>${e(w.kr)}</b></td>${langs.map(l => {
+          const v = String(w[l.code] || '').trim(), fx = fixedMap.get(w.kr + '\t' + l.code);
+          return `<td class="${fx ? 'rv-fixed' : (!v ? 'rv-empty' : '')}"${fx ? ` title="${e('기존: ' + fx.from + (fx.note ? ' · ' + fx.note : ''))}"` : ''}>${e(v)}</td>`;
+        }).join('')}<td>${e(w.page)}</td></tr>`;
+      }).join('');
+      document.getElementById('resultLogBox').innerHTML = reviewLog.length ? `
+        <div class="input-check-title" style="padding:0.5rem 0.6rem 0.2rem;">검수 내역 (${reviewLog.length}건)</div>
+        <table class="admin-table result-table"><thead><tr><th>한국어</th><th>언어</th><th>구분</th><th>기존 번역</th><th>수정 번역</th><th>이유</th></tr></thead><tbody>
+        ${reviewLog.map(x => `<tr><td><b>${e(x.kr)}</b></td><td>${e(langNameOf(x.code))}</td><td>${e(x.level)}</td><td>${e(x.from)}</td><td>${e(x.to)}</td><td>${e(x.note)}</td></tr>`).join('')}
+        </tbody></table>` : '';
+      renderResultDiff();
+    }
+
+    function renderResultDiff() {
+      const box = document.getElementById('resultDiff');
+      if (!popupDiff) { box.style.display = 'none'; box.innerHTML = ''; return; }
+      const e = cascadeEsc, ch = popupDiff.changes;
+      box.style.display = 'block';
+      box.innerHTML = `
+        <div class="review-head">
+          <span>${e(popupDiff.title)} · ${ch.length}건${popupDiff.info ? ' · ' + e(popupDiff.info) : ''} · 체크한 것만 반영</span>
+          <button type="button" class="cascade-reset" onclick="document.querySelectorAll('.rd-cb').forEach(c => c.checked = true)">전체 선택</button>
+          <button type="button" class="cascade-reset" onclick="document.querySelectorAll('.rd-cb').forEach(c => c.checked = false)">전체 해제</button>
+          <button type="button" class="cascade-reset" onclick="popupDiff = null; renderResultDiff()">닫기</button>
+          <button type="button" class="btn btn-success btn-sm" onclick="applyResultDiff()">선택한 수정 반영</button>
+        </div>
+        ${ch.length ? `<table class="admin-table"><thead><tr><th></th><th>번호</th><th>한국어</th><th>칸</th><th>현재</th><th>제안</th><th>구분</th><th>이유</th></tr></thead><tbody>
+        ${ch.map((c, i) => `<tr><td><input type="checkbox" class="rd-cb" data-i="${i}" checked /></td><td>${builtJsonData.indexOf(c.w) + 1}</td><td><b>${e(c.w.kr)}</b></td><td>${e(fieldLabel(c.code))}</td><td>${e(c.from)}</td><td style="color:#047857; font-weight:700;">${e(c.to)}</td><td>${e(c.level || '')}</td><td>${e(c.note || '')}</td></tr>`).join('')}
+        </tbody></table>` : '<div class="cascade-hint">바꿀 곳을 찾지 못했어요.</div>'}`;
+    }
+
+    function applyResultDiff() {
+      if (!popupDiff) return;
+      const picked = [...document.querySelectorAll('.rd-cb:checked')].map(c => popupDiff.changes[Number(c.dataset.i)]);
+      if (picked.length === 0) { alert('반영할 항목을 선택해 주세요.'); return; }
+      picked.forEach(c => {
+        const from = c.w[c.code];
+        c.w[c.code] = c.to;
+        if (!PLAIN_FIELDS.includes(c.code)) logReview({ ...c, from: c.from !== undefined ? c.from : from, level: c.level || '수정', note: c.note || '엑셀에서 수정' });
+      });
+      syncJobFromBuilt();
+      popupDiff = null;
+      renderResultPopup();
+      document.getElementById('resultMsg').textContent = `${picked.length}칸을 반영했어요. 이어서 "사이트에 등록"이나 JSON 저장을 하면 반영돼요.`;
+    }
+
+    /* ---- 엑셀 받기 ---- */
+    function downloadResultExcel() {
+      if (typeof XLSX === 'undefined') { alert('엑셀 도구를 불러오지 못했어요. 인터넷 연결을 확인해 주세요.'); return; }
+      const langs = resultLangs(), idx = resultIndexes();
+      const aoa = [['번호', '대단원', '소단원', '한국어', ...langs.map(l => l.name), '페이지']];
+      idx.forEach(i => { const w = builtJsonData[i]; aoa.push([i + 1, w.unit, w.section, w.kr, ...langs.map(l => w[l.code] || ''), w.page === undefined ? '' : w.page]); });
+      const ws = XLSX.utils.aoa_to_sheet(aoa);
+      ws['!cols'] = aoa[0].map((h, i) => ({ wch: i === 0 ? 6 : (h === '한국어' ? 18 : (h === '페이지' || h === '대단원' || h === '소단원') ? 9 : 24) }));
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, '수정 반영본');
+      if (reviewLog.length) {
+        const a2 = [['한국어', '언어', '구분', '기존 번역', '수정 번역', '이유', '원어민 확인'], ...reviewLog.map(x => [x.kr, langNameOf(x.code), x.level, x.from, x.to, x.note, false])];
+        const w2 = XLSX.utils.aoa_to_sheet(a2);
+        w2['!cols'] = [18, 10, 8, 28, 28, 40, 12].map(wch => ({ wch }));
+        XLSX.utils.book_append_sheet(wb, w2, '검수 내역');
+      }
+      XLSX.writeFile(wb, `${yymmdd()}_번역결과_${idx.length}개.xlsx`);
+      document.getElementById('resultMsg').textContent = `엑셀로 받았어요 (${idx.length}개${reviewLog.length ? ' · 검수 내역 시트 포함' : ''})`;
+    }
+
+    /* ---- 인쇄 / PDF ---- */
+    function printResult() {
+      document.body.classList.add('printing-result');
+      const done = () => document.body.classList.remove('printing-result');
+      window.addEventListener('afterprint', done, { once: true });
+      setTimeout(() => { try { window.print(); } finally { setTimeout(done, 1500); } }, 50);
+    }
+
+    /* ---- 검수 요청 문구 복사 ---- */
+    async function copyToClipboard(text) {
+      try { await navigator.clipboard.writeText(text); return true; } catch (err) {
+        const ta = document.createElement('textarea');
+        ta.value = text; document.body.appendChild(ta); ta.select();
+        let ok = false; try { ok = document.execCommand('copy'); } catch (e2) { /* ignore */ }
+        ta.remove(); return ok;
+      }
+    }
+
+    async function copyReviewPrompt(mode) {
+      const langs = resultLangs(), idx = resultIndexes();
+      const names = langs.map(l => l.name).join(', ');
+      const cols = ['번호', '대단원', '소단원', '한국어', ...langs.map(l => l.name), '페이지'].join(', ');
+      const intro = `한국어 학습용 단어장의 번역을 검수해 주세요. ${mode === 'file' ? '첨부한 엑셀 파일에는' : '아래 표에는'} 한국어 단어와 ${names} 번역이 ${idx.length}개 단어만큼 들어 있습니다.
+
+[검수 기준]
+- 한국어 단어의 뜻과 맞는지, 해당 언어에서 자연스러운 사전식 표현인지 확인합니다.
+- 의미가 틀리거나 비문이거나 오해를 부르면 구분을 "필수", 더 자연스럽거나 정확한 표현이 있으면 "권장"으로 표시합니다.
+- 고칠 필요가 없는 칸은 그대로 두고, 새로 번역하지 마세요. 번호, 대단원, 소단원, 한국어, 페이지 열은 수정하지 마세요.`;
+      let text;
+      if (mode === 'file') {
+        text = `${intro}
+
+[결과물] 엑셀 파일(.xlsx) 하나로 만들어 주세요.
+1) 시트 "수정 반영본": 첨부 파일과 같은 열 구조(${cols})로, 수정 사항이 반영된 전체 단어.
+2) 시트 "검수 내역": 열은 한국어, 언어, 구분(필수/권장), 기존 번역, 수정 번역, 이유(한국어 한 줄), 원어민 확인(체크박스, 기본은 체크 안 함). 고친 칸만 한 줄씩 적고, 고친 것이 없으면 제목 줄만 둡니다.`;
+      } else {
+        const tsv = [['번호', '대단원', '소단원', '한국어', ...langs.map(l => l.name), '페이지'].join('\t'),
+          ...idx.map(i => { const w = builtJsonData[i]; return [i + 1, w.unit, w.section, w.kr, ...langs.map(l => String(w[l.code] || '').replace(/[\t\n]/g, ' ')), w.page === undefined ? '' : w.page].join('\t'); })].join('\n');
+        text = `${intro}
+
+[결과물] 파일을 만들 수 없으면 표를 글자로 출력해 주세요. 각 표는 코드 블록 안에 넣고 열은 탭(Tab)으로 구분합니다.
+### 수정 반영본
+열: ${cols} (수정 사항이 반영된 전체 단어)
+### 검수 내역
+열: 한국어, 언어, 구분(필수/권장), 기존 번역, 수정 번역, 이유(한국어 한 줄). 고친 칸만 한 줄씩.
+
+[검수할 표]
+${tsv}`;
+      }
+      const ok = await copyToClipboard(text);
+      document.getElementById('resultMsg').textContent = ok ? `검수 문구를 복사했어요 (${mode === 'file' ? '엑셀 파일로 받기' : '표 글자로 받기'}). AI 대화창에 붙여 넣으세요.` : '복사하지 못했어요. 브라우저 권한을 확인해 주세요.';
+    }
+
+    /* ---- 수정한 엑셀 올리기 ---- */
+    async function onResultExcelChosen(inputEl) {
+      const file = inputEl.files && inputEl.files[0];
+      inputEl.value = '';
+      if (!file) return;
+      if (!builtJsonData.length) { alert('먼저 번역 결과가 있어야 해요.'); return; }
+      if (typeof XLSX === 'undefined') { alert('엑셀 도구를 불러오지 못했어요.'); return; }
+      const msg = document.getElementById('resultMsg');
+      try {
+        const wb = XLSX.read(await file.arrayBuffer(), { type: 'array' });
+        const toAoa = n => XLSX.utils.sheet_to_json(wb.Sheets[n], { header: 1, defval: '', raw: false });
+        let main = null;
+        for (const n of [...wb.SheetNames].sort((a, b) => (a === '수정 반영본' ? -1 : b === '수정 반영본' ? 1 : 0))) {
+          if (n === '검수 내역') continue;
+          const aoa = toAoa(n);
+          const hi = aoa.findIndex((r, i) => i < 15 && r.some(c => cellText(c) === '한국어'));
+          if (hi >= 0) { main = { aoa, hi }; break; }
+        }
+        if (!main) throw new Error('"한국어" 제목 줄이 있는 시트를 찾지 못했어요');
+        const head = main.aoa[main.hi];
+        const colOf = { langs: {} };
+        head.forEach((raw, i) => {
+          const t = cellText(raw), low = t.toLowerCase();
+          if (!t) return;
+          if (/^(번호|no\.?|#)$/.test(low)) colOf.no = i;
+          else if (t === '대단원') colOf.unit = i; else if (t === '소단원') colOf.section = i;
+          else if (t === '한국어') colOf.kr = i; else if (t === '페이지') colOf.page = i;
+          else { const code = detectLangCode(t); if (code && colOf.langs[code] === undefined) colOf.langs[code] = i; }
+        });
+        const known = new Set(Object.keys(builtJsonData[0] || {}).filter(k => k !== 'id' && !PLAIN_FIELDS.includes(k)));
+        // 검수 내역 시트의 이유 읽기
+        const notes = new Map();
+        if (wb.Sheets['검수 내역']) {
+          const a2 = toAoa('검수 내역'), h2 = a2.findIndex(r => r.some(c => cellText(c) === '한국어'));
+          if (h2 >= 0) {
+            const ix = n => a2[h2].findIndex(c => cellText(c) === n);
+            const [ik, il, ig, ir] = [ix('한국어'), ix('언어'), ix('구분'), ix('이유')];
+            a2.slice(h2 + 1).forEach(r => { const code = detectLangCode(cellText(r[il])); if (cellText(r[ik]) && code) notes.set(cellText(r[ik]) + '\t' + code, { level: cellText(r[ig]), note: cellText(r[ir]) }); });
+          }
+        }
+        const used = new Set(), changes = [];
+        let unmatched = 0, krDiff = 0;
+        main.aoa.slice(main.hi + 1).forEach(r => {
+          const kr = cellText(r[colOf.kr]);
+          if (!kr) return;
+          let i = -1;
+          if (colOf.no !== undefined) {
+            const n = parseInt(cellText(r[colOf.no]), 10);
+            if (n >= 1 && n <= builtJsonData.length && !used.has(n - 1)) { if (builtJsonData[n - 1].kr === kr) i = n - 1; else { krDiff++; return; } }
+          }
+          if (i < 0) i = builtJsonData.findIndex((w, k) => !used.has(k) && w.kr === kr && (colOf.section === undefined || String(w.section) === cellText(r[colOf.section])));
+          if (i < 0) { unmatched++; return; }
+          used.add(i);
+          const w = builtJsonData[i];
+          const cmp = (code, col) => {
+            const to = cellText(r[col]), from = cellText(w[code]);
+            if (to !== from) { const nt = notes.get(kr + '\t' + code) || {}; changes.push({ w, code, from, to, level: nt.level || '', note: nt.note || '' }); }
+          };
+          ['unit', 'section', 'page'].forEach(k => { if (colOf[k] !== undefined) cmp(k, colOf[k]); });
+          Object.entries(colOf.langs).forEach(([code, col]) => { if (known.has(code)) cmp(code, col); });
+        });
+        const ignored = Object.keys(colOf.langs).filter(c => !known.has(c)).map(langNameOf);
+        popupDiff = { title: `${file.name} 비교`, changes, info: [unmatched && `찾지 못한 줄 ${unmatched}개`, krDiff && `한국어가 달라 건너뜀 ${krDiff}개`, ignored.length && `없는 언어 열 무시: ${ignored.join('·')}`].filter(Boolean).join(' · ') };
+        renderResultDiff();
+        msg.textContent = changes.length ? `바뀐 칸 ${changes.length}개를 찾았어요. 확인 후 반영해 주세요.` : '바뀐 칸이 없어요.';
+      } catch (err) { alert('엑셀을 읽지 못했어요: ' + err.message); }
+    }
+
+    /* ---- ④ 검수만 실행 ---- */
+    async function runReviewOnly() {
+      if (currentUserRole !== 'MAIN_ADMIN') return;
+      const langs = builderAvailableLangs.filter(l => l.checked);
+      if (langs.length === 0) { alert('검수할 언어를 1개 이상 선택해 주세요.'); return; }
+      const input = collectInputRows(langs);
+      if (!input) return;
+      if (!(translateJob && translateJob.sig === input.sig)) { translateJob = { sig: input.sig, rows: input.make(), reviewed: false }; reviewLog = []; }
+      const rows = translateJob.rows;
+      builtJsonData = cleanBuiltRows(rows, langs);
+      const target = builtJsonData.filter(w => langs.some(l => String(w[l.code] || '').trim()));
+      const statusEl = document.getElementById('builderStatusText');
+      if (target.length === 0) { alert('검수할 번역이 없어요. 번역이 채워진 자료를 입력하거나 먼저 번역해 주세요.'); return; }
+      const engines = [...new Set(langs.map(l => getAiConfig(reviewEngineFor(l.code)).name))];
+      if (!confirm(`${target.length}개 단어의 ${langs.map(l => l.name).join(', ')} 번역을 ${engines.join('·')}로 검수할까요? (약 ${Math.ceil(target.length / 25) * engines.length}번 호출)\n결과는 팝업에서 확인한 뒤에만 반영돼요.`)) return;
+      const btns = ['btnReviewOnly', 'btnRunAiTranslate', 'btnTrialTranslate'].map(id => document.getElementById(id));
+      btns.forEach(b => { if (b) b.disabled = true; });
+      enrichStopFlag = false;
+      popupDiff = null;
+      const out = await aiReviewCollect(target, langs, 'builderStatusText');
+      btns.forEach(b => { if (b) b.disabled = false; });
+      if (!out) { statusEl.textContent = ''; return; }
+      setResultView(showLangsFor(rows, langs), null);
+      popupDiff = { title: '검수 제안', changes: out.changes, info: out.error ? `검수 중 오류: ${out.error}` : (enrichStopFlag ? '중지됨 · 여기까지의 결과' : '') };
+      statusEl.textContent = (out.error ? `검수 실패: ${out.error} · ` : (enrichStopFlag ? '중지됨 · ' : '검수 완료 · ')) + `고칠 제안 ${out.changes.length}건 → 결과 보기 팝업에서 확인해 주세요.`;
+      openResultPopup();
+    }
+
+    /* ---- 언어별 검수 엔진 표 ---- */
+    function renderLangEngineTable() {
+      const prefs = getLangEnginePrefs(), box = document.getElementById('langEngineTable');
+      if (!box) return;
+      const e = cascadeEsc;
+      box.innerHTML = builderAvailableLangs.map(l => {
+        const p = prefs[l.code] || {};
+        return `<div class="le-row"><span>${e(l.name)}</span><span style="display:flex; gap:0.4rem;">
+          <select onchange="saveLangEnginePref('${l.code}', 'engine', this.value)" style="min-width:110px;">
+            <option value="">기본</option>${Object.entries(AI_ENGINES).map(([id, en]) => `<option value="${id}" ${p.engine === id ? 'selected' : ''}>${en.name}</option>`).join('')}
+          </select>
+          <input type="text" class="typing-input" placeholder="메모 (예: 몽골어는 Claude가 나음)" value="${e(p.memo || '')}" onchange="saveLangEnginePref('${l.code}', 'memo', this.value)" /></span></div>`;
+      }).join('');
+    }
+    function saveLangEnginePref(code, field, value) {
+      const prefs = getLangEnginePrefs();
+      prefs[code] = Object.assign(prefs[code] || {}, { [field]: value });
+      if (!prefs[code].engine && !prefs[code].memo) delete prefs[code];
+      localStorage.setItem('YONGIN_AI_REVIEW_LANG', JSON.stringify(prefs));
+    }
+
     async function runAiMultilingualTranslation(limit) {
       if (currentUserRole !== 'MAIN_ADMIN') return;
       const cfg = pickTranslateEngine();
@@ -7801,7 +8849,8 @@ ${JSON.stringify(payload)}`;
 
       // 같은 입력이면 지난번 결과에 이어서 번역
       const resumed = !!(translateJob && translateJob.sig === input.sig && !translateJob.complete);
-      if (!resumed) translateJob = { sig: input.sig, rows: input.make(), reviewed: false };
+      if (!resumed) { translateJob = { sig: input.sig, rows: input.make(), reviewed: false }; reviewLog = []; }
+      popupDiff = null;
       const rows = translateJob.rows;
 
       const btn = document.getElementById('btnRunAiTranslate');
@@ -7812,7 +8861,9 @@ ${JSON.stringify(payload)}`;
       if (todo.length === 0) {
         builtJsonData = cleanBuiltRows(rows, activeLangs);
         renderBuilderPreview(showLangsFor(rows, activeLangs));
-        statusEl.textContent = `전체 ${rows.length}개 단어 · 번역할 빈 칸이 없어 입력 내용 그대로 사용해요.`;
+        statusEl.textContent = `전체 ${rows.length}개 단어 · 번역할 빈 칸이 없어 입력 내용 그대로 사용해요. (검수는 "④ 검수만 실행")`;
+        setResultView(showLangsFor(rows, activeLangs), null);
+        openResultPopup();
         return;
       }
 
@@ -7854,14 +8905,17 @@ ${JSON.stringify(payload)}`;
 
       builtJsonData = cleanBuiltRows(rows, activeLangs);
       const remain = rows.filter(r => activeLangs.some(l => !String(r.langs[l.code] || '').trim())).length;
-      renderBuilderPreview(showLangsFor(rows, activeLangs), limit ? 20 : 0);
+      renderBuilderPreview(showLangsFor(rows, activeLangs), 0);
+      const viewIdx = limit ? translatedRows.map(r => rows.indexOf(r)).filter(i => i >= 0).sort((a, b) => a - b) : null;
+      setResultView(showLangsFor(rows, activeLangs), limit ? (viewIdx.length ? viewIdx : rows.slice(0, 20).map((_, i) => i)) : null);
       if (!failMsg && !enrichStopFlag && remain === 0) translateJob.complete = true;
       if (failMsg) statusEl.textContent = `번역 실패: ${failMsg} · ${done}개까지 번역했어요. 다시 누르면 남은 ${remain}개부터 이어서 해요.`;
       else if (enrichStopFlag) statusEl.textContent = `중지됨 · ${done}개 번역했어요. 다시 누르면 남은 ${remain}개부터 이어서 해요.`;
-      else if (limit && remain > 0) statusEl.textContent = `시험 번역 ${done}개 완료${reviewMsg} · 아래 표(상위 20개)를 확인하고 문제가 없으면 "③ 전체 번역"을 눌러 주세요. 번역한 단어는 다시 하지 않고 이어서 해요.`;
+      else if (limit && remain > 0) statusEl.textContent = `시험 번역 ${done}개 완료${reviewMsg} · 결과 보기 팝업에서 번역을 확인하고 문제가 없으면 "③ 전체 번역"을 눌러 주세요. 번역한 단어는 다시 하지 않고 이어서 해요.`;
       else statusEl.textContent = `전체 ${rows.length}개 단어 (${activeLangs.map(l => l.name).join(', ')}) 번역 완료!${reviewMsg}`;
       btn.disabled = false;
       if (btn2) btn2.disabled = false;
+      openResultPopup();
     }
 
     function renderBuilderPreview(activeLangs, maxRows) {
@@ -8407,6 +9461,7 @@ ${JSON.stringify(payload)}`;
     }
 
     function detectLockedInstitutionFromUrl() {
+      applyClassLinkParams();
       const params = new URLSearchParams(window.location.search);
       const orgParam = (params.get('org') || '').trim();
       if (!orgParam) {
@@ -9498,6 +10553,9 @@ ${link}`);
           ...built.fields,
           canExportCSV: document.getElementById('permExportCSV').checked,
           canDeleteRecord: document.getElementById('permDeleteRecord').checked,
+          canWorkbook: document.getElementById('permWorkbook').checked,
+          canPpt: document.getElementById('permPpt').checked,
+          canTest: document.getElementById('permTest').checked,
           createdAt: firebase.firestore.FieldValue.serverTimestamp(),
           registeredDate: new Date().toLocaleString('ko-KR')
         });
@@ -9581,7 +10639,7 @@ ${link}`);
         const snapshot = await db.collection("teacher_roles").get();
         teacherRecordsCacheMap.clear();
         if (snapshot.empty) {
-          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:1.5rem; color:var(--text-muted);">등록된 담당 선생님이 없습니다.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:1.5rem; color:var(--text-muted);">등록된 담당 선생님이 없습니다.</td></tr>';
           return;
         }
         let html = '';
@@ -9622,6 +10680,9 @@ ${link}`);
               </td>
               <td><input type="checkbox" ${t.canExportCSV ? 'checked' : ''} onchange="updateTeacherField('${t.email}', 'canExportCSV', this.checked)" /> 허용</td>
               <td><input type="checkbox" ${t.canDeleteRecord ? 'checked' : ''} onchange="updateTeacherField('${t.email}', 'canDeleteRecord', this.checked)" /> 허용</td>
+              <td><input type="checkbox" ${t.canPpt !== false ? 'checked' : ''} onchange="updateTeacherField('${t.email}', 'canPpt', this.checked)" /> 허용</td>
+              <td><input type="checkbox" ${t.canTest !== false ? 'checked' : ''} onchange="updateTeacherField('${t.email}', 'canTest', this.checked)" /> 허용</td>
+              <td><input type="checkbox" ${t.canWorkbook !== false ? 'checked' : ''} onchange="updateTeacherField('${t.email}', 'canWorkbook', this.checked)" /> 허용</td>
               <td>${t.registeredDate || '-'}</td>
               <td><button class="btn btn-danger btn-sm" style="padding:0.2rem 0.55rem; font-size:0.75rem;" onclick="deleteTeacherAccount('${t.email}')">삭제</button></td>
             </tr>
@@ -9629,7 +10690,7 @@ ${link}`);
         });
         tbody.innerHTML = html;
       } catch (err) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--danger); padding:1.5rem;">선생님 목록 조회 오류</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; color:var(--danger); padding:1.5rem;">선생님 목록 조회 오류</td></tr>';
       }
     }
 
@@ -9684,6 +10745,31 @@ ${link}`);
       <div id="orgQrCanvasContainer" style="display:inline-flex; align-items:center; justify-content:center; padding:1rem; background:#ffffff; border:1.5px solid #e2e8f0; border-radius:16px; margin-bottom:1rem;"></div>
       <div id="orgQrUrlText" style="font-size:0.75rem; color:#64748b; word-break:break-all; background:#f1f5f9; padding:0.5rem 0.75rem; border-radius:8px; margin-bottom:0.9rem;"></div>
       <button type="button" id="orgQrCopyBtn" class="btn btn-primary btn-sm" style="width:100%; padding:0.65rem; font-size:0.88rem;">접속 링크 복사</button>
+    </div>
+  </div>
+  <!-- v3.14: 결과 보기 팝업 -->
+  <div id="resultModal" class="result-modal" onclick="if (event.target === this) closeResultPopup()">
+    <div class="result-box">
+      <div class="result-head no-print">
+        <div><b id="resultTitle">번역 결과</b> <span id="resultSub" class="result-sub"></span></div>
+        <button type="button" class="btn btn-outline btn-sm" onclick="closeResultPopup()">닫기</button>
+      </div>
+      <div class="result-actions no-print">
+        <button type="button" class="btn btn-primary btn-sm" onclick="downloadResultExcel()">엑셀 받기</button>
+        <button type="button" class="btn btn-outline btn-sm" onclick="printResult()">인쇄 / PDF 저장</button>
+        <button type="button" class="btn btn-outline btn-sm" onclick="downloadBuiltJson()">JSON 저장</button>
+        <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('resultExcelInput').click()">수정한 엑셀 올리기</button>
+        <input type="file" id="resultExcelInput" accept=".xlsx,.xls" style="display:none;" onchange="onResultExcelChosen(this)" />
+        <button type="button" class="btn btn-outline btn-sm" onclick="copyReviewPrompt('file')">검수 문구 복사 (엑셀 파일로 받기)</button>
+        <button type="button" class="btn btn-outline btn-sm" onclick="copyReviewPrompt('text')">검수 문구 복사 (표 글자로 받기)</button>
+        <span id="resultMsg" class="result-msg"></span>
+      </div>
+      <div id="resultDiff" class="result-diff no-print" style="display:none;"></div>
+      <div class="result-scroll">
+        <table class="admin-table result-table"><thead id="resultHead"></thead><tbody id="resultBody"></tbody></table>
+        <div id="resultLogBox"></div>
+      </div>
+      <p class="manage-note no-print">다른 AI(Claude·ChatGPT 등)에 검수를 맡길 때: 엑셀을 받고 → 검수 문구를 복사해 같이 붙여 넣고 → 받은 결과 엑셀을 "수정한 엑셀 올리기"로 올리면 바뀐 칸만 보여 줘요. 인쇄 창에서 "가로"를 고르면 더 잘 보여요.</p>
     </div>
   </div>
 </body>
