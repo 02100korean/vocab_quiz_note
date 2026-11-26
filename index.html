@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>다국어 한국어 어휘 학습 & 실전 퀴즈 플랫폼 v2.7</title>
+  <title>다국어 한국어 어휘 학습 & 실전 퀴즈 플랫폼 v2.8</title>
   <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
   <!-- Google Fonts & Libraries -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1029,7 +1029,8 @@
       border-collapse: collapse;
       table-layout: fixed;
     }
-    .wb-table.wb-practice-table {
+    .wb-table.wb-practice-table,
+    .wb-table.wb-ref-stretch {
       flex: 1;
       height: 100%;
     }
@@ -3082,13 +3083,32 @@
       return parts.join(' / ');
     }
 
-    function formatCompactUnitColumn(unitStr) {
-      if (!unitStr) return '-';
-      const s = String(unitStr).trim();
+    function formatCompactUnitColumn(recordOrUnitStr) {
+      if (recordOrUnitStr && typeof recordOrUnitStr === 'object') {
+        const r = recordOrUnitStr;
+        if (Array.isArray(r.testedSections) && r.testedSections.length > 0) {
+          const codes = Array.from(new Set(r.testedSections.map(sec => extractSectionCodeLabel(sec)).filter(Boolean)));
+          if (codes.length > 0) return codes.join(', ');
+        }
+        return formatCompactUnitColumn(r.unit || '');
+      }
+      if (!recordOrUnitStr) return '-';
+      const s = String(recordOrUnitStr).trim();
       if (s === '전체 단원 통합' || s === '전체 단원') return '전체';
-      if (s.includes(' / ') || s.includes('과 전체')) return s;
-      const secMatch = s.match(/^(\d+-\d+)/);
-      if (secMatch && !s.includes(',')) return secMatch[1];
+      const subMatches = s.match(/\d+-\d+/g);
+      if (subMatches && subMatches.length > 0) {
+        return Array.from(new Set(subMatches)).join(', ');
+      }
+      const unitNumMatch = s.match(/^(\d+)(?:과|단원)/);
+      if (unitNumMatch && typeof RAW_VOCAB !== 'undefined' && Array.isArray(RAW_VOCAB)) {
+        const uPrefix = unitNumMatch[1] + '-';
+        const secs = Array.from(new Set(
+          RAW_VOCAB
+            .map(v => extractSectionCodeLabel(v.section))
+            .filter(code => code && code.startsWith(uPrefix))
+        ));
+        if (secs.length > 0) return secs.join(', ');
+      }
       return s.replace(/단원/g, '과');
     }
 
@@ -4184,7 +4204,7 @@
           <td><span style="color:#475569; font-weight:700;">${r.studentSemester || '-'}</span></td>
           <td><span style="background:${isUnassigned ? '#fef2f2' : '#eff6ff'}; color:${isUnassigned ? '#b91c1c' : '#1e3a8a'}; padding:2px 6px; border-radius:6px; font-weight:700; font-size:0.76rem;">${clsLabel}</span></td>
           <td><strong>${r.studentName}</strong></td>
-          <td><span style="font-weight:700; color:var(--primary);">${formatCompactUnitColumn(r.unit)}</span></td>
+          <td><span style="font-weight:700; color:var(--primary);">${formatCompactUnitColumn(r)}</span></td>
           <td>${modeNames[r.mode] || r.mode}</td>
           <td>${(r.language || 'en').toUpperCase()}</td>
           <td>${r.correctCount}/${r.totalQuestions}</td>
@@ -4662,7 +4682,7 @@
           ['완료일시', '학기', '소속급수', '학생이름', '단원', '학습모드', '학습언어', '정답수', '전체문항', '정답률', '스트릭'],
           ...adminFilteredRecords.map(r => [
             r.clientDate || '', r.studentSemester || '', r.studentClass || '', r.studentName,
-            formatCompactUnitColumn(r.unit), r.mode, r.language, r.correctCount, r.totalQuestions, `${r.accuracy}%`, `${r.streak || 1}일`
+            formatCompactUnitColumn(r), r.mode, r.language, r.correctCount, r.totalQuestions, `${r.accuracy}%`, `${r.streak || 1}일`
           ])
         ];
         const ws = XLSX.utils.aoa_to_sheet(aoa);
@@ -6331,7 +6351,20 @@
 
       let bodyPageNum = 1;
 
-      // PART 1: Front Vocabulary Reference Section (17 items/col so 2-line cells never overflow bottom, fixed 20-row height scale so <20 leaves clean blank gap)
+      // PART 1: Front Vocabulary Reference Section
+      // - Max 20 rows per column/page
+      // - 16~20 rows: fill full table height down to footer with zero bottom gap, giving wrapped (2-line) rows higher proportional weight
+      // - <= 15 rows: keep standard 20-row base cell height (1 line = 6.8mm, wrapped 2 lines = 10.2mm)
+      const estimateRefRowWeight = (item, langCodes, twoColMode) => {
+        const krLimit = twoColMode ? 9 : 13;
+        const langLimit = twoColMode
+          ? (langCodes.length <= 2 ? 17 : 12)
+          : (langCodes.length >= 5 ? 16 : 21);
+        const krWrapped = (item.kr || '').length > krLimit;
+        const anyLangWrapped = langCodes.some(l => (item[l] || '').length > langLimit);
+        return (krWrapped || anyLangWrapped) ? 1.55 : 1.0;
+      };
+
       const rowsPerBlock = 20;
       selectedUnits.forEach(unitName => {
         const unitItems = (wbVocabData.length > 0 ? wbVocabData : RAW_VOCAB).filter(v => v.unit === unitName);
@@ -6345,8 +6378,13 @@
 
             const renderHalfTable = (slice, startIdx) => {
               if (slice.length === 0) return '<div></div>';
+              const isFullStretch = slice.length >= 16;
+              const weights = slice.map(it => estimateRefRowWeight(it, langs, true));
+              const totalWeight = weights.reduce((a, b) => a + b, 0);
+              const tableCls = isFullStretch ? 'wb-table wb-ref-stretch' : 'wb-table wb-fixed-20';
+
               return `
-                <table class="wb-table wb-fixed-20">
+                <table class="${tableCls}">
                   <thead>
                     <tr>
                       <th style="width:8%;">번호</th>
@@ -6357,8 +6395,12 @@
                   <tbody>
                     ${slice.map((item, idx) => {
                       const krFs = calcAutoFontSize(item.kr, langs.length, true);
+                      const w = weights[idx];
+                      const rowH = isFullStretch
+                        ? `${((w / totalWeight) * 100).toFixed(2)}%`
+                        : `${(6.8 * w).toFixed(1)}mm`;
                       return `
-                        <tr>
+                        <tr style="height:${rowH};">
                           <td style="text-align:center; font-weight:700; font-size:0.7rem; color:#475569;">${startIdx + idx + 1}</td>
                           <td style="font-weight:700; font-size:${krFs};"><div class="wb-cell-clamp">${item.kr}</div></td>
                           ${langs.map(l => {
@@ -6374,6 +6416,7 @@
               `;
             };
 
+            const anyStretch = leftSlice.length >= 16 || rightSlice.length >= 16;
             pages.push(`
               <div class="wb-page">
                 <div style="flex:1; display:flex; flex-direction:column;">
@@ -6381,7 +6424,7 @@
                     <span>📘 ${unitName}</span>
                     <span style="font-size:0.8rem; color:#475569;">다국어 어휘 정리 (${langs.map(l => WB_LANG_NAMES[l] || l).join(' · ')})</span>
                   </div>
-                  <div class="wb-two-col-grid" style="align-items:start;">
+                  <div class="wb-two-col-grid" style="align-items:${anyStretch ? 'stretch' : 'start'};">
                     ${renderHalfTable(leftSlice, i)}
                     ${renderHalfTable(rightSlice, i + rowsPerBlock)}
                   </div>
@@ -6391,10 +6434,14 @@
             `);
           }
         } else {
-          // 1-column full-width layout (4+ languages: 17 items/page so wrapped rows never clip outside page, fixed 20-row height scale)
           const perPage = 20;
           for (let i = 0; i < unitItems.length; i += perPage) {
             const slice = unitItems.slice(i, i + perPage);
+            const isFullStretch = slice.length >= 16;
+            const weights = slice.map(it => estimateRefRowWeight(it, langs, false));
+            const totalWeight = weights.reduce((a, b) => a + b, 0);
+            const tableCls = isFullStretch ? 'wb-table wb-ref-stretch' : 'wb-table wb-fixed-20';
+
             pages.push(`
               <div class="wb-page">
                 <div class="wb-one-col-wrap">
@@ -6402,7 +6449,7 @@
                     <span>📘 ${unitName}</span>
                     <span style="font-size:0.8rem; color:#475569;">다국어 어휘 정리 (${langs.map(l => WB_LANG_NAMES[l] || l).join(' · ')})</span>
                   </div>
-                  <table class="wb-table wb-fixed-20">
+                  <table class="${tableCls}">
                     <thead>
                       <tr>
                         <th style="width:5%;">번호</th>
@@ -6413,8 +6460,12 @@
                     <tbody>
                       ${slice.map((item, idx) => {
                         const krFs = calcAutoFontSize(item.kr, langs.length, false);
+                        const w = weights[idx];
+                        const rowH = isFullStretch
+                          ? `${((w / totalWeight) * 100).toFixed(2)}%`
+                          : `${(6.8 * w).toFixed(1)}mm`;
                         return `
-                          <tr>
+                          <tr style="height:${rowH};">
                             <td style="text-align:center; font-weight:700; font-size:0.72rem; color:#475569;">${i + idx + 1}</td>
                             <td style="font-weight:700; font-size:${krFs};"><div class="wb-cell-clamp">${item.kr}</div></td>
                             ${langs.map(l => {
