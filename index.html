@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>다국어 한국어 어휘 학습 & 실전 퀴즈 플랫폼 v3.17</title>
+  <title>다국어 한국어 어휘 학습 & 실전 퀴즈 플랫폼 v3.19</title>
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
   <!-- Google Fonts & Libraries -->
@@ -1557,6 +1557,10 @@
     .lang-engine input { width: 100%; }
     @media print {
       body.printing-result > *:not(#resultModal) { display: none !important; }
+      body.printing-result #resultModal, body.printing-result #resultModal * { visibility: visible !important; }
+      body.printing-result #resultModal { height: auto !important; overflow: visible !important; }
+      body.printing-result .result-box { height: auto !important; overflow: visible !important; box-shadow: none !important; }
+      body.printing-result .result-diff, body.printing-result .result-actions { display: none !important; }
       body.printing-result #resultModal { display: block !important; position: static; background: #fff; padding: 0; }
       body.printing-result .result-box { width: 100%; max-height: none; padding: 0; }
       body.printing-result .result-scroll { overflow: visible; border: none; }
@@ -1593,6 +1597,26 @@
     .entry-pin-row input { flex:1; margin-bottom:0; letter-spacing:0.25em; text-align:center; }
     .entry-note { font-size:0.78rem; color:var(--text-muted); margin-top:0.3rem; }
 
+    /* v3.18 */
+    .entry-code-box { background:#eff6ff; border:1px solid #bfdbfe; border-radius:10px; padding:0.6rem 0.7rem; margin-bottom:0.85rem; text-align:left; }
+    .entry-code-row { display:flex; gap:0.5rem; }
+    .entry-code-row input { flex:1; margin-bottom:0; text-transform:uppercase; letter-spacing:0.08em; }
+    .entry-code-msg { font-size:0.8rem; font-weight:700; margin-top:0.35rem; min-height:1rem; color:#b91c1c; }
+    .entry-code-msg.ok { color:#166534; }
+    .ca-link-row { display:flex; gap:0.45rem; align-items:center; margin-bottom:0.5rem; }
+    .ca-link-row input { flex:1; padding:0.4rem 0.6rem; font-size:0.78rem; margin-bottom:0; background:#fff; }
+    .stu-pending { font-size:0.7rem; font-weight:800; color:#92400e; background:#fef3c7; border-radius:5px; padding:1px 6px; margin-left:0.3rem; }
+
+    /* v3.19 */
+    .xs-box { max-width: 460px; text-align: left; }
+    .xs-box h3 { margin: 0 0 0.35rem; font-size: 1.05rem; }
+    .xs-box p { font-size: 0.82rem; color: #475569; margin: 0 0 0.8rem; line-height: 1.5; }
+    .xs-btns { display: flex; flex-direction: column; gap: 0.45rem; }
+    .xs-btns .btn { justify-content: flex-start; text-align: left; }
+    .xs-btns .btn small { display: block; font-weight: 600; opacity: 0.8; font-size: 0.74rem; }
+    .xs-progress { font-size: 0.82rem; font-weight: 800; color: var(--primary); margin-top: 0.6rem; min-height: 1rem; }
+    .title-rule { font-size: 0.72rem; color: #64748b; font-weight: 700; margin-top: -0.25rem; }
+
   </style>
 </head>
 <body>
@@ -1624,6 +1648,15 @@
       <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem; line-height: 1.5;">
         <strong>기관 · 학기 · 반 · 이름</strong>을 선택해 주세요.
       </p>
+
+      <div class="entry-code-box" id="entryCodeBox">
+        <label style="font-size:0.78rem; font-weight:800; color:#1e40af; display:block; margin-bottom:0.3rem;">코드 또는 PIN이 있으면 여기에 입력 / Enter your code or PIN</label>
+        <div class="entry-code-row">
+          <input type="text" id="entryCodeInput" class="typing-input" placeholder="코드 / PIN" maxlength="20" autocomplete="off" onkeydown="if(event.key==='Enter')submitEntryCode()" />
+          <button type="button" class="btn btn-primary btn-sm" onclick="submitEntryCode()">확인 / OK</button>
+        </div>
+        <div class="entry-code-msg" id="entryCodeMsg"></div>
+      </div>
 
       <div id="recentProfilesBox" style="display:none; background:#f8fafc; border:1px solid var(--border); border-radius:12px; padding:0.75rem; margin-bottom:1rem; text-align:left;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.45rem;">
@@ -1677,6 +1710,16 @@
 
 
   <!-- v3.16: 승인 안내 / 코드 입력 / 체험 -->
+  <!-- v3.19: 여러 단원 저장 방식 선택 -->
+  <div class="modal-overlay" id="exportSplitModal">
+    <div class="modal-content xs-box">
+      <h3 id="xsTitle">어떻게 저장할까요?</h3>
+      <p id="xsDesc"></p>
+      <div class="xs-btns" id="xsBtns"></div>
+      <div class="xs-progress" id="xsProgress"></div>
+    </div>
+  </div>
+
   <div id="approvalModal" class="modal-overlay">
     <div class="modal-box ap-box">
       <h2>승인된 학생만 사용할 수 있어요 <span class="en" style="font-weight:600;">/ For approved students only</span></h2>
@@ -1685,8 +1728,8 @@
       <p>코드를 입력하세요. 코드가 없으면 선생님/관리자에게 문의하세요. 코드를 입력하면 정해진 기간 동안 체험해 볼 수 있어요. 체험 중 학습 기록은 화면에서만 볼 수 있고, 저장되지 않아요.</p>
       <p class="en">Enter your code. If you do not have one, please ask your teacher or administrator. A code lets you try the site for a limited time. Records during the trial are not saved.</p>
       <div class="ap-code-row">
-        <input type="text" id="trialCodeInput" class="typing-input" placeholder="코드 / Code" maxlength="20" autocomplete="off" onkeydown="if(event.key==='Enter')submitTrialCode()" />
-        <button type="button" class="btn btn-primary" onclick="submitTrialCode()">코드 입력 / Enter</button>
+        <input type="text" id="trialCodeInput" class="typing-input" placeholder="코드 / PIN" maxlength="20" autocomplete="off" onkeydown="if(event.key==='Enter')submitTrialCode()" />
+        <button type="button" class="btn btn-primary" onclick="submitTrialCode()">코드·PIN 입력 / Enter</button>
       </div>
       <div class="ap-msg" id="trialCodeMsg"></div>
       <div class="ap-btns">
@@ -1967,7 +2010,11 @@
             <select id="caInst" onchange="renderClassAccessControls(true)"></select>
             <select id="caSem" onchange="renderClassAccessControls(true)"></select>
             <select id="caCls" onchange="loadClassAccessPanel()"></select>
-            <button type="button" class="btn btn-outline btn-sm" onclick="copyClassLink()">반 전용 링크 복사</button>
+          </div>
+          <div class="ca-link-row">
+            <strong style="font-size:0.82rem; white-space:nowrap;">반 전용 링크</strong>
+            <input type="text" id="caLinkInput" readonly onclick="this.select()" />
+            <button type="button" class="btn btn-outline btn-sm" onclick="copyClassLink()">복사</button>
           </div>
           <div class="ca-row">
             <strong style="font-size:0.82rem;">PIN</strong>
@@ -2403,9 +2450,10 @@
           <div class="cloudbook-grid">
             <select id="cloudBookSelect" onchange="onCloudBookSelectChange()"></select>
             <input type="text" id="cloudBookIdInput" class="typing-input" placeholder="교재 ID (영문·숫자, 예: snu4b)" />
-            <input type="text" id="cloudBookTitleInput" class="typing-input" placeholder="교재 이름 (예: 서울대 한국어+ 4B)" />
+            <input type="text" id="cloudBookTitleInput" class="typing-input" placeholder="교재 이름 (예: 서울대 한국어 4B)" maxlength="40" oninput="cleanBookTitleInput(this)" />
             <input type="text" id="cloudBookSubInput" class="typing-input" placeholder="설명 (선택)" />
           </div>
+          <div class="title-rule">교재 이름에 쓸 수 있는 것: 한글 · 영문 · 숫자 · 띄어쓰기 · 기호는 - _ 만 (파일 이름에 그대로 쓰여요)</div>
           </div>
 
           <div style="background:white; border:1px solid #bfdbfe; border-radius:10px; padding:0.65rem; margin-bottom:0.65rem;">
@@ -2532,7 +2580,7 @@
           <h3 style="font-size:0.96rem; font-weight:800; color:#92400e; margin-bottom:0.45rem;">체험 코드</h3>
           <p class="manage-note" style="margin-bottom:0.6rem;">승인되지 않은 학생이 일정 기간 체험하거나, 베타 테스터에게 줄 코드를 만들어요. 체험 중에는 학습 기록이 저장되지 않아요. 사용 횟수를 정하면 그 횟수가 끝난 코드는 쓸 수 없어요.</p>
           <div style="display:flex; flex-wrap:wrap; gap:0.5rem; align-items:center; margin-bottom:0.6rem;">
-            <input type="text" id="tcCode" class="typing-input" placeholder="코드 (비우면 자동 생성)" maxlength="20" style="width:190px; padding:0.45rem 0.65rem; font-size:0.85rem; margin-bottom:0; text-transform:uppercase;" />
+            <input type="text" id="tcCode" class="typing-input" placeholder="코드 (영문 포함 · 비우면 자동)" maxlength="20" style="width:190px; padding:0.45rem 0.65rem; font-size:0.85rem; margin-bottom:0; text-transform:uppercase;" />
             <select id="tcMinutes" style="padding:0.45rem; font-size:0.85rem;">
               <option value="3">3분</option><option value="30">30분</option><option value="60">1시간</option><option value="1440">24시간</option><option value="10080">7일</option>
             </select>
@@ -2606,19 +2654,19 @@
           <div style="display:flex; flex-wrap:wrap; gap:0.6rem; align-items:center; margin-bottom:0.6rem;">
             <input type="email" id="newTeacherEmail" placeholder="선생님 구글 이메일" class="typing-input" style="flex:1; min-width:240px; padding:0.52rem 0.85rem; font-size:0.88rem; margin-bottom:0; text-align:left;" />
             <label style="display:inline-flex; align-items:center; gap:0.35rem; cursor:pointer; font-size:0.82rem; font-weight:700;">
-              <input type="checkbox" id="permExportCSV" checked /> 엑셀 허용
+              <input type="checkbox" id="permExportCSV" checked /> 엑셀
             </label>
             <label style="display:inline-flex; align-items:center; gap:0.35rem; cursor:pointer; font-size:0.82rem; font-weight:700;">
-              <input type="checkbox" id="permDeleteRecord" /> 삭제 허용
+              <input type="checkbox" id="permDeleteRecord" /> 기록/명단 삭제
             </label>
             <label style="display:inline-flex; align-items:center; gap:0.35rem; cursor:pointer; font-size:0.82rem; font-weight:700;">
-              <input type="checkbox" id="permWorkbook" /> 단어 자료 허용
+              <input type="checkbox" id="permWorkbook" /> 단어 자료
             </label>
             <label style="display:inline-flex; align-items:center; gap:0.35rem; cursor:pointer; font-size:0.82rem; font-weight:700;">
-              <input type="checkbox" id="permPpt" /> PPT 허용
+              <input type="checkbox" id="permPpt" /> PPT
             </label>
             <label style="display:inline-flex; align-items:center; gap:0.35rem; cursor:pointer; font-size:0.82rem; font-weight:700;">
-              <input type="checkbox" id="permTest" /> 테스트 허용
+              <input type="checkbox" id="permTest" /> 테스트
             </label>
             <button type="button" class="btn btn-primary btn-sm" onclick="registerNewTeacher()">등록 저장</button>
           </div>
@@ -2633,8 +2681,8 @@
               <tr>
                 <th>선생님 이메일</th>
                 <th>담당 범위</th>
-                <th>엑셀 허용</th>
-                <th>삭제 허용</th>
+                <th>엑셀</th>
+                <th>기록/명단 삭제</th>
                 <th>PPT</th>
                 <th>테스트</th>
                 <th>단어 자료</th>
@@ -3090,6 +3138,7 @@
     ========================================================================== */
     const TRIAL_KEY = 'YONGIN_KOREAN_TRIAL_V1';
     const FREE_TRIAL_CODE = 'FREE';
+    const TRIAL_NAME = '체험(Guest)';
     const FREE_TRIAL_MINUTES = 3;
     let trialState = null;       // 체험 중이면 { code, until }
     let trialTimer = null;
@@ -3142,9 +3191,6 @@
       document.getElementById('trialExpiredModal').classList.remove('show');
       openNameModal();
     }
-    function showTrialMsg(ko, en) {
-      document.getElementById('trialCodeMsg').textContent = ko + ' / ' + en;
-    }
 
     function startFreeTrial() {
       const st = readTrialStore();
@@ -3158,18 +3204,74 @@
       location.reload();
     }
 
+    // 승인 안내창(X)에서 누르는 입력: 코드·PIN 모두 처리
     async function submitTrialCode() {
-      const code = (document.getElementById('trialCodeInput').value || '').trim().toUpperCase();
-      if (!/^[A-Z0-9]{3,20}$/.test(code)) { showTrialMsg('코드는 영어와 숫자 3~20자예요.', 'Use 3-20 letters or numbers.'); return; }
+      const msgEl = document.getElementById('trialCodeMsg');
+      await redeemCode(document.getElementById('trialCodeInput').value, (ko, en, ok) => { msgEl.style.color = ok ? '#166534' : ''; msgEl.textContent = en ? ko + ' / ' + en : ko; });
+    }
+    // 입장 화면 위쪽 입력
+    async function submitEntryCode() {
+      const msgEl = document.getElementById('entryCodeMsg');
+      await redeemCode(document.getElementById('entryCodeInput').value, (ko, en, ok) => { msgEl.className = 'entry-code-msg' + (ok ? ' ok' : ''); msgEl.textContent = en ? ko + ' / ' + en : ko; });
+    }
+
+    async function redeemCode(raw, say) {
+      const code = String(raw || '').trim().toUpperCase();
+      if (!code) { say('코드 또는 PIN을 입력하세요.', 'Enter a code or PIN.'); return; }
+      if (/^\d+$/.test(code) && !/^\d{4,8}$/.test(code)) { say('PIN은 숫자 4~8자리예요.', 'PIN is 4-8 digits.'); return; }
+      if (!/^[A-Z0-9]{3,20}$/.test(code)) { say('코드는 영어와 숫자 3~20자예요.', 'Use 3-20 letters or numbers.'); return; }
+      if (/^\d+$/.test(code)) {                           // 숫자만 → 반 PIN
+        if (!/^\d{4,8}$/.test(code)) { say('PIN은 숫자 4~8자리예요.', 'PIN is 4-8 digits.'); return; }
+        const r = await tryClassPin(code, say);
+        if (r === false) say('없는 PIN이에요. 선생님께 다시 확인해 주세요.', 'PIN not found.');
+        return;
+      }
+      await tryTrialCode(code, say);                       // 영문 포함 → 체험 코드
+    }
+
+    // 반 PIN으로 반 찾기 (true: 성공, false: 그런 PIN 없음, null: 확인 불가)
+    async function tryClassPin(pin, say) {
+      if (!db) { say('지금은 확인할 수 없어요. 인터넷을 확인해 주세요.', 'Cannot check now. Please check your internet.'); return null; }
+      say('확인하는 중...', 'Checking...');
+      try {
+        const snap = await db.collection('class_pins').doc(await classPinIndexHash(pin)).get();
+        if (!snap.exists) return false;
+        const d = snap.data();
+        const cfg = await fetchClassAccess(d.institution, d.semester, d.studentClass, true);
+        const id = classAccessId(d.institution, d.semester, d.studentClass);
+        if (!cfgHasPin(cfg) || cfg.pinIndex !== await classPinIndexHash(pin)) return false;   // 이미 바뀐 PIN
+        setPinVerified(id, cfg.pinHash);
+        applyPinEntry(d);
+        return true;
+      } catch (e) {
+        say('확인하지 못했어요. 잠시 뒤에 다시 해 주세요.', 'Could not check. Please try again.');
+        return null;
+      }
+    }
+
+    let entryPinLocked = null;     // PIN으로 반이 정해졌을 때 { inst, sem, cls }
+    function applyPinEntry(d) {
+      document.getElementById('approvalModal').classList.remove('show');
+      userInstitution = d.institution; userSemester = d.semester; userClass = d.studentClass; userName = '학습자';
+      entryPinLocked = { inst: d.institution, sem: d.semester, cls: d.studentClass };
+      openNameModal();
+      const m = document.getElementById('entryCodeMsg');
+      m.className = 'entry-code-msg ok';
+      m.textContent = `확인됐어요 ✓ ${d.semester} · ${d.studentClass} 반이에요. 이름을 ${'고르세요'} / Confirmed. Now choose your name.`;
+    }
+    function unlockEntryClass() { entryPinLocked = null; openNameModal(); }
+
+    async function tryTrialCode(code, say) {
       const st = readTrialStore();
       if (st && st.code === code) {                 // 같은 기기에서 같은 코드: 남은 시간만 이어서 (시간이 다시 시작되지 않음)
         document.getElementById('approvalModal').classList.remove('show');
+        document.getElementById('nameModal').classList.remove('show');
         if (st.until > Date.now()) { location.reload(); return; }
         document.getElementById('trialExpiredModal').classList.add('show');
         return;
       }
-      if (!db) { showTrialMsg('지금은 코드를 확인할 수 없어요. 인터넷을 확인해 주세요.', 'Cannot check the code now. Please check your internet.'); return; }
-      showTrialMsg('확인하는 중...', 'Checking...');
+      if (!db) { say('지금은 코드를 확인할 수 없어요. 인터넷을 확인해 주세요.', 'Cannot check the code now. Please check your internet.'); return; }
+      say('확인하는 중...', 'Checking...');
       try {
         const ref = db.collection('trial_codes').doc(code);
         const result = await db.runTransaction(async tx => {
@@ -3181,12 +3283,12 @@
           tx.update(ref, { usedCount: used + 1 });
           return { minutes: d.minutes || FREE_TRIAL_MINUTES };
         });
-        if (result.error === 'none') { showTrialMsg('없는 코드예요. 다시 확인해 주세요.', 'Code not found.'); return; }
-        if (result.error === 'limit') { showTrialMsg('사용 횟수가 끝난 코드예요.', 'This code has reached its limit.'); return; }
+        if (result.error === 'none') { say('없는 코드예요. 다시 확인해 주세요.', 'Code not found.'); return; }
+        if (result.error === 'limit') { say('사용 횟수가 끝난 코드예요.', 'This code has reached its limit.'); return; }
         writeTrialStore({ code, until: Date.now() + result.minutes * 60000 });
         location.reload();
       } catch (err) {
-        showTrialMsg('확인하지 못했어요. 잠시 뒤에 다시 해 주세요.', 'Could not check. Please try again.');
+        say('확인하지 못했어요. 잠시 뒤에 다시 해 주세요.', 'Could not check. Please try again.');
       }
     }
 
@@ -3201,7 +3303,7 @@
 
     function startTrialSession(st) {
       trialState = { code: st.code, until: st.until };
-      userName = '체험(Guest)';
+      userName = TRIAL_NAME;
       updateHeaderUserUI();
       document.getElementById('nameModal').classList.remove('show');
       document.getElementById('approvalModal').classList.remove('show');
@@ -3225,6 +3327,8 @@
       clearInterval(trialTimer);
       trialState = null;
       trialMem.clear();
+      userName = '학습자';
+      updateHeaderUserUI();
       document.getElementById('trialBadge').style.display = 'none';
       document.getElementById('trialExpiredModal').classList.add('show');
     }
@@ -3240,8 +3344,10 @@
 
     /* ----- 관리자: 체험 코드 관리 ----- */
     function randomTrialCode() {
-      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-      return Array.from({ length: 6 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+      const chars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';   // 헷갈리는 O·0·I·1·L 뺌
+      let c = '';
+      do { c = Array.from({ length: 6 }, () => chars[Math.floor(Math.random() * chars.length)]).join(''); } while (!/[A-Z]/.test(c));
+      return c;
     }
     function trialMinutesLabel(m) {
       if (m >= 1440 && m % 1440 === 0) return (m / 1440) + '일';
@@ -3253,6 +3359,7 @@
       let code = (document.getElementById('tcCode').value || '').trim().toUpperCase();
       if (!code) code = randomTrialCode();
       if (!/^[A-Z0-9]{3,20}$/.test(code)) { alert('코드는 영어와 숫자 3~20자로 만들어 주세요.'); return; }
+      if (!/[A-Z]/.test(code)) { alert('코드에는 영어 글자를 1개 이상 넣어 주세요. (숫자만 있으면 반 PIN과 헷갈려요)'); return; }
       if (code === FREE_TRIAL_CODE) { alert('FREE는 무료 체험용으로 쓰는 이름이라 만들 수 없어요.'); return; }
       const minutes = parseInt(document.getElementById('tcMinutes').value, 10) || 3;
       const maxUses = Math.max(0, parseInt(document.getElementById('tcMax').value, 10) || 0);
@@ -3315,6 +3422,7 @@
       return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
     }
     async function classPinHash(id, pin) { return sha256Hex(id + '|' + String(pin).trim()); }
+    async function classPinIndexHash(pin) { return sha256Hex('PIN|' + String(pin).trim()); }   // 반 찾기용(PIN → 반)
     function cfgHasPin(cfg) { return !!(cfg && cfg.pinHash); }
     function cfgHasRoster(cfg) { return !!(cfg && Array.isArray(cfg.roster) && cfg.roster.length > 0); }
 
@@ -3428,13 +3536,32 @@
         }
       }
     }
-    function copyClassLink() {
-      const inst = document.getElementById('caInst').value, sem = document.getElementById('caSem').value, cls = document.getElementById('caCls').value;
-      if (!inst || !sem || !cls) { alert('기관·학기·반을 먼저 골라 주세요.'); return; }
+    function applyEntryPinLock() {
+      if (!entryPinLocked) return;
+      const { inst, sem, cls } = entryPinLocked;
+      const instSel = document.getElementById('userInstSelect'), semSel = document.getElementById('userSemesterSelect'), lvlSel = document.getElementById('userLevelSelect'), clsSel = document.getElementById('userClassSelect');
+      if (instSel && Array.from(instSel.options).some(o => o.value === inst)) { instSel.value = inst; onStudentInstSelectChange(); }
+      if (semSel && Array.from(semSel.options).some(o => o.value === sem)) { semSel.value = sem; onStudentInstSelectChange(); }
+      const levels = getLevelsFor(inst, sem);
+      const lv = Object.keys(levels).find(k => (levels[k] || []).includes(cls));
+      if (lv && lvlSel && clsSel) { lvlSel.value = lv; onStudentLevelSelectChange(); clsSel.value = cls; }
+      [instSel, semSel, lvlSel, clsSel].forEach(el => { if (el) el.disabled = true; });
+    }
+    function buildClassLink() {
+      const inst = document.getElementById('caInst')?.value, sem = document.getElementById('caSem')?.value, cls = document.getElementById('caCls')?.value;
+      if (!inst || !sem || !cls) return '';
       let link = getStudentLinkForInstitution(inst);
-      link += (link.includes('?') ? '&' : '?') + 'sem=' + encodeURIComponent(sem) + '&cls=' + encodeURIComponent(cls);
+      return link + (link.includes('?') ? '&' : '?') + 'sem=' + encodeURIComponent(sem) + '&cls=' + encodeURIComponent(cls);
+    }
+    function updateClassLinkField() {
+      const el = document.getElementById('caLinkInput'); if (el) el.value = buildClassLink();
+    }
+    function copyClassLink() {
+      const link = buildClassLink();
+      if (!link) { alert('기관·학기·반을 먼저 골라 주세요.'); return; }
       if (navigator.clipboard) navigator.clipboard.writeText(link).catch(() => {});
-      setCaMsg('반 전용 링크를 복사했어요: ' + link);
+      document.getElementById('caLinkInput').select();
+      setCaMsg('반 전용 링크를 복사했어요.');
     }
 
     /* ----- 선생님·관리자 화면 ----- */
@@ -3480,9 +3607,10 @@
       const inst = document.getElementById('caInst')?.value, sem = document.getElementById('caSem')?.value, cls = document.getElementById('caCls')?.value;
       const statusEl = document.getElementById('caStatus');
       if (!statusEl) return;
-      if (!inst || !sem || !cls) { statusEl.textContent = '반을 고르세요'; document.getElementById('caRosterText').value = ''; updateRosterCount(); return; }
+      if (!inst || !sem || !cls) { updateClassLinkField(); statusEl.textContent = '반을 고르세요'; document.getElementById('caRosterText').value = ''; updateRosterCount(); return; }
       const id = classAccessId(inst, sem, cls);
       caCurrent = { id, inst, sem, cls, cfg: null };
+      updateClassLinkField();
       document.getElementById('caPinInput').value = ''; document.getElementById('caRosterText').value = '';
       if (!keepMsg) setCaMsg('');
       if (!db) { statusEl.textContent = '서버에 연결되지 않았어요'; return; }
@@ -3501,7 +3629,8 @@
       } catch (e) { statusEl.textContent = '불러오지 못했어요'; }
     }
     function makeRandomPin() {
-      document.getElementById('caPinInput').value = String(Math.floor(1000 + Math.random() * 9000));
+      const d = '23456789';   // 0·1은 빼서 헷갈리지 않게
+      document.getElementById('caPinInput').value = Array.from({ length: 4 }, () => d[Math.floor(Math.random() * d.length)]).join('');
     }
     async function writeClassAccess(fields) {
       const { id, inst, sem, cls } = caCurrent;
@@ -3522,7 +3651,17 @@
       if (!/^\d{4,8}$/.test(pin)) { setCaMsg('PIN은 숫자 4~8자리로 해 주세요. (없애려면 PIN 해제)', true); return; }
       try {
         const h = await classPinHash(caCurrent.id, pin);
-        await writeClassAccess({ pinHash: h, hasPin: true });
+        const idx = await classPinIndexHash(pin);
+        const ex = await db.collection('class_pins').doc(idx).get();
+        if (ex.exists && ex.data().classId !== caCurrent.id) {
+          const o = ex.data();
+          setCaMsg(`이 PIN은 이미 다른 반(${o.semester} · ${o.studentClass})에서 쓰고 있어요. 다른 PIN으로 해 주세요.`, true);
+          return;
+        }
+        const oldIdx = caCurrent.cfg && caCurrent.cfg.pinIndex;
+        await db.collection('class_pins').doc(idx).set({ classId: caCurrent.id, institution: caCurrent.inst, semester: caCurrent.sem, studentClass: caCurrent.cls });
+        if (oldIdx && oldIdx !== idx) { try { await db.collection('class_pins').doc(oldIdx).delete(); } catch (e2) { /* 없어도 됨 */ } }
+        await writeClassAccess({ pinHash: h, pinIndex: idx, hasPin: true });
         await db.collection('class_pin_private').doc(caCurrent.id).set({ pin, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
         setCaMsg('PIN을 저장했어요. 학생에게 알려 주세요: ' + pin);
         loadClassAccessPanel(true);
@@ -3532,7 +3671,9 @@
       if (!caReady()) return;
       if (!confirm('이 반의 PIN을 없앨까요? 없애면 PIN 없이 들어올 수 있어요.')) return;
       try {
-        await writeClassAccess({ pinHash: '', hasPin: false });
+        const oldIdx = caCurrent.cfg && caCurrent.cfg.pinIndex;
+        await writeClassAccess({ pinHash: '', pinIndex: '', hasPin: false });
+        try { if (oldIdx) await db.collection('class_pins').doc(oldIdx).delete(); } catch (e) { /* 없어도 됨 */ }
         try { await db.collection('class_pin_private').doc(caCurrent.id).delete(); } catch (e) { /* 없어도 됨 */ }
         setCaMsg('PIN을 없앴어요.');
         loadClassAccessPanel(true);
@@ -4008,6 +4149,7 @@
         alert(document.getElementById('userNameSelect').style.display !== 'none' ? '명단에서 이름을 골라 주세요. / Please choose your name.' : '이름을 입력해 주세요.');
         return;
       }
+      if (inputName.startsWith('체험(')) { alert('이 이름은 쓸 수 없어요. 본인 이름을 입력해 주세요. / Please use your own name.'); return; }
       const blockMsg = checkEntryAllowed(inputName);
       if (blockMsg) { alert(blockMsg); return; }
       userInstitution = selectedInst;
@@ -4053,8 +4195,12 @@
       if (clsSel && Array.from(clsSel.options).some(o => o.value === userClass)) {
         clsSel.value = userClass;
       }
-      document.getElementById('userNameInput').value = userName === '학습자' ? '' : userName;
+      document.getElementById('userNameInput').value = (userName === '학습자' || userName === TRIAL_NAME) ? '' : userName;
+      ['userInstSelect', 'userSemesterSelect', 'userLevelSelect', 'userClassSelect'].forEach(id => { const el = document.getElementById(id); if (el) el.disabled = false; });
+      document.getElementById('entryCodeInput').value = '';
+      { const m = document.getElementById('entryCodeMsg'); m.className = 'entry-code-msg'; m.textContent = ''; }
       applyClassLinkLock();
+      applyEntryPinLock();
       document.getElementById('nameModal').classList.add('show');
       refreshEntryAccess();
     }
@@ -5909,6 +6055,25 @@
           mapByKey.set(`${d.semester || '26-1'}__${d.studentClass || '미지정'}__${d.studentName}`, d);
         });
 
+        // v3.18: 반 입장 설정의 명단(아직 한 번도 안 들어온 학생)도 목록에 넣음
+        try {
+          const accSnap = await db.collection('class_access').get();
+          accSnap.forEach(doc => {
+            const a = doc.data();
+            if (!Array.isArray(a.roster) || !a.roster.length) return;
+            if (currentUserRole === 'TEACHER' && !isTeacherAllScope() && !isClassAllowedForTeacher(a.studentClass, a.semester, a.institution)) return;
+            a.roster.forEach(nm => {
+              const k = `${a.semester || '26-1'}__${a.studentClass || '미지정'}__${nm}`;
+              if (mapByKey.has(k)) return;
+              mapByKey.set(k, {
+                _docId: buildStudentDocId(a.institution || '용인대학교 한국어학당', a.semester || '26-1', a.studentClass || '미지정', nm),
+                _fromRoster: false, _fromAccess: true, _accessId: doc.id,
+                institution: a.institution, semester: a.semester, studentClass: a.studentClass, studentName: nm, lastActiveDate: '-'
+              });
+            });
+          });
+        } catch (e) { /* 규칙 게시 전이면 건너뜀 */ }
+
         adminRecordsCache.forEach(r => {
           const sem = r.studentSemester || '26-1';
           const cls = r.studentClass || '미지정';
@@ -5989,7 +6154,7 @@
             <td style="text-align:center;"><input type="checkbox" class="stu-row-cb" value="${idx}" onchange="onStudentRowCheckboxChange(this)" /></td>
             <td style="text-align:center; font-weight:700; color:#64748b;">${idx + 1}</td>
             <td>
-              <input type="text" id="editStuName_${idx}" value="${s.studentName}" style="padding:0.25rem 0.5rem; font-size:0.84rem; font-weight:700; border:1px solid var(--border); border-radius:6px; width:145px;" />
+ ${s._fromAccess ? '<span class="stu-pending">입장 전</span>' : ''}<input type="text" id="editStuName_${idx}" value="${s.studentName}" style="padding:0.25rem 0.5rem; font-size:0.84rem; font-weight:700; border:1px solid var(--border); border-radius:6px; width:145px;" />
             </td>
             <td>
               <select id="editStuCls_${idx}" style="padding:0.25rem 0.45rem; font-size:0.8rem;">
@@ -6050,6 +6215,12 @@
         if (s._fromRoster && s._docId && s._docId !== newDocId) {
           await db.collection("students").doc(s._docId).delete();
         }
+        if (s._fromAccess && (newName !== oldName || newCls !== oldCls)) {   // 입장 전 학생: 명단의 이름도 같이 고침
+          const ref = db.collection('class_access').doc(s._accessId);
+          const snap = await ref.get();
+          if (snap.exists) await ref.set({ roster: (snap.data().roster || []).map(n => n === oldName ? newName : n) }, { merge: true });
+          classAccessCache.delete(s._accessId);
+        }
 
         const matchingRecords = adminRecordsCache.filter(r =>
           (r.studentName || '') === oldName && (r.studentClass || '미지정') === oldCls && (r.studentSemester || '26-1') === oldSem
@@ -6095,8 +6266,15 @@
       if (!confirm(msg)) return;
 
       try {
+        // v3.18: '입장 전' 학생은 반 입장 명단에서 이름을 뺌
+        for (const s of targets.filter(t => t._fromAccess)) {
+          const ref = db.collection('class_access').doc(s._accessId);
+          const snap = await ref.get();
+          if (snap.exists) await ref.set({ roster: (snap.data().roster || []).filter(n => n !== s.studentName) }, { merge: true });
+          classAccessCache.delete(s._accessId);
+        }
         const batch = db.batch();
-        targets.forEach(s => {
+        targets.filter(t => !t._fromAccess).forEach(s => {
           if (s._docId) {
             batch.delete(db.collection("students").doc(s._docId));
           }
@@ -6211,6 +6389,112 @@
     };
 
     let currentPptThemeKey = 'clean_white';
+
+    /* ===================== v3.19: 파일명 · 저장 방식 공통 ===================== */
+    const LANG_SHORT = { en: '영', vi: '베', zh: '중', ja: '일', mn: '몽', ru: '러', es: '스', th: '태', uz: '우', ar: '아', id: '인', fr: '프', de: '독', pt: '포', it: '이', tr: '튀', hi: '힌', ne: '네', my: '미', km: '캄', tl: '필', bn: '방', kk: '카', ky: '키', ur: '우르', fa: '페', lo: '라', si: '싱', ko: '한', uk: '우크', pl: '폴', nl: '네덜' };
+    function langShortLetters(codes) {
+      const list = (codes || []).filter(Boolean);
+      const one = list.map(c => LANG_SHORT[c] || (typeof langNameOf === 'function' ? String(langNameOf(c) || c).slice(0, 1) : c));
+      // 같은 글자가 겹치면 그 언어들만 두 글자로
+      return list.map((c, i) => {
+        if (one.filter(x => x === one[i]).length < 2) return one[i];
+        const nm = typeof langNameOf === 'function' ? String(langNameOf(c) || c) : c;
+        return nm.replace(/어$/, '').slice(0, 2);
+      }).join('');
+    }
+    function fileSafe(t) { return String(t || '').replace(/\s+/g, '').replace(/[^0-9A-Za-z가-힣ㄱ-ㅎㅏ-ㅣ\-_~,]/g, ''); }
+    function todayYymmdd() { const d = new Date(), z = n => String(n).padStart(2, '0'); return String(d.getFullYear()).slice(2) + z(d.getMonth() + 1) + z(d.getDate()); }
+    function unitNumOf(u) { const m = String(u || '').match(/\d+/); return m ? m[0] : fileSafe(u); }
+    // [{full:true,num:'1'}, {full:false,label:'2-1'}] → '1~3,5,6-1'
+    function joinRangeParts(parts) {
+      const out = [];
+      for (let i = 0; i < parts.length; i++) {
+        const p = parts[i];
+        if (!p.full || !/^\d+$/.test(p.num)) { out.push(p.full ? p.num : p.label); continue; }
+        let j = i;
+        while (j + 1 < parts.length && parts[j + 1].full && /^\d+$/.test(parts[j + 1].num) && Number(parts[j + 1].num) === Number(parts[j].num) + 1) j++;
+        out.push(j > i ? `${p.num}~${parts[j].num}` : p.num);
+        i = j;
+      }
+      return out.join(',');
+    }
+    // 고른 소단원 → 파일명용 단원 표시 (대단원 전체면 숫자, 일부면 소단원 번호)
+    function rangeLabelFor(secSet, vocab) {
+      const order = [], byUnit = new Map();
+      (vocab || []).forEach(v => { if (!byUnit.has(v.unit)) { byUnit.set(v.unit, []); order.push(v.unit); } const a = byUnit.get(v.unit); if (!a.includes(v.section)) a.push(v.section); });
+      const parts = [];
+      order.forEach(u => {
+        const all = byUnit.get(u), sel = all.filter(x => secSet.has(x));
+        if (!sel.length) return;
+        if (sel.length === all.length) parts.push({ full: true, num: unitNumOf(u) });
+        else sel.forEach(x => parts.push({ full: false, label: String(x).split(' ')[0] }));
+      });
+      return joinRangeParts(parts) || '전체';
+    }
+    function buildExportFileBase(bookTitle, rangePart, langs) {
+      return [fileSafe(bookTitle) || '교재', fileSafe(rangePart) || '전체', langShortLetters(langs), todayYymmdd()].filter(Boolean).join('_');
+    }
+    function downloadBlob(blob, name) {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = name;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 60000);
+    }
+    const waitMs = ms => new Promise(r => setTimeout(r, ms));
+    function xsProgress(t) { const el = document.getElementById('xsProgress'); if (el) el.textContent = t || ''; }
+
+    // 여러 단원일 때 저장 방식 묻기. 결과: {mode:'one'} | {mode:'split', save:'zip'|'seq', cover:bool} | null(취소)
+    function askExportSplit(kind, unitCount, opts = {}) {
+      return new Promise(resolve => {
+        const modal = document.getElementById('exportSplitModal');
+        const title = document.getElementById('xsTitle'), desc = document.getElementById('xsDesc'), box = document.getElementById('xsBtns');
+        const close = v => { modal.classList.remove('show'); box.onclick = null; resolve(v); };
+        const btn = (v, cls, main, sub) => `<button type="button" class="btn ${cls}" data-v="${v}">${main}${sub ? `<small>${sub}</small>` : ''}</button>`;
+        const step1 = () => {
+          title.textContent = `${unitCount}개 단원을 어떻게 저장할까요?`;
+          xsProgress('');
+          if (kind === 'ppt') {
+            desc.textContent = '단원별로 따로 만들면 단원마다 PPT 파일이 하나씩 생겨요.';
+            box.innerHTML = btn('one', 'btn-primary', '하나로 합치기', '모든 단원을 PPT 파일 하나에') +
+              btn('zip', 'btn-outline', '단원별로 따로 · ZIP으로 묶기', `파일 ${unitCount}개를 ZIP 하나로 받기 (권장)`) +
+              btn('seq', 'btn-outline', '단원별로 따로 · 파일 하나씩 저장', '브라우저가 "여러 파일 다운로드"를 물으면 허용') +
+              btn('x', 'btn-ghost', '취소', '');
+          } else if (kind === 'pdf') {
+            desc.textContent = 'PDF는 인쇄창에서 "PDF로 저장"으로 만들어져요. 단원별로 하면 인쇄창이 단원 수만큼 차례로 열려요.';
+            box.innerHTML = btn('one', 'btn-primary', '하나로 합치기', '인쇄창 한 번') +
+              btn('seq', 'btn-outline', '단원별로 따로', `인쇄창 ${unitCount}번 · 파일 이름은 단원별로 자동 입력`) +
+              btn('x', 'btn-ghost', '취소', '');
+          } else {
+            desc.textContent = '한 파일로 하면 표지와 판권지는 한 번만 들어가요. 단원별로 하면 인쇄창이 단원 수만큼 차례로 열려요.';
+            box.innerHTML = btn('one', 'btn-primary', '한 파일로 저장', '모든 단원 + 표지·판권지 한 번') +
+              btn('seq', 'btn-outline', '단원별 각각 저장', `인쇄창 ${unitCount}번`) +
+              btn('x', 'btn-ghost', '취소', '');
+          }
+        };
+        const step2 = () => {
+          title.textContent = '각 파일에 표지·판권지를 넣을까요?';
+          desc.textContent = '모든 파일에 똑같이 적용돼요.';
+          box.innerHTML = btn('cin', 'btn-primary', '모두 포함', '단원 파일마다 표지·판권지') + btn('cout', 'btn-outline', '모두 제외', '단어 페이지만') + btn('x', 'btn-ghost', '취소', '');
+        };
+        box.onclick = ev => {
+          const b = ev.target.closest('button[data-v]'); if (!b) return;
+          const v = b.dataset.v;
+          if (v === 'x') return close(null);
+          if (v === 'one') return close({ mode: 'one' });
+          if (v === 'zip') return close({ mode: 'split', save: 'zip' });
+          if (v === 'seq') {
+            if (kind === 'workbook' && opts.hasCover) return step2();
+            return close({ mode: 'split', save: 'seq', cover: false });
+          }
+          if (v === 'cin') return close({ mode: 'split', save: 'seq', cover: true });
+          if (v === 'cout') return close({ mode: 'split', save: 'seq', cover: false });
+        };
+        step1();
+        modal.classList.add('show');
+      });
+    }
+
     let pptDeckSlides = [];
     let pptOrderedLangs = ['en', 'vi', 'zh'];
     let previewSlideIdx = 0;
@@ -6379,8 +6663,14 @@
     }
 
     function rebuildPptDeck() {
-      const secSet = getSelectedTreeSections('ppt');
-      let pool = RAW_VOCAB.filter(v => secSet.has(v.section));
+      pptDeckSlides = makePptDeck(getSelectedTreeSections('ppt'));
+      previewSlideIdx = 0;
+      previewRevealed = true;
+      updatePptPreview();
+    }
+
+    function makePptDeck(secSet, onlyUnit) {
+      let pool = RAW_VOCAB.filter(v => secSet.has(v.section) && (onlyUnit === undefined || v.unit === onlyUnit));
       const orderMode = document.getElementById('pptOrderMode')?.value || 'sequential';
       const partMode = document.getElementById('pptPartMode')?.value || 'both';
 
@@ -6396,15 +6686,21 @@
         pool.forEach(item => slides.push({ part: 'multi_to_kr', item }));
       }
 
-      pptDeckSlides = slides.map((s, idx) => ({
+      return slides.map((s, idx) => ({
         ...s,
         num: idx + 1,
         total: slides.length
       }));
+    }
 
-      previewSlideIdx = 0;
-      previewRevealed = true;
-      updatePptPreview();
+    // 고른 소단원을 대단원별로 나눔
+    function pptUnitGroups() {
+      const secSet = getSelectedTreeSections('ppt');
+      const units = [...new Set(RAW_VOCAB.filter(v => secSet.has(v.section)).map(v => v.unit))];
+      return units.map(u => {
+        const sub = new Set(RAW_VOCAB.filter(v => v.unit === u && secSet.has(v.section)).map(v => v.section));
+        return { unit: u, label: rangeLabelFor(sub, RAW_VOCAB.filter(v => v.unit === u)), deck: makePptDeck(sub, u) };
+      });
     }
 
     function updatePptPreview() {
@@ -6700,6 +6996,46 @@
         alert("PPT 생성 라이브러리를 불러오는 중입니다. 잠시 후 다시 시도해 주세요.");
         return;
       }
+      const groups = pptUnitGroups();
+      const langs = getPptCustomConfig().langs;
+      const book = currentBook?.title;
+      let choice = { mode: 'one' };
+      if (groups.length > 1) { choice = await askExportSplit('ppt', groups.length); if (!choice) return; }
+      if (choice.mode === 'one') {
+        const blob = await buildPptxBlob(pptDeckSlides);
+        downloadBlob(blob, buildExportFileBase(book, rangeLabelFor(getSelectedTreeSections('ppt'), RAW_VOCAB), langs) + '.pptx');
+        return;
+      }
+      if (choice.save === 'zip' && typeof JSZip === 'undefined') { alert('ZIP 도구를 불러오지 못했어요. "파일 하나씩 저장"을 써 주세요.'); return; }
+      const modal = document.getElementById('exportSplitModal');
+      document.getElementById('xsBtns').innerHTML = '';
+      modal.classList.add('show');
+      try {
+        const files = [];
+        for (let i = 0; i < groups.length; i++) {
+          xsProgress(`PPT 만드는 중... ${i + 1} / ${groups.length} (${groups[i].unit})`);
+          await waitMs(30);
+          const blob = await buildPptxBlob(groups[i].deck);
+          const name = buildExportFileBase(book, groups[i].label, langs) + '.pptx';
+          if (choice.save === 'zip') files.push({ name, blob });
+          else { downloadBlob(blob, name); await waitMs(900); }
+        }
+        if (choice.save === 'zip') {
+          xsProgress('ZIP으로 묶는 중...');
+          const zip = new JSZip();
+          files.forEach(f => zip.file(f.name, f.blob));
+          const zblob = await zip.generateAsync({ type: 'blob', compression: 'STORE' });
+          downloadBlob(zblob, buildExportFileBase(book, rangeLabelFor(getSelectedTreeSections('ppt'), RAW_VOCAB), langs) + '.zip');
+        }
+      } catch (err) {
+        alert('PPT를 만들지 못했어요: ' + err.message);
+      } finally {
+        modal.classList.remove('show');
+        xsProgress('');
+      }
+    }
+
+    async function buildPptxBlob(deck) {
 
       const cfg = getPptCustomConfig();
       const isTwoSlide = (cfg.revealMode === 'two_slide');
@@ -6722,7 +7058,7 @@
       });
 
       const slidePairsToBuild = [];
-      pptDeckSlides.forEach(sObj => {
+      deck.forEach(sObj => {
         if (isTwoSlide) {
           slidePairsToBuild.push({ ...sObj, showAnswer: false });
           slidePairsToBuild.push({ ...sObj, showAnswer: true });
@@ -6980,21 +7316,7 @@
         }
       }
 
-      const checkedUnits = Array.from(document.querySelectorAll('.ppt-unit-parent:checked')).map(cb => cb.dataset.unit.split(' ')[0] + '단원');
-      const checkedSecs = Array.from(document.querySelectorAll('.ppt-sec-child:checked')).map(cb => cb.dataset.section.split(' ')[0]);
-      let unitFileLabel = '';
-      if (checkedUnits.length > 0) {
-        unitFileLabel = checkedUnits.join('_');
-      } else if (checkedSecs.length > 0) {
-        unitFileLabel = checkedSecs.slice(0, 3).join('_') + (checkedSecs.length > 3 ? `외${checkedSecs.length - 3}` : '');
-      } else {
-        unitFileLabel = (currentBook?.title || '단원명').replace(/\s+/g, '');
-      }
-      const todayCompact = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(finalBlob);
-      a.download = `${unitFileLabel}_${todayCompact}.pptx`;
-      a.click();
+      return finalBlob;
     }
 
     /* Standard OOXML <p:timing> injection that preserves Left/Up arrow Previous Slide navigation in PowerPoint */
@@ -7077,44 +7399,65 @@
       return await zip.generateAsync({ type: 'blob' });
     }
 
-    function exportPptAsPdf() {
+    async function exportPptAsPdf() {
       if (!canUsePptOrStudent()) return;
       if (pptDeckSlides.length === 0) {
         alert("먼저 출제할 단원 또는 소단원을 1개 이상 선택해 주세요.");
         return;
       }
-      const cfg = getPptCustomConfig();
-      const isTwoSlide = (cfg.revealMode === 'two_slide');
-      const container = document.getElementById('pptPdfPrintContainer');
-
-      let pagesHtml = '';
-      let pageNum = 1;
-      pptDeckSlides.forEach(sObj => {
-        if (isTwoSlide) {
-          pagesHtml += `<div class="pdf-ppt-page">${renderSlideHtml({ ...sObj, num: pageNum++ }, cfg, false)}</div>`;
-          pagesHtml += `<div class="pdf-ppt-page">${renderSlideHtml({ ...sObj, num: pageNum++ }, cfg, true)}</div>`;
-        } else {
-          pagesHtml += `<div class="pdf-ppt-page">${renderSlideHtml({ ...sObj, num: pageNum++ }, cfg, true)}</div>`;
-        }
-      });
-
-      let styleTag = document.getElementById('dynamicPrintPageStyle');
-      if (!styleTag) {
-        styleTag = document.createElement('style');
-        styleTag.id = 'dynamicPrintPageStyle';
-        document.head.appendChild(styleTag);
+      const groups = pptUnitGroups();
+      const langs = getPptCustomConfig().langs;
+      const book = currentBook?.title;
+      let choice = { mode: 'one' };
+      if (groups.length > 1) { choice = await askExportSplit('pdf', groups.length); if (!choice) return; }
+      if (choice.mode === 'one') {
+        await printPptPdfDeck(pptDeckSlides, buildExportFileBase(book, rangeLabelFor(getSelectedTreeSections('ppt'), RAW_VOCAB), langs));
+        return;
       }
-      styleTag.textContent = `@media print { @page { size: 254mm 190.5mm; margin: 0; } }`;
-
-      container.innerHTML = pagesHtml;
-      document.body.classList.remove('print-mode-sheet', 'print-mode-workbook');
-      document.body.classList.add('print-mode-ppt');
-      setTimeout(() => {
-        window.print();
-        document.body.classList.remove('print-mode-ppt');
-        styleTag.textContent = '';
-      }, 250);
+      for (const g of groups) {
+        await printPptPdfDeck(g.deck, buildExportFileBase(book, g.label, langs));
+        await waitMs(400);
+      }
     }
+
+    // 덱 하나를 인쇄창(PDF로 저장)으로. 인쇄창이 닫히면 끝남
+    function printPptPdfDeck(deck, fileTitle) {
+      return new Promise(resolve => {
+        const cfg = getPptCustomConfig();
+        const isTwoSlide = (cfg.revealMode === 'two_slide');
+        const container = document.getElementById('pptPdfPrintContainer');
+        let pagesHtml = '';
+        let pageNum = 1;
+        deck.forEach(sObj => {
+          if (isTwoSlide) {
+            pagesHtml += `<div class="pdf-ppt-page">${renderSlideHtml({ ...sObj, num: pageNum++ }, cfg, false)}</div>`;
+            pagesHtml += `<div class="pdf-ppt-page">${renderSlideHtml({ ...sObj, num: pageNum++ }, cfg, true)}</div>`;
+          } else {
+            pagesHtml += `<div class="pdf-ppt-page">${renderSlideHtml({ ...sObj, num: pageNum++ }, cfg, true)}</div>`;
+          }
+        });
+        let styleTag = document.getElementById('dynamicPrintPageStyle');
+        if (!styleTag) {
+          styleTag = document.createElement('style');
+          styleTag.id = 'dynamicPrintPageStyle';
+          document.head.appendChild(styleTag);
+        }
+        styleTag.textContent = `@media print { @page { size: 254mm 190.5mm; margin: 0; } }`;
+        container.innerHTML = pagesHtml;
+        document.body.classList.remove('print-mode-sheet', 'print-mode-workbook');
+        document.body.classList.add('print-mode-ppt');
+        const prevTitle = document.title;
+        document.title = fileTitle;   // PDF 저장 시 기본 파일명
+        setTimeout(() => {
+          window.print();
+          document.body.classList.remove('print-mode-ppt');
+          styleTag.textContent = '';
+          document.title = prevTitle;
+          resolve();
+        }, 250);
+      });
+    }
+
 
     /* ==========================================================================
        13. PRINTABLE A4 QUIZ SHEET GENERATOR
@@ -7519,15 +7862,15 @@
       }
     }
 
-    function buildWorkbookPagesHtml() {
+    function buildWorkbookPagesHtml(opts = {}) {
       const coverTitle = document.getElementById('wbCoverTitle').value.trim() || '한국어 단어 자료집';
       const coverTagline = document.getElementById('wbCoverTagline').value.trim();
       const langs = wbOrderedLangs.length > 0 ? [...wbOrderedLangs] : ['vi', 'en', 'zh'];
       const practiceCols = parseInt(document.getElementById('wbPracticeCols').value, 10) || 5;
-      const selectedUnits = Array.from(document.querySelectorAll('.wb-unit-cb:checked')).map(cb => cb.value);
+      const selectedUnits = opts.units || Array.from(document.querySelectorAll('.wb-unit-cb:checked')).map(cb => cb.value);
       const printSectionMode = document.getElementById('wbPrintSectionMode')?.value || 'all';
-      const includeCover = document.getElementById('wbIncludeCover') ? document.getElementById('wbIncludeCover').checked : true;
-      const includeColophon = document.getElementById('wbIncludeColophon').checked;
+      const includeCover = (opts.cover === false) ? false : (document.getElementById('wbIncludeCover') ? document.getElementById('wbIncludeCover').checked : true);
+      const includeColophon = (opts.cover === false) ? false : document.getElementById('wbIncludeColophon').checked;
 
       const showVocabPart = (printSectionMode === 'all' || printSectionMode === 'vocab_only');
       const showPracticePart = (printSectionMode === 'all' || printSectionMode === 'practice_only');
@@ -7810,32 +8153,56 @@
       document.getElementById('wbLivePreviewContainer').innerHTML = pages.join('');
     }
 
-    function printWorkbookLandscapeA4() {
+    async function printWorkbookLandscapeA4() {
       if (!canUseWorkbook()) return;
-      const { pages, bodyPageCount } = buildWorkbookPagesHtml();
-      if (bodyPageCount <= 0) {
-        alert("인쇄할 단원을 1개 이상 선택해 주세요.");
+      const units = Array.from(document.querySelectorAll('.wb-unit-cb:checked')).map(cb => cb.value);
+      if (units.length === 0) { alert("인쇄할 단원을 1개 이상 선택해 주세요."); return; }
+      const bookSel = document.getElementById('wbBookSelect');
+      const bookTitle = bookSel && bookSel.selectedIndex >= 0 ? bookSel.options[bookSel.selectedIndex].text : (currentBook?.title || '');
+      const langs = wbOrderedLangs.length > 0 ? [...wbOrderedLangs] : ['vi', 'en', 'zh'];
+      const label = list => joinRangeParts(list.map(u => ({ full: true, num: unitNumOf(u) })));
+      const hasCover = (document.getElementById('wbIncludeCover')?.checked !== false) || document.getElementById('wbIncludeColophon').checked;
+      let choice = { mode: 'one' };
+      if (units.length > 1) { choice = await askExportSplit('workbook', units.length, { hasCover }); if (!choice) return; }
+      if (choice.mode === 'one') {
+        const { pages, bodyPageCount } = buildWorkbookPagesHtml();
+        if (bodyPageCount <= 0) { alert("인쇄할 내용이 없어요."); return; }
+        await printWorkbookPages(pages, buildExportFileBase(bookTitle, label(units), langs));
         return;
       }
-      const printBox = document.getElementById('workbookPrintContainer');
-      printBox.innerHTML = pages.join('');
-
-      let styleTag = document.getElementById('dynamicPrintPageStyle');
-      if (!styleTag) {
-        styleTag = document.createElement('style');
-        styleTag.id = 'dynamicPrintPageStyle';
-        document.head.appendChild(styleTag);
+      for (const u of units) {
+        const { pages, bodyPageCount } = buildWorkbookPagesHtml({ units: [u], cover: choice.cover ? undefined : false });
+        if (bodyPageCount <= 0) continue;
+        await printWorkbookPages(pages, buildExportFileBase(bookTitle, label([u]), langs));
+        await waitMs(400);
       }
-      styleTag.textContent = `@media print { @page { size: A4 landscape; margin: 6mm; } }`;
-
-      document.body.classList.remove('print-mode-sheet', 'print-mode-ppt');
-      document.body.classList.add('print-mode-workbook');
-      setTimeout(() => {
-        window.print();
-        document.body.classList.remove('print-mode-workbook');
-        styleTag.textContent = '';
-      }, 250);
     }
+
+    function printWorkbookPages(pages, fileTitle) {
+      return new Promise(resolve => {
+        const printBox = document.getElementById('workbookPrintContainer');
+        printBox.innerHTML = pages.join('');
+        let styleTag = document.getElementById('dynamicPrintPageStyle');
+        if (!styleTag) {
+          styleTag = document.createElement('style');
+          styleTag.id = 'dynamicPrintPageStyle';
+          document.head.appendChild(styleTag);
+        }
+        styleTag.textContent = `@media print { @page { size: A4 landscape; margin: 6mm; } }`;
+        document.body.classList.remove('print-mode-sheet', 'print-mode-ppt');
+        document.body.classList.add('print-mode-workbook');
+        const prevTitle = document.title;
+        document.title = fileTitle;
+        setTimeout(() => {
+          window.print();
+          document.body.classList.remove('print-mode-workbook');
+          styleTag.textContent = '';
+          document.title = prevTitle;
+          resolve();
+        }, 250);
+      });
+    }
+
 
     /* ==========================================================================
        14. MAIN ADMIN ONLY: AI MULTILINGUAL TRANSLATOR & JSON BUILDER (DROPDOWN LANGUAGE ADDITION)
@@ -8210,6 +8577,24 @@ ${JSON.stringify(norm)}`;
       const text = document.getElementById('builderRawWordsInput').value;
       const lines = text.split('\n').map(l => l.replace(/\r/g, '')).filter(l => l.trim());
       if (lines.length === 0) { alert('번역할 한국어 단어를 한 줄에 하나씩 입력해 주세요.'); return null; }
+      // v3.18: 엑셀·결과 표를 그대로 복사해 붙여 넣은 경우(첫 줄에 '한국어' 제목이 있고 탭으로 나뉨) 열 제목으로 읽음
+      {
+        const firstCells = lines[0].split('\t').map(x => x.trim());
+        if (firstCells.length >= 3 && firstCells.some(c => /^(한국어|korean)$/i.test(c))) {
+          const SENT = '\u0001붙여넣기';
+          const info = parseExcelSheet(SENT, lines.map(l => l.split('\t')));
+          if (info.header && info.rows.length) {
+            return {
+              sig: ['t', text, unitIn, secIn, pageIn, langKey].join('|'),
+              make: () => info.rows.map(r => ({
+                unit: unitIn || (r.unit === SENT ? '1단원' : r.unit),
+                section: secIn || (r.section === SENT ? (unitIn || '1-1 어휘') : r.section),
+                kr: r.kr, page: pageIn || r.page || '1', langs: { ...r.langs }, hint: r.hint
+              }))
+            };
+          }
+        }
+      }
       return {
         sig: ['m', text, unitIn, secIn, pageIn, langKey].join('|'),
         make: () => lines.map(line => {
@@ -8569,7 +8954,7 @@ ${JSON.stringify(payload)}`;
       builtJsonData.forEach((w, i) => {
         const r = translateJob.rows[i];
         Object.keys(w).forEach(k => { if (k !== 'id' && !PLAIN_FIELDS.includes(k)) r.langs[k] = w[k]; });
-        ['unit', 'section', 'page'].forEach(k => { r[k] = w[k]; });
+        ['unit', 'section', 'kr', 'page'].forEach(k => { r[k] = w[k]; });
       });
     }
 
@@ -8766,7 +9151,20 @@ ${tsv}`;
           let i = -1;
           if (colOf.no !== undefined) {
             const n = parseInt(cellText(r[colOf.no]), 10);
-            if (n >= 1 && n <= builtJsonData.length && !used.has(n - 1)) { if (builtJsonData[n - 1].kr === kr) i = n - 1; else { krDiff++; return; } }
+            if (n >= 1 && n <= builtJsonData.length && !used.has(n - 1)) {
+              const nk = x => String(x == null ? '' : x).normalize('NFC').replace(/\s+/g, ' ').trim();
+              if (nk(builtJsonData[n - 1].kr) === nk(kr)) i = n - 1;
+              else {
+                // 번호는 같은데 한국어가 다름: 다른 칸이 대부분 같으면 같은 줄에서 한국어를 고친 것으로 봄
+                const w0 = builtJsonData[n - 1]; let same = 0, tot = 0;
+                Object.entries(colOf.langs).forEach(([code, col]) => {
+                  if (!known.has(code)) return;
+                  const to0 = cellText(r[col]), fr0 = cellText(w0[code]);
+                  if (to0 || fr0) { tot++; if (to0 === fr0) same++; }
+                });
+                if (tot > 0 && same * 2 >= tot) i = n - 1; else { krDiff++; return; }
+              }
+            }
           }
           if (i < 0) i = builtJsonData.findIndex((w, k) => !used.has(k) && w.kr === kr && (colOf.section === undefined || String(w.section) === cellText(r[colOf.section])));
           if (i < 0) { unmatched++; return; }
@@ -8776,7 +9174,7 @@ ${tsv}`;
             const to = cellText(r[col]), from = cellText(w[code]);
             if (to !== from) { const nt = notes.get(kr + '\t' + code) || {}; changes.push({ w, code, from, to, level: nt.level || '', note: nt.note || '' }); }
           };
-          ['unit', 'section', 'page'].forEach(k => { if (colOf[k] !== undefined) cmp(k, colOf[k]); });
+          ['unit', 'section', 'kr', 'page'].forEach(k => { if (colOf[k] !== undefined) cmp(k, colOf[k]); });
           Object.entries(colOf.langs).forEach(([code, col]) => { if (known.has(code)) cmp(code, col); });
         });
         const ignored = Object.keys(colOf.langs).filter(c => !known.has(c)).map(langNameOf);
@@ -9014,9 +9412,15 @@ ${tsv}`;
       document.getElementById('cloudBookSubInput').value = book ? book.subtitle : '';
     }
 
+    const BOOK_TITLE_BAD = /[^가-힣ㄱ-ㅎㅏ-ㅣa-zA-Z0-9 \-_]/g;
+    function cleanBookTitleInput(el) {
+      const v = el.value, c = v.replace(BOOK_TITLE_BAD, '');
+      if (v !== c) { const pos = el.selectionStart - (v.length - c.length); el.value = c; try { el.setSelectionRange(pos, pos); } catch (e) { } }
+    }
     function readCloudBookForm() {
       let id = document.getElementById('cloudBookIdInput').value.trim().toLowerCase();
-      const title = document.getElementById('cloudBookTitleInput').value.trim();
+      const title = document.getElementById('cloudBookTitleInput').value.replace(BOOK_TITLE_BAD, '').replace(/\s+/g, ' ').trim();
+      document.getElementById('cloudBookTitleInput').value = title;
       if (!id && title && !document.getElementById('cloudBookSelect').value) {
         id = title.toLowerCase().replace(/[^a-z0-9]+/g, '') || ('book' + Date.now().toString(36));
         id = id.slice(0, 40);
