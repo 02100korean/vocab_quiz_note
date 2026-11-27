@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>다국어 한국어 어휘 학습 & 실전 퀴즈 플랫폼 v3.19</title>
+  <title>다국어 한국어 어휘 학습 & 실전 퀴즈 플랫폼 v3.21</title>
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
   <!-- Google Fonts & Libraries -->
@@ -1617,6 +1617,19 @@
     .xs-progress { font-size: 0.82rem; font-weight: 800; color: var(--primary); margin-top: 0.6rem; min-height: 1rem; }
     .title-rule { font-size: 0.72rem; color: #64748b; font-weight: 700; margin-top: -0.25rem; }
 
+    /* v3.20 */
+    #exportSplitModal { z-index: 9600; }
+    #noticeModal, #inquiryModal { z-index: 9700; }
+    .result-diff .review-head { position: sticky; top: 0; background: #f8fbff; z-index: 2; padding-bottom: 0.35rem; }
+    .recent-chip-wrap { display: inline-flex; align-items: stretch; gap: 0; margin: 0 0.3rem 0.3rem 0; }
+    .recent-chip-wrap .recent-profile-chip { margin: 0; border-top-right-radius: 0; border-bottom-right-radius: 0; }
+    .recent-chip-x { border: 1px solid #cbd5e1; border-left: 0; background: #fff; color: #64748b; font-weight: 800; padding: 0 0.5rem; cursor: pointer; border-radius: 0 999px 999px 0; }
+    .recent-chip-x:hover { background: #fee2e2; color: #b91c1c; }
+    .entry-nopin { background: #fff7ed; border: 1px solid #fed7aa; border-radius: 10px; padding: 0.65rem 0.75rem; margin-bottom: 1rem; text-align: left; font-size: 0.84rem; line-height: 1.5; color: #9a3412; font-weight: 700; }
+    .inq-form input, .inq-form textarea { width: 100%; margin-bottom: 0.45rem; }
+    .inq-form textarea { min-height: 110px; padding: 0.6rem; border: 1px solid var(--border); border-radius: 8px; font-family: inherit; font-size: 0.9rem; }
+    .stu-bulkbar { display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap; margin:0.4rem 0; font-size:0.82rem; font-weight:700; color:#475569; }
+
   </style>
 </head>
 <body>
@@ -1697,6 +1710,11 @@
         </div>
         <div class="entry-note" id="entryPinMsg">선생님께 받은 PIN을 입력하세요. / Enter the PIN from your teacher.</div>
       </div>
+      <div id="entryNoPin" class="entry-nopin" style="display:none;">
+        이 반은 아직 입장 PIN이 없어요. 위 '코드 / PIN' 칸에 PIN이나 코드를 입력하세요. 없으면 선생님이나 관리자에게 문의하세요.<br>
+        <span style="font-weight:600;">This class has no PIN yet. Enter a PIN or code above, or ask your teacher or administrator.</span>
+        <div style="margin-top:0.4rem;"><button type="button" class="btn btn-outline btn-sm" onclick="openInquiryModal()">문의하기 / Contact</button></div>
+      </div>
       <div id="entryNameBox" style="text-align:left; margin-bottom:1.1rem;">
         <label style="font-size:0.78rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.25rem;">학생 이름</label>
         <input type="text" id="userNameInput" class="typing-input" placeholder="예: 홍길동" style="margin-bottom:0; font-size:1.02rem; padding:0.75rem;" />
@@ -1720,6 +1738,34 @@
     </div>
   </div>
 
+  <!-- v3.20: 안내창 / 문의 창 -->
+  <div class="modal-overlay" id="noticeModal">
+    <div class="modal-box ap-box">
+      <h2 id="noticeTitle"></h2>
+      <p id="noticeKo"></p>
+      <p class="en" id="noticeEn"></p>
+      <div class="ap-btns">
+        <button type="button" class="btn btn-primary" onclick="closeNotice();openInquiryModal()">문의하기 / Contact</button>
+        <button type="button" class="btn btn-outline" onclick="closeNotice()">닫기 / Close</button>
+      </div>
+    </div>
+  </div>
+  <div class="modal-overlay" id="inquiryModal">
+    <div class="modal-box ap-box inq-form" style="text-align:left;">
+      <h2 style="margin-bottom:0.3rem;">문의하기 <span class="en" style="font-weight:600;">/ Contact</span></h2>
+      <p style="font-size:0.82rem; margin-bottom:0.6rem;">이름, 이메일, 내용을 남기면 관리자에게 전달돼요. 답장은 적어 준 이메일로 가요.</p>
+      <p class="en" style="margin-bottom:0.6rem;">Leave your name, email and message. The administrator will reply to your email.</p>
+      <input type="text" id="inqName" class="typing-input" placeholder="이름 / Name" maxlength="60" />
+      <input type="email" id="inqEmail" class="typing-input" placeholder="내 이메일 / Your email" maxlength="120" />
+      <textarea id="inqMsg" placeholder="내용 (예: 체험을 더 하고 싶어요. 4급 7반이에요.) / Message" maxlength="1000"></textarea>
+      <div class="ap-msg" id="inqMsgState"></div>
+      <div class="ap-btns">
+        <button type="button" class="btn btn-primary" id="inqSendBtn" onclick="submitInquiry()">보내기 / Send</button>
+        <button type="button" class="btn btn-outline" onclick="closeInquiryModal()">닫기 / Close</button>
+      </div>
+    </div>
+  </div>
+
   <div id="approvalModal" class="modal-overlay">
     <div class="modal-box ap-box">
       <h2>승인된 학생만 사용할 수 있어요 <span class="en" style="font-weight:600;">/ For approved students only</span></h2>
@@ -1734,17 +1780,20 @@
       <div class="ap-msg" id="trialCodeMsg"></div>
       <div class="ap-btns">
         <button type="button" class="btn btn-outline" onclick="backToEntryForm()">돌아가기 / Go back</button>
-        <button type="button" class="btn btn-accent" id="btnFreeTrial" onclick="startFreeTrial()">체험하기 (3분) / Try 3 min</button>
+        <button type="button" class="btn btn-accent" id="btnFreeTrial" onclick="startFreeTrial()">무료 체험 (3분 · 3회) / Free trial (3 min, 3 times)</button>
+        <button type="button" class="btn btn-outline" onclick="closeNoticeAndInquiry()">문의하기 / Contact</button>
       </div>
     </div>
   </div>
   <div id="trialExpiredModal" class="modal-overlay">
     <div class="modal-box ap-box">
       <h2>기간 만료 <span class="en" style="font-weight:600;">/ Trial expired</span></h2>
-      <p>체험 기간이 끝났어요. 계속 사용하려면 수업을 신청하거나 선생님/관리자에게 문의하세요. 코드가 있으면 코드를 입력하세요.</p>
-      <p class="en">Your trial has ended. To keep using the site, please sign up for a class or ask your teacher or administrator. If you have a code, enter it.</p>
+      <p>체험이 끝났어요. 무료 체험은 같은 기기에서 3번까지예요. 계속 사용하려면 선생님/관리자에게 문의하세요. 코드나 PIN이 있으면 입력하세요.</p>
+      <p class="en">Your trial has ended. The free trial is limited to 3 times on the same device. To keep using the site, please contact your teacher or administrator. If you have a code or PIN, enter it.</p>
       <div class="ap-btns">
-        <button type="button" class="btn btn-primary" onclick="expiredToCode()">코드 입력 / Enter code</button>
+        <button type="button" class="btn btn-primary" onclick="expiredToCode()">코드·PIN 입력 / Enter code or PIN</button>
+        <button type="button" class="btn btn-accent" id="expiredRetry" onclick="startFreeTrial()">무료 체험 다시 하기 / Try again</button>
+        <button type="button" class="btn btn-outline" onclick="closeNoticeAndInquiry()">문의하기 / Contact</button>
         <button type="button" class="btn btn-outline" onclick="expiredToEntry()">입장 화면 / Entry</button>
       </div>
     </div>
@@ -2039,6 +2088,12 @@
           <div class="ca-warn">PIN 없이 명단만 저장하면, 그 반의 이름이 입장 화면에서 누구에게나 보여요. 가능하면 PIN과 함께 쓰세요. PIN과 명단은 브라우저에서 확인하는 방식이라 완전한 보안은 아니고, 승인되지 않은 학생이 마음대로 쓰는 것을 줄이는 용도예요.</div>
         </div>
 
+        <div class="stu-bulkbar">
+          <span id="stuSelCount">선택 0명</span>
+          <button type="button" class="btn btn-outline btn-sm" style="color:var(--danger); border-color:#fca5a5;" onclick="bulkDeleteStudents(false)">선택한 학생 명단 삭제</button>
+          <button type="button" class="btn btn-danger btn-sm" onclick="bulkDeleteStudents(true)">명단+성적 삭제</button>
+          <span class="manage-note" style="margin:0;">체크박스로 여러 명을 고른 뒤 한꺼번에 지울 수 있어요. 맨 위 체크박스는 전체 선택이에요.</span>
+        </div>
         <div class="admin-table-container" style="max-height:420px;">
           <table class="admin-table">
             <thead>
@@ -2596,6 +2651,19 @@
             </table>
           </div>
         </div>
+        <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:12px; padding:0.95rem; margin-bottom:0.95rem;">
+          <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap; margin-bottom:0.5rem;">
+            <h3 style="font-size:0.96rem; font-weight:800; color:#92400e; margin:0;">문의함</h3>
+            <span id="inquiryCount" class="manage-note" style="margin:0;"></span>
+            <button type="button" class="btn btn-outline btn-sm" onclick="loadInquiries()">새로고침</button>
+          </div>
+          <div class="admin-table-container" style="max-height:260px;">
+            <table class="admin-table">
+              <thead><tr><th>날짜</th><th>이름·반</th><th>이메일</th><th>내용</th><th>읽음</th><th>관리</th></tr></thead>
+              <tbody id="inquiryBody"><tr><td colspan="6" style="text-align:center; color:var(--text-muted); padding:1rem;">문의를 불러오는 중입니다...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
         <!-- v3.7: 기관 → 학기 → 급 → 반 관리 (급·반은 학기마다 따로) -->
         <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:12px; padding:0.95rem; margin-bottom:0.95rem;">
           <h3 style="font-size:0.96rem; font-weight:800; color:var(--primary); margin-bottom:0.55rem;">기관 · 학기 · 급 · 반</h3>
@@ -3140,6 +3208,10 @@
     const FREE_TRIAL_CODE = 'FREE';
     const TRIAL_NAME = '체험(Guest)';
     const FREE_TRIAL_MINUTES = 3;
+    const FREE_TRIAL_MAX = 3;                       // 같은 기기에서 무료 체험 횟수
+    const FREECNT_KEY = 'YONGIN_KOREAN_FREECNT_V1';
+    const ENTRY_REQUIRES_PIN = true;                // true: 코드나 반 PIN 없이는 새로 입장할 수 없음
+    const INQUIRY_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbwxHp6wkA7aAnjA1lSzfko27lASc88GSMDdGmim5_m1zMBNu7TxdNOoUjYpuESgqBjR/exec';                 // (선택) 문의를 메일로 받는 Apps Script 웹앱 주소
     let trialState = null;       // 체험 중이면 { code, until }
     let trialTimer = null;
     const trialMem = new Map();
@@ -3147,7 +3219,7 @@
     (function patchStorageForTrial() {
       const _get = Storage.prototype.getItem, _set = Storage.prototype.setItem, _rm = Storage.prototype.removeItem;
       Storage.prototype.setItem = function (k, v) {
-        if (trialState && this === window.localStorage && k !== TRIAL_KEY) { trialMem.set(k, String(v)); return; }
+        if (trialState && this === window.localStorage && k !== TRIAL_KEY && k !== FREECNT_KEY) { trialMem.set(k, String(v)); return; }
         return _set.call(this, k, v);
       };
       Storage.prototype.getItem = function (k) {
@@ -3155,7 +3227,7 @@
         return _get.call(this, k);
       };
       Storage.prototype.removeItem = function (k) {
-        if (trialState && this === window.localStorage && k !== TRIAL_KEY) { trialMem.delete(k); return; }
+        if (trialState && this === window.localStorage && k !== TRIAL_KEY && k !== FREECNT_KEY) { trialMem.delete(k); return; }
         return _rm.call(this, k);
       };
     })();
@@ -3177,6 +3249,8 @@
     function openApprovalModal() {
       document.getElementById('trialCodeInput').value = '';
       document.getElementById('trialCodeMsg').textContent = '';
+      { const left = Math.max(0, FREE_TRIAL_MAX - freeTrialUsed());
+        document.getElementById('btnFreeTrial').textContent = left > 0 ? `무료 체험 (3분 · 3회 중 ${left}회 남음) / Free trial (${left} left)` : '무료 체험을 모두 썼어요 / Free trial used up'; }
       document.getElementById('approvalModal').classList.add('show');
     }
     function backToEntryForm() {
@@ -3192,17 +3266,96 @@
       openNameModal();
     }
 
+    function freeTrialUsed() { const n = parseInt(localStorage.getItem(FREECNT_KEY) || '0', 10); return isNaN(n) ? 0 : Math.max(0, n); }
     function startFreeTrial() {
       const st = readTrialStore();
-      if (st && st.code === FREE_TRIAL_CODE) {      // 이 기기에서 이미 체험함
+      if (st && st.until > Date.now()) {              // 진행 중인 체험은 이어서
         document.getElementById('approvalModal').classList.remove('show');
-        if (st.until > Date.now()) { location.reload(); return; }
-        document.getElementById('trialExpiredModal').classList.add('show');
+        location.reload();
         return;
       }
+      const used = freeTrialUsed();
+      if (used >= FREE_TRIAL_MAX) {
+        document.getElementById('approvalModal').classList.remove('show');
+        document.getElementById('trialExpiredModal').classList.remove('show');
+        showNotice('무료 체험이 끝났어요', 'Free trial used up',
+          `무료 체험은 같은 기기에서 ${FREE_TRIAL_MAX}번까지예요. 더 사용하고 싶으면 관리자에게 문의해 주세요. 코드나 PIN이 있으면 입력하세요.`,
+          `The free trial is limited to ${FREE_TRIAL_MAX} times on this device. To keep using the site, please contact the administrator. If you have a code or PIN, enter it.`);
+        return;
+      }
+      localStorage.setItem(FREECNT_KEY, String(used + 1));
       writeTrialStore({ code: FREE_TRIAL_CODE, until: Date.now() + FREE_TRIAL_MINUTES * 60000 });
       location.reload();
     }
+
+    /* ----- v3.20: 안내창 · 문의 ----- */
+    function showNotice(titleKo, titleEn, ko, en) {
+      document.getElementById('noticeTitle').innerHTML = `${cascadeEsc(titleKo)} <span class="en" style="font-weight:600;">/ ${cascadeEsc(titleEn)}</span>`;
+      document.getElementById('noticeKo').textContent = ko;
+      document.getElementById('noticeEn').textContent = en;
+      document.getElementById('noticeModal').classList.add('show');
+    }
+    function closeNotice() { document.getElementById('noticeModal').classList.remove('show'); }
+    function closeNoticeAndInquiry() {
+      document.getElementById('approvalModal').classList.remove('show');
+      document.getElementById('trialExpiredModal').classList.remove('show');
+      openInquiryModal();
+    }
+    let inquiryReturn = '';
+    function openInquiryModal() {
+      document.getElementById('inqMsgState').textContent = '';
+      document.getElementById('inqSendBtn').disabled = false;
+      document.getElementById('inquiryModal').classList.add('show');
+    }
+    function closeInquiryModal() {
+      document.getElementById('inquiryModal').classList.remove('show');
+      if (!hasSavedProfile() && !trialState && !document.getElementById('nameModal').classList.contains('show')) openNameModal();
+    }
+    async function submitInquiry() {
+      const name = document.getElementById('inqName').value.trim().slice(0, 60);
+      const email = document.getElementById('inqEmail').value.trim().slice(0, 120);
+      const message = document.getElementById('inqMsg').value.trim().slice(0, 1000);
+      const st = document.getElementById('inqMsgState');
+      const bad = t => { st.style.color = ''; st.textContent = t; };
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return bad('이메일을 정확히 써 주세요. / Please enter a valid email.');
+      if (message.length < 5) return bad('내용을 5자 이상 써 주세요. / Please write your message.');
+      let last = 0; try { last = parseInt(localStorage.getItem('YONGIN_KOREAN_INQ_TS') || '0', 10) || 0; } catch (e) { }
+      if (Date.now() - last < 60000) return bad('잠시 뒤에 다시 보내 주세요. (1분에 한 번) / Please wait a minute.');
+      if (!db) return bad('지금은 보낼 수 없어요. 인터넷을 확인해 주세요. / Cannot send now.');
+      const btn = document.getElementById('inqSendBtn'); btn.disabled = true; st.style.color = ''; st.textContent = '보내는 중... / Sending...';
+      const ctx = [userInstitution, userSemester, userClass].filter(Boolean).join(' · ').slice(0, 200);
+      try {
+        await db.collection('inquiries').add({ name, email, message, context: ctx, read: false, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+        if (INQUIRY_WEBHOOK_URL) { try { fetch(INQUIRY_WEBHOOK_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ name, email, message, context: ctx }) }).catch(() => { }); } catch (e) { } }
+        try { localStorage.setItem('YONGIN_KOREAN_INQ_TS', String(Date.now())); } catch (e) { }
+        st.style.color = '#166534'; st.textContent = '보냈어요. 관리자가 확인하고 이메일로 답해 줄 거예요. / Sent. The administrator will reply by email.';
+        document.getElementById('inqMsg').value = '';
+      } catch (err) { btn.disabled = false; bad('보내지 못했어요. 잠시 뒤에 다시 해 주세요. / Could not send.'); }
+    }
+
+    /* ----- 관리자: 문의함 ----- */
+    async function loadInquiries() {
+      const tb = document.getElementById('inquiryBody'); if (!tb || !db) return;
+      tb.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:1rem;">불러오는 중...</td></tr>';
+      try {
+        const snap = await db.collection('inquiries').get();
+        const rows = []; snap.forEach(d => rows.push({ id: d.id, ...d.data() }));
+        const tms = r => (r.createdAt && r.createdAt.toMillis) ? r.createdAt.toMillis() : 0;
+        rows.sort((a, b) => tms(b) - tms(a));
+        const e = cascadeEsc;
+        document.getElementById('inquiryCount').textContent = rows.length ? `${rows.length}건 · 안 읽음 ${rows.filter(r => !r.read).length}건` : '';
+        tb.innerHTML = rows.length ? rows.map(r => `<tr style="${r.read ? '' : 'background:#fffbeb;'}">
+          <td style="white-space:nowrap; font-size:0.78rem;">${tms(r) ? new Date(tms(r)).toLocaleString('ko-KR') : '-'}</td>
+          <td><b>${e(r.name || '')}</b><br><span style="font-size:0.76rem; color:#64748b;">${e(r.context || '')}</span></td>
+          <td style="font-size:0.8rem;">${e(r.email || '')}</td>
+          <td style="white-space:pre-wrap; font-size:0.84rem; max-width:340px;">${e(r.message || '')}</td>
+          <td><input type="checkbox" ${r.read ? 'checked' : ''} onchange="markInquiryRead('${r.id}', this.checked)" title="읽음" /></td>
+          <td style="white-space:nowrap;"><a class="btn btn-outline btn-sm" href="mailto:${encodeURIComponent(r.email || '')}?subject=${encodeURIComponent('[한국어 단어 사이트] 문의 답장')}">답장</a>
+            <button type="button" class="btn btn-danger btn-sm" onclick="deleteInquiry('${r.id}')">삭제</button></td></tr>`).join('') : '<tr><td colspan="6" style="text-align:center; color:var(--text-muted); padding:1rem;">문의가 없어요.</td></tr>';
+      } catch (err) { tb.innerHTML = `<tr><td colspan="6" style="color:var(--danger); padding:1rem;">불러오지 못했어요: ${cascadeEsc(err.message)}</td></tr>`; }
+    }
+    async function markInquiryRead(id, v) { try { await db.collection('inquiries').doc(id).set({ read: !!v }, { merge: true }); loadInquiries(); } catch (e) { alert('저장하지 못했어요: ' + e.message); } }
+    async function deleteInquiry(id) { if (!confirm('이 문의를 삭제할까요?')) return; try { await db.collection('inquiries').doc(id).delete(); loadInquiries(); } catch (e) { alert('삭제하지 못했어요: ' + e.message); } }
 
     // 승인 안내창(X)에서 누르는 입력: 코드·PIN 모두 처리
     async function submitTrialCode() {
@@ -3267,7 +3420,7 @@
         document.getElementById('approvalModal').classList.remove('show');
         document.getElementById('nameModal').classList.remove('show');
         if (st.until > Date.now()) { location.reload(); return; }
-        document.getElementById('trialExpiredModal').classList.add('show');
+        showTrialExpired();
         return;
       }
       if (!db) { say('지금은 코드를 확인할 수 없어요. 인터넷을 확인해 주세요.', 'Cannot check the code now. Please check your internet.'); return; }
@@ -3330,6 +3483,13 @@
       userName = '학습자';
       updateHeaderUserUI();
       document.getElementById('trialBadge').style.display = 'none';
+      showTrialExpired();
+    }
+    function showTrialExpired() {
+      const left = Math.max(0, FREE_TRIAL_MAX - freeTrialUsed());
+      const b = document.getElementById('expiredRetry');
+      b.textContent = left > 0 ? `무료 체험 다시 하기 (${left}회 남음) / Try again (${left} left)` : '무료 체험을 모두 썼어요 / Free trial used up';
+      b.style.display = left > 0 ? '' : 'none';
       document.getElementById('trialExpiredModal').classList.add('show');
     }
 
@@ -3338,7 +3498,7 @@
       const st = readTrialStore();
       if (!st) return false;
       if (st.until > Date.now()) { startTrialSession(st); return true; }
-      document.getElementById('trialExpiredModal').classList.add('show');
+      showTrialExpired();
       return true;
     }
 
@@ -3437,9 +3597,10 @@
         return cfg;
       } catch (e) { return null; }
     }
-    function readPinOkMap() { try { return JSON.parse(localStorage.getItem(PIN_OK_KEY) || '{}') || {}; } catch (e) { return {}; } }
-    function isPinVerified(id, cfg) { return !!(cfg && cfg.pinHash && readPinOkMap()[id] === cfg.pinHash); }
-    function setPinVerified(id, hash) { const m = readPinOkMap(); m[id] = hash; localStorage.setItem(PIN_OK_KEY, JSON.stringify(m)); }
+    // v3.20: PIN 확인은 이번 입장 화면에서만 유효 (기기에 저장하지 않음 → [변경]을 누르면 다시 PIN 확인)
+    let pinSession = {};
+    function isPinVerified(id, cfg) { return !!(cfg && cfg.pinHash && pinSession[id] === cfg.pinHash); }
+    function setPinVerified(id, hash) { pinSession[id] = hash; }
 
     function currentEntrySelection() {
       return {
@@ -3459,14 +3620,17 @@
       const sel = document.getElementById('userNameSelect');
       const note = document.getElementById('entryNameNote');
       if (!pinBox || !nameBox) return;
+      { const np0 = document.getElementById('entryNoPin'); if (np0) np0.style.display = 'none'; }
       if (!cls) { entryAccess = { id: '', cfg: null, pinOk: true, loading: false }; pinBox.style.display = 'none'; nameBox.style.display = 'block'; txt.style.display = 'block'; sel.style.display = 'none'; note.style.display = 'none'; return; }
       entryAccess = { id: classAccessId(inst, sem, cls), cfg: null, pinOk: false, loading: true };
       const cfg = await fetchClassAccess(inst, sem, cls);
       if (token !== entryAccessToken) return;       // 그 사이 다른 반을 골랐으면 무시
       const id = classAccessId(inst, sem, cls);
-      const pinOk = !cfgHasPin(cfg) || isPinVerified(id, cfg);
+      const noPinBlock = ENTRY_REQUIRES_PIN && !cfgHasPin(cfg);
+      const pinOk = cfgHasPin(cfg) ? isPinVerified(id, cfg) : !ENTRY_REQUIRES_PIN;
       entryAccess = { id, cfg, pinOk, loading: false };
       pinBox.style.display = (cfgHasPin(cfg) && !pinOk) ? 'block' : 'none';
+      { const np = document.getElementById('entryNoPin'); if (np) np.style.display = noPinBlock ? 'block' : 'none'; }
       nameBox.style.display = pinOk ? 'block' : 'none';
       if (cfgHasRoster(cfg) && pinOk) {
         const names = [...cfg.roster].sort((a, b) => String(a).localeCompare(String(b), 'ko'));
@@ -4045,11 +4209,21 @@
       }
       box.style.display = 'block';
       listEl.innerHTML = list.map((p, idx) => `
-        <button type="button" class="recent-profile-chip" onclick="quickSwitchRecentProfile(${idx})">
-          <span><svg class="i"><use href="#i-user"/></svg></span>
-          <span>${p.semester || '26-1'} · ${p.userClass} · ${p.name}</span>
-        </button>
+        <span class="recent-chip-wrap">
+          <button type="button" class="recent-profile-chip" onclick="quickSwitchRecentProfile(${idx})">
+            <span><svg class="i"><use href="#i-user"/></svg></span>
+            <span>${cascadeEsc(p.semester || '26-1')} · ${cascadeEsc(p.userClass)} · ${cascadeEsc(p.name)}</span>
+          </button>
+          <button type="button" class="recent-chip-x" title="이 이름을 목록에서 지우기 / Remove" onclick="removeRecentProfile(${idx})">×</button>
+        </span>
       `).join('');
+    }
+    function removeRecentProfile(idx) {
+      const view = lockedStudentInstitution ? getRecentProfiles().filter(p => p.institution === lockedStudentInstitution) : getRecentProfiles();
+      const t = view[idx]; if (!t) return;
+      const all = getRecentProfiles().filter(p => !(p.institution === t.institution && p.semester === t.semester && p.userClass === t.userClass && p.name === t.name));
+      localStorage.setItem(STORAGE_KEYS.RECENT_PROFILES, JSON.stringify(all));
+      renderRecentProfilesUI();
     }
 
     async function quickSwitchRecentProfile(idx) {
@@ -4083,6 +4257,7 @@
         name: userName
       }));
       addRecentProfile({ institution: userInstitution, semester: userSemester, userClass, name: userName });
+      pinSession = {};
       updateHeaderUserUI();
       upsertStudentRosterToCloud();
       document.getElementById('nameModal').classList.remove('show');
@@ -4145,6 +4320,12 @@
         alert('급과 반을 선택해 주세요.');
         return;
       }
+      if (ENTRY_REQUIRES_PIN && !(cfgHasPin(entryAccess.cfg) && entryAccess.pinOk) && !entryAccess.loading) {
+        showNotice('입장할 수 없어요', 'Cannot enter',
+          '이 사이트는 코드나 반 PIN이 있는 학생만 들어올 수 있어요. 코드나 PIN은 선생님이나 관리자에게 문의하세요.',
+          'Only students with a code or a class PIN can enter. Please ask your teacher or administrator for one.');
+        return;
+      }
       if (!inputName) {
         alert(document.getElementById('userNameSelect').style.display !== 'none' ? '명단에서 이름을 골라 주세요. / Please choose your name.' : '이름을 입력해 주세요.');
         return;
@@ -4159,6 +4340,7 @@
       const profileObj = { institution: userInstitution, semester: userSemester, userClass, name: userName };
       localStorage.setItem(STORAGE_KEYS.USER_PROFILE, JSON.stringify(profileObj));
       addRecentProfile(profileObj);
+      pinSession = {}; entryPinLocked = null;
       updateHeaderUserUI();
       upsertStudentRosterToCloud();
       document.getElementById('nameModal').classList.remove('show');
@@ -5374,7 +5556,7 @@
         if (view) view.style.display = key === tab ? 'block' : 'none';
       });
       if (tab === 'students') { loadStudentRoster(); renderClassAccessControls(); }
-      if (tab === 'teachers') { loadTeacherList(); loadTrialCodes(); }
+      if (tab === 'teachers') { loadTeacherList(); loadTrialCodes(); loadInquiries(); }
       if (tab === 'printSheet') initPrintSheetControls();
       if (tab === 'pptStudio') initPptStudioControls();
       if (tab === 'workbook') initWorkbookControls();
@@ -6130,6 +6312,7 @@
       const selAll = document.getElementById('selectAllStudentsCb');
       if (selAll) selAll.checked = false;
       renderStudentRosterTable();
+      updateStuSelCount();
     }
 
     function renderStudentRosterTable() {
@@ -6171,18 +6354,21 @@
       }).join('');
     }
 
+    function updateStuSelCount() { const el = document.getElementById('stuSelCount'); if (el) el.textContent = `선택 ${selectedStudentDocIds.size}명`; }
     function toggleSelectAllStudents(checked) {
       selectedStudentDocIds.clear();
       document.querySelectorAll('.stu-row-cb').forEach(cb => {
         cb.checked = checked;
         if (checked) selectedStudentDocIds.add(parseInt(cb.value, 10));
       });
+      updateStuSelCount();
     }
 
     function onStudentRowCheckboxChange(cb) {
       const idx = parseInt(cb.value, 10);
       if (cb.checked) selectedStudentDocIds.add(idx);
       else selectedStudentDocIds.delete(idx);
+      updateStuSelCount();
     }
 
     async function saveEditedStudentRow(idx) {
@@ -6200,6 +6386,30 @@
       const oldCls = s.studentClass;
       const oldSem = s.semester;
 
+      if (s._fromAccess) {   // v3.20: 입장 전 학생은 반 입장 명단의 이름만 고침 (학생 문서를 만들지 않음 → '입장 전' 표시 유지)
+        try {
+          const inst = s.institution || '용인대학교 한국어학당';
+          const oldId = s._accessId, newId = classAccessId(inst, newSem, newCls);
+          const oldRef = db.collection('class_access').doc(oldId);
+          const oldSnap = await oldRef.get();
+          const oldRoster = oldSnap.exists ? (oldSnap.data().roster || []) : [];
+          if (newId === oldId) {
+            await oldRef.set({ roster: oldRoster.map(n => n === oldName ? newName : n) }, { merge: true });
+          } else {
+            await oldRef.set({ roster: oldRoster.filter(n => n !== oldName) }, { merge: true });
+            const newRef = db.collection('class_access').doc(newId);
+            const nSnap = await newRef.get();
+            const nRoster = nSnap.exists ? (nSnap.data().roster || []) : [];
+            if (!nRoster.includes(newName)) nRoster.push(newName);
+            await newRef.set({ institution: inst, semester: newSem, studentClass: newCls, roster: nRoster }, { merge: true });
+            classAccessCache.delete(newId);
+          }
+          classAccessCache.delete(oldId);
+          await loadStudentRoster();
+          if (typeof loadClassAccessPanel === 'function' && document.getElementById('caRosterText')) loadClassAccessPanel(true);
+        } catch (err) { alert('입장 전 학생 수정 실패: ' + err.message); }
+        return;
+      }
       try {
         const newDocId = buildStudentDocId(s.institution || '용인대학교 한국어학당', newSem, newCls, newName);
         await db.collection("students").doc(newDocId).set({
@@ -6214,12 +6424,6 @@
 
         if (s._fromRoster && s._docId && s._docId !== newDocId) {
           await db.collection("students").doc(s._docId).delete();
-        }
-        if (s._fromAccess && (newName !== oldName || newCls !== oldCls)) {   // 입장 전 학생: 명단의 이름도 같이 고침
-          const ref = db.collection('class_access').doc(s._accessId);
-          const snap = await ref.get();
-          if (snap.exists) await ref.set({ roster: (snap.data().roster || []).map(n => n === oldName ? newName : n) }, { merge: true });
-          classAccessCache.delete(s._accessId);
         }
 
         const matchingRecords = adminRecordsCache.filter(r =>
@@ -6286,7 +6490,7 @@
             });
           }
         });
-        await batch.commit();
+        if (targets.some(t => !t._fromAccess)) await batch.commit();
 
         if (alsoDeleteRecords) {
           const targetPairs = new Set(targets.map(t => `${t.studentClass}__${t.studentName}`));
@@ -6295,6 +6499,7 @@
         }
         selectedStudentDocIds.clear();
         await loadStudentRoster();
+        if (typeof loadClassAccessPanel === 'function' && document.getElementById('caRosterText')) loadClassAccessPanel(true);
         alert(`${targets.length}명의 학생 삭제가 완료되었습니다.`);
       } catch (err) {
         alert("일괄 삭제 오류: " + err.message);
@@ -8595,6 +8800,21 @@ ${JSON.stringify(norm)}`;
           }
         }
       }
+      {
+        const grid = lines.map(l => l.split('\t').map(x => x.trim()));
+        const maxLen = Math.max(...grid.map(r => r.length));
+        const full = grid.filter(r => r.length === maxLen).length;
+        if (maxLen >= 3 && activeLangs.length >= 1 && maxLen - 1 === activeLangs.length && full >= Math.ceil(grid.length * 0.6)) {
+          return {
+            sig: ['g', text, unitIn, secIn, pageIn, langKey].join('|'),
+            note: `표로 읽었어요: 1열 한국어, 이어서 ${activeLangs.map(l => l.name).join(' → ')} (선택한 언어 순서). 순서가 다르면 언어 선택 순서를 바꾸거나 제목 줄을 붙여 넣어 주세요.`,
+            make: () => grid.map(r => ({
+              unit: unitIn || '1단원', section: secIn || '1-1 어휘', kr: r[0], page: pageIn || '1', hint: '',
+              langs: Object.fromEntries(activeLangs.map((l, i) => [l.code, r[i + 1] || '']).filter(x => x[1]))
+            }))
+          };
+        }
+      }
       return {
         sig: ['m', text, unitIn, secIn, pageIn, langKey].join('|'),
         make: () => lines.map(line => {
@@ -8636,6 +8856,7 @@ ${JSON.stringify(norm)}`;
       const bounds = [...secs.values()].slice(0, 60).map(x => `<tr><td>${e(x.r.unit)}</td><td>${e(x.r.section)}</td><td><b>${e(x.r.kr)}</b></td><td>${x.n}개</td></tr>`).join('');
       box.style.display = 'block';
       box.innerHTML = `
+        ${input.note ? `<div class="manage-note" style="color:#1e40af; font-weight:700;">${e(input.note)}</div>` : ''}
         <div class="excel-sum-head">전체 ${rows.length}개 단어 · 대단원 ${units.size} · 소단원 ${secs.size} · 번역할 칸이 있는 단어 ${needCnt}개${needCnt === 0 ? ' (번역 없이 바로 사용 가능)' : ''}</div>
         <div class="input-check-title">상위 20개 <button type="button" class="cascade-reset" onclick="document.getElementById('inputCheckBox').style.display='none'">닫기</button></div>
         <div class="input-check-scroll"><table class="admin-table"><thead><tr><th>#</th><th>대단원</th><th>소단원</th><th>한국어</th><th>힌트</th><th>이미 있는 번역</th><th>페이지</th></tr></thead><tbody>${head}</tbody></table></div>
@@ -8944,9 +9165,10 @@ ${JSON.stringify(payload)}`;
     function setResultView(langs, idx) { resultView = { langs, idx }; }
 
     function logReview(c) {
-      const hit = reviewLog.find(x => x.kr === c.w.kr && x.code === c.code);
-      if (hit) { hit.to = c.to; hit.note = c.note || hit.note; hit.level = c.level || hit.level; }
-      else reviewLog.push({ kr: c.w.kr, code: c.code, level: c.level || '권장', from: c.from, to: c.to, note: c.note || '' });
+      const hit = reviewLog.find(x => x.wid === c.w.id && x.code === c.code);
+      if (hit) { hit.kr = c.w.kr; hit.to = c.to; hit.note = c.note || hit.note; hit.level = c.level || hit.level; }
+      else reviewLog.push({ wid: c.w.id, kr: c.w.kr, code: c.code, level: c.level || '권장', from: c.from, to: c.to, note: c.note || '' });
+      reviewLog.forEach(x => { if (x.wid === c.w.id) x.kr = c.w.kr; });   // 한국어를 고쳤으면 같은 줄의 기록도 새 한국어로
     }
 
     function syncJobFromBuilt() {
@@ -8977,22 +9199,23 @@ ${JSON.stringify(payload)}`;
 
     function renderResultPopup() {
       const e = cascadeEsc, langs = resultLangs(), idx = resultIndexes();
-      const fixedMap = new Map(reviewLog.map(x => [x.kr + '\t' + x.code, x]));
+      const fixedMap = new Map(reviewLog.map(x => [(x.wid || x.kr) + '\t' + x.code, x]));
       document.getElementById('resultTitle').textContent = '번역 결과';
       const empty = builtJsonData.filter(w => langs.some(l => !String(w[l.code] || '').trim())).length;
       document.getElementById('resultSub').textContent = `전체 ${builtJsonData.length}개 중 ${idx.length}개 표시 · 번역 안 된 칸이 있는 단어 ${empty}개 · 검수로 고친 칸 ${reviewLog.length}개 (노란색)`;
       document.getElementById('resultHead').innerHTML = `<tr><th>번호</th><th>대단원</th><th>소단원</th><th>한국어</th>${langs.map(l => `<th>${e(l.name)}</th>`).join('')}<th>페이지</th></tr>`;
       document.getElementById('resultBody').innerHTML = idx.map(i => {
         const w = builtJsonData[i];
-        return `<tr><td>${i + 1}</td><td>${e(w.unit)}</td><td>${e(w.section)}</td><td><b>${e(w.kr)}</b></td>${langs.map(l => {
-          const v = String(w[l.code] || '').trim(), fx = fixedMap.get(w.kr + '\t' + l.code);
+        const pf = code => { const f = fixedMap.get(w.id + '\t' + code); return f ? ` class="rv-fixed" title="${e('기존: ' + f.from + (f.note ? ' · ' + f.note : ''))}"` : ''; };
+        return `<tr><td>${i + 1}</td><td${pf('unit')}>${e(w.unit)}</td><td${pf('section')}>${e(w.section)}</td><td${pf('kr')}><b>${e(w.kr)}</b></td>${langs.map(l => {
+          const v = String(w[l.code] || '').trim(), fx = fixedMap.get(w.id + '\t' + l.code);
           return `<td class="${fx ? 'rv-fixed' : (!v ? 'rv-empty' : '')}"${fx ? ` title="${e('기존: ' + fx.from + (fx.note ? ' · ' + fx.note : ''))}"` : ''}>${e(v)}</td>`;
-        }).join('')}<td>${e(w.page)}</td></tr>`;
+        }).join('')}<td${pf('page')}>${e(w.page)}</td></tr>`;
       }).join('');
       document.getElementById('resultLogBox').innerHTML = reviewLog.length ? `
         <div class="input-check-title" style="padding:0.5rem 0.6rem 0.2rem;">검수 내역 (${reviewLog.length}건)</div>
         <table class="admin-table result-table"><thead><tr><th>한국어</th><th>언어</th><th>구분</th><th>기존 번역</th><th>수정 번역</th><th>이유</th></tr></thead><tbody>
-        ${reviewLog.map(x => `<tr><td><b>${e(x.kr)}</b></td><td>${e(langNameOf(x.code))}</td><td>${e(x.level)}</td><td>${e(x.from)}</td><td>${e(x.to)}</td><td>${e(x.note)}</td></tr>`).join('')}
+        ${reviewLog.map(x => `<tr><td><b>${e(x.kr)}</b></td><td>${e(fieldLabel(x.code))}</td><td>${e(x.level)}</td><td>${e(x.from)}</td><td>${e(x.to)}</td><td>${e(x.note)}</td></tr>`).join('')}
         </tbody></table>` : '';
       renderResultDiff();
     }
@@ -9008,7 +9231,7 @@ ${JSON.stringify(payload)}`;
           <button type="button" class="cascade-reset" onclick="document.querySelectorAll('.rd-cb').forEach(c => c.checked = true)">전체 선택</button>
           <button type="button" class="cascade-reset" onclick="document.querySelectorAll('.rd-cb').forEach(c => c.checked = false)">전체 해제</button>
           <button type="button" class="cascade-reset" onclick="popupDiff = null; renderResultDiff()">닫기</button>
-          <button type="button" class="btn btn-success btn-sm" onclick="applyResultDiff()">선택한 수정 반영</button>
+          <button type="button" class="btn btn-success btn-sm" style="font-weight:800;" onclick="applyResultDiff()">✔ 반영하기 (체크한 ${ch.length ? '것' : ''}만)</button>
         </div>
         ${ch.length ? `<table class="admin-table"><thead><tr><th></th><th>번호</th><th>한국어</th><th>칸</th><th>현재</th><th>제안</th><th>구분</th><th>이유</th></tr></thead><tbody>
         ${ch.map((c, i) => `<tr><td><input type="checkbox" class="rd-cb" data-i="${i}" checked /></td><td>${builtJsonData.indexOf(c.w) + 1}</td><td><b>${e(c.w.kr)}</b></td><td>${e(fieldLabel(c.code))}</td><td>${e(c.from)}</td><td style="color:#047857; font-weight:700;">${e(c.to)}</td><td>${e(c.level || '')}</td><td>${e(c.note || '')}</td></tr>`).join('')}
@@ -9022,7 +9245,7 @@ ${JSON.stringify(payload)}`;
       picked.forEach(c => {
         const from = c.w[c.code];
         c.w[c.code] = c.to;
-        if (!PLAIN_FIELDS.includes(c.code)) logReview({ ...c, from: c.from !== undefined ? c.from : from, level: c.level || '수정', note: c.note || '엑셀에서 수정' });
+        logReview({ ...c, from: c.from !== undefined ? c.from : from, level: c.level || '수정', note: c.note || '엑셀에서 수정' });
       });
       syncJobFromBuilt();
       popupDiff = null;
@@ -9041,12 +9264,17 @@ ${JSON.stringify(payload)}`;
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, '수정 반영본');
       if (reviewLog.length) {
-        const a2 = [['한국어', '언어', '구분', '기존 번역', '수정 번역', '이유', '원어민 확인'], ...reviewLog.map(x => [x.kr, langNameOf(x.code), x.level, x.from, x.to, x.note, false])];
+        const a2 = [['한국어', '언어', '구분', '기존 번역', '수정 번역', '이유', '원어민 확인'], ...reviewLog.map(x => [x.kr, fieldLabel(x.code), x.level, x.from, x.to, x.note, false])];
         const w2 = XLSX.utils.aoa_to_sheet(a2);
         w2['!cols'] = [18, 10, 8, 28, 28, 40, 12].map(wch => ({ wch }));
         XLSX.utils.book_append_sheet(wb, w2, '검수 내역');
       }
-      XLSX.writeFile(wb, `${yymmdd()}_번역결과_${idx.length}개.xlsx`);
+      {
+        const bookTitle = (document.getElementById('cloudBookTitleInput')?.value || '').trim() || (currentBook?.title || '새교재');
+        const nums = [...new Set(idx.map(i => unitNumOf(builtJsonData[i].unit)))].filter(Boolean);
+        const range = nums.length ? joinRangeParts(nums.map(n => ({ full: true, num: n }))) : '전체';
+        XLSX.writeFile(wb, buildExportFileBase(bookTitle, range, langs.map(l => l.code)) + '.xlsx');
+      }
       document.getElementById('resultMsg').textContent = `엑셀로 받았어요 (${idx.length}개${reviewLog.length ? ' · 검수 내역 시트 포함' : ''})`;
     }
 
@@ -9140,7 +9368,7 @@ ${tsv}`;
           if (h2 >= 0) {
             const ix = n => a2[h2].findIndex(c => cellText(c) === n);
             const [ik, il, ig, ir] = [ix('한국어'), ix('언어'), ix('구분'), ix('이유')];
-            a2.slice(h2 + 1).forEach(r => { const code = detectLangCode(cellText(r[il])); if (cellText(r[ik]) && code) notes.set(cellText(r[ik]) + '\t' + code, { level: cellText(r[ig]), note: cellText(r[ir]) }); });
+            a2.slice(h2 + 1).forEach(r => { const lt = cellText(r[il]); const code = ({ '한국어': 'kr', '대단원': 'unit', '소단원': 'section', '페이지': 'page' })[lt] || detectLangCode(lt); if (cellText(r[ik]) && code) notes.set(cellText(r[ik]) + '\t' + code, { level: cellText(r[ig]), note: cellText(r[ir]) }); });
           }
         }
         const used = new Set(), changes = [];
@@ -9180,7 +9408,8 @@ ${tsv}`;
         const ignored = Object.keys(colOf.langs).filter(c => !known.has(c)).map(langNameOf);
         popupDiff = { title: `${file.name} 비교`, changes, info: [unmatched && `찾지 못한 줄 ${unmatched}개`, krDiff && `한국어가 달라 건너뜀 ${krDiff}개`, ignored.length && `없는 언어 열 무시: ${ignored.join('·')}`].filter(Boolean).join(' · ') };
         renderResultDiff();
-        msg.textContent = changes.length ? `바뀐 칸 ${changes.length}개를 찾았어요. 확인 후 반영해 주세요.` : '바뀐 칸이 없어요.';
+        msg.textContent = changes.length ? `바뀐 칸 ${changes.length}개를 찾았어요. 위의 파란 상자에서 확인한 뒤 초록색 [반영하기] 버튼을 눌러 주세요.` : '바뀐 칸이 없어요.';
+        try { document.getElementById('resultDiff').scrollIntoView({ block: 'nearest' }); } catch (e2) { }
       } catch (err) { alert('엑셀을 읽지 못했어요: ' + err.message); }
     }
 
@@ -10089,7 +10318,9 @@ ${link}`);
         `;
       }
 
+      const _scTop = panel.scrollTop;
       panel.innerHTML = html;
+      panel.scrollTop = _scTop;
       syncScopeFilterParentChecks(prefix);
       updateScopeFilterLabel(prefix, allAllowedClasses, includeUnassigned);
     }
@@ -10663,6 +10894,9 @@ ${link}`);
       const st = cascadeState[prefix];
       cascadePrune(st);
       cascadeItems[prefix] = {};
+      const _oldPanel = box.querySelector('.cascade-panel.open');
+      const _keepScroll = _oldPanel ? _oldPanel.scrollTop : 0;
+      const _keepCol = _oldPanel ? cascadeOpen[prefix] : '';
       const openCol = st.all ? '' : (cascadeOpen[prefix] || '');
 
       const colsHtml = CASCADE_COLS.map(([col, cap, sk]) => {
@@ -10712,6 +10946,10 @@ ${link}`);
         </div>
         <div class="cascade-row">${colsHtml}</div>
         <div class="cascade-summary">${summaryHtml}</div>`;
+      if (_keepCol && _keepScroll) {   // v3.20: 항목을 눌러도 목록이 맨 위로 돌아가지 않게
+        const np = box.querySelector('.cascade-panel.open');
+        if (np) np.scrollTop = _keepScroll;
+      }
     }
 
     function cascadeOpenCol(prefix, col, ev) {
